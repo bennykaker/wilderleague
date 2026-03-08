@@ -1,45 +1,25 @@
-"use client";
+ "use client";
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const movie = {
-  title: "The Matrix",
-  budget: 90,
-  roles: ["Neo", "Trinity", "Morpheus", "Agent Smith"],
+  title: "The Apartment",
+  budget: 35,
+  roles: ["C.C. Baxter", "Fran Kubelik", "Jeff D. Sheldrake", "Dr. Dreyfuss"],
 };
 
 const actors = [
-  {
-    name: "Dev Patel",
-    cost: 8,
-    image: "/test.jpg",
-  },
-  {
-    name: "Jodie Comer",
-    cost: 7,
-    image: "/test.jpg",
-  },
-  {
-    name: "Mahershala Ali",
-    cost: 10,
-    image: "/test.jpg",
-  },
-  {
-    name: "Cillian Murphy",
-    cost: 9,
-    image: "/test.jpg",
-  },
-  {
-    name: "Florence Pugh",
-    cost: 10,
-    image: "/test.jpg",
-  },
-  {
-    name: "Oscar Isaac",
-    cost: 8,
-    image: "/test.jpg",
-  },
+  { name: "Paul Mescal", cost: 8, image: "/test.jpg" },
+  { name: "Daisy Edgar-Jones", cost: 7, image: "/test.jpg" },
+  { name: "Jon Hamm", cost: 6, image: "/test.jpg" },
+  { name: "John Turturro", cost: 4, image: "/test.jpg" },
+  { name: "Glen Powell", cost: 9, image: "/test.jpg" },
+  { name: "Jodie Comer", cost: 8, image: "/test.jpg" },
+  { name: "Bryan Cranston", cost: 7, image: "/test.jpg" },
+  { name: "Mark Ruffalo", cost: 8, image: "/test.jpg" },
+  { name: "Carey Mulligan", cost: 7, image: "/test.jpg" },
+  { name: "Sterling K. Brown", cost: 6, image: "/test.jpg" },
 ];
 
 type Selections = Record<string, string>;
@@ -64,30 +44,30 @@ function decodeCast(value: string | null): SharedCast | null {
   }
 }
 
-export default function MatrixPage() {
+export default function ApartmentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const sharedCast = decodeCast(searchParams.get("cast"));
 
   const [castTitle, setCastTitle] = useState(
-    sharedCast?.title ?? "My Matrix Cast"
+    sharedCast?.title ?? "My Apartment Cast"
   );
 
   const [selections, setSelections] = useState<Selections>(
     sharedCast?.selections ?? {
-      Neo: "",
-      Trinity: "",
-      Morpheus: "",
-      "Agent Smith": "",
+      "C.C. Baxter": "",
+      "Fran Kubelik": "",
+      "Jeff D. Sheldrake": "",
+      "Dr. Dreyfuss": "",
     }
   );
 
   const [searchTerms, setSearchTerms] = useState<SearchTerms>({
-    Neo: "",
-    Trinity: "",
-    Morpheus: "",
-    "Agent Smith": "",
+    "C.C. Baxter": "",
+    "Fran Kubelik": "",
+    "Jeff D. Sheldrake": "",
+    "Dr. Dreyfuss": "",
   });
 
   const spent = useMemo(() => {
@@ -127,7 +107,7 @@ export default function MatrixPage() {
       selections,
     });
 
-    router.push(`/matrix?cast=${encodeURIComponent(encoded)}`);
+    router.push(`/apartment?cast=${encodeURIComponent(encoded)}`);
   }
 
   async function handleCopyLink() {
@@ -138,6 +118,7 @@ export default function MatrixPage() {
   return (
     <main className="min-h-screen bg-black px-6 py-12 text-white">
       <div className="mx-auto max-w-3xl">
+
         <p className="mb-2 text-sm uppercase tracking-[0.2em] text-zinc-400">
           Demo
         </p>
@@ -147,8 +128,11 @@ export default function MatrixPage() {
           Recast the movie. Make it right.
         </p>
 
+        {/* Budget */}
         <div className="mb-8 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:gap-8">
+
             <div>
               <p className="text-sm text-zinc-400">Budget</p>
               <p className="text-2xl font-semibold">${movie.budget}M</p>
@@ -169,6 +153,7 @@ export default function MatrixPage() {
                 ${remaining}M
               </p>
             </div>
+
           </div>
 
           <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-800">
@@ -178,30 +163,33 @@ export default function MatrixPage() {
             />
           </div>
 
-          {overBudget && (
-            <p className="mt-4 text-sm font-medium text-red-400">
-              Over budget. Cut costs before publishing your cast.
-            </p>
-          )}
         </div>
 
         {!isPublishedView && (
+
           <>
+            {/* Cast Title */}
             <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+
               <label className="mb-2 block text-sm uppercase tracking-[0.15em] text-zinc-400">
                 Cast Title
               </label>
+
               <input
                 type="text"
                 value={castTitle}
                 onChange={(e) => setCastTitle(e.target.value)}
-                placeholder="My Matrix Cast"
-                className="w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-white placeholder:text-zinc-500"
+                placeholder="My Apartment Cast"
+                className="w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-white"
               />
+
             </div>
 
+            {/* Roles */}
             <div className="space-y-6">
+
               {movie.roles.map((role) => {
+
                 const selectedActorsForOtherRoles = Object.entries(selections)
                   .filter(([otherRole, actorName]) => otherRole !== role && actorName)
                   .map(([, actorName]) => actorName);
@@ -217,6 +205,7 @@ export default function MatrixPage() {
                     key={role}
                     className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5"
                   >
+
                     <h2 className="mb-2 text-xl font-semibold">{role}</h2>
 
                     <input
@@ -224,7 +213,7 @@ export default function MatrixPage() {
                       value={searchTerms[role]}
                       onChange={(e) => handleSearchChange(role, e.target.value)}
                       placeholder="Search actors"
-                      className="mb-3 w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-white placeholder:text-zinc-500"
+                      className="mb-3 w-full rounded-xl border border-zinc-700 bg-black px-4 py-3 text-white"
                     />
 
                     <select
@@ -232,9 +221,11 @@ export default function MatrixPage() {
                       onChange={(e) => handleSelect(role, e.target.value)}
                       className="w-full rounded-xl border border-zinc-700 bg-black px-3 py-2 text-white"
                     >
+
                       <option value="">Select actor</option>
 
                       {filteredActors.map((actor) => {
+
                         const isUsedElsewhere =
                           selectedActorsForOtherRoles.includes(actor.name);
 
@@ -248,10 +239,13 @@ export default function MatrixPage() {
                           </option>
                         );
                       })}
+
                     </select>
 
                     {selectedActor && (
+
                       <div className="mt-4 flex items-center gap-4">
+
                         <img
                           src={selectedActor.image}
                           className="h-14 w-14 rounded-full object-cover"
@@ -263,110 +257,88 @@ export default function MatrixPage() {
                             ${selectedActor.cost}M
                           </p>
                         </div>
+
                       </div>
+
                     )}
+
                   </div>
                 );
               })}
+
             </div>
 
+            {/* Publish */}
             <div className="mt-10">
+
               <button
                 onClick={handlePublish}
                 disabled={!canPublish}
                 className={`rounded-2xl px-6 py-3 font-medium ${
                   canPublish
-                    ? "bg-white text-black hover:opacity-90"
+                    ? "bg-white text-black"
                     : "cursor-not-allowed bg-zinc-800 text-zinc-500"
                 }`}
               >
                 Publish Cast
               </button>
 
-              {castTitle.trim() === "" && (
-                <p className="mt-3 text-sm text-zinc-500">
-                  Give your cast a title to publish.
-                </p>
-              )}
-
-              {!allRolesFilled && castTitle.trim() !== "" && (
-                <p className="mt-3 text-sm text-zinc-500">
-                  Fill every role to publish.
-                </p>
-              )}
             </div>
+
           </>
         )}
 
         {isPublishedView && (
-          <section className="mt-12 overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950">
-            <div className="border-b border-zinc-800 bg-gradient-to-b from-zinc-900 to-black px-6 py-8">
-              <p className="text-sm uppercase tracking-[0.2em] text-zinc-400">
-                Published Cast
-              </p>
-              <h2 className="mt-3 text-4xl font-bold">{castTitle}</h2>
-              <p className="mt-2 text-zinc-400">{movie.title}</p>
+
+          <section className="mt-12 rounded-3xl border border-zinc-800 bg-zinc-950 p-6">
+
+            <h2 className="text-3xl font-bold mb-4">{castTitle}</h2>
+            <p className="text-zinc-400 mb-6">{movie.title}</p>
+
+            <div className="space-y-4">
+
+              {movie.roles.map((role) => {
+
+                const actorName = selections[role];
+                const actor = actors.find((a) => a.name === actorName);
+
+                return (
+
+                  <div
+                    key={role}
+                    className="flex items-center justify-between border border-zinc-800 rounded-xl p-4"
+                  >
+
+                    <span className="text-zinc-400">{role}</span>
+                    <span className="font-medium">{actorName}</span>
+
+                    {actor && (
+                      <span className="text-sm text-zinc-500">
+                        ${actor.cost}M
+                      </span>
+                    )}
+
+                  </div>
+                );
+              })}
+
             </div>
 
-            <div className="px-6 py-6">
-              <div className="space-y-4">
-                {movie.roles.map((role) => {
-                  const actorName = selections[role];
-                  const actor = actors.find((a) => a.name === actorName);
+            <div className="mt-6">
 
-                  return (
-                    <div
-                      key={role}
-                      className="rounded-2xl border border-zinc-800 bg-black/40 px-4 py-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm uppercase tracking-wide text-zinc-400">
-                          {role}
-                        </span>
-                        <span className="text-lg font-medium text-white">
-                          {actorName}
-                        </span>
-                      </div>
+              <button
+                onClick={handleCopyLink}
+                className="rounded-2xl bg-white px-6 py-3 text-black"
+              >
+                Copy Link
+              </button>
 
-                      {actor && (
-                        <div className="mt-2 flex justify-end">
-                          <span className="text-sm text-zinc-500">
-                            ${actor.cost}M
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-zinc-800 bg-black/40 px-4 py-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Budget Used</span>
-                  <span className="font-medium text-white">
-                    ${spent}M / ${movie.budget}M
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  onClick={handleCopyLink}
-                  className="rounded-2xl bg-white px-6 py-3 font-medium text-black hover:opacity-90"
-                >
-                  Copy Link
-                </button>
-
-                <button
-                  onClick={() => router.push("/matrix")}
-                  className="rounded-2xl border border-zinc-700 px-6 py-3 font-medium text-white hover:bg-white/10"
-                >
-                  Build Another
-                </button>
-              </div>
             </div>
+
           </section>
+
         )}
+
       </div>
     </main>
   );
