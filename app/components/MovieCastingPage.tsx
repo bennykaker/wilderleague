@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import RoleCastingCard from "./RoleCastingCard";
 
 export default function MovieCastingPage({
@@ -13,56 +13,21 @@ export default function MovieCastingPage({
   roles: any[];
   actors: any[];
 }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   const storageKey = `cast:${projectTitle}`;
-
-  const roleNames = useMemo(
-    () => roles.map((role: any) => role.character_name),
-    [roles]
-  );
-
   const [selections, setSelections] = useState<Record<string, string>>({});
+  const [copyMessage, setCopyMessage] = useState("");
 
   useEffect(() => {
-    const fromUrl: Record<string, string> = {};
-
-    roleNames.forEach((roleName) => {
-      const value = searchParams.get(roleName);
-      if (value) {
-        fromUrl[roleName] = value;
-      }
-    });
-
-    if (Object.keys(fromUrl).length > 0) {
-      setSelections(fromUrl);
-      return;
-    }
-
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       setSelections(JSON.parse(saved));
     }
-  }, [roleNames, searchParams, storageKey]);
+  }, [storageKey]);
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(selections));
-
-    const params = new URLSearchParams();
-
-    Object.entries(selections).forEach(([roleName, actorName]) => {
-      if (actorName) {
-        params.set(roleName, actorName);
-      }
-    });
-
-    const queryString = params.toString();
-    const nextUrl = queryString ? `${pathname}?${queryString}` : pathname;
-
-    router.replace(nextUrl);
-  }, [selections, storageKey, pathname, router]);
+  }, [selections, storageKey]);
 
   function handleSelect(roleName: string, actorName: string) {
     setSelections((prev) => ({
@@ -74,11 +39,29 @@ export default function MovieCastingPage({
   function handleReset() {
     setSelections({});
     localStorage.removeItem(storageKey);
-    router.replace(pathname);
+    setCopyMessage("");
   }
 
-  async function handleCopyLink() {
-    await navigator.clipboard.writeText(window.location.href);
+  async function handleCopyShareLink() {
+    const params = new URLSearchParams();
+
+    Object.entries(selections).forEach(([roleName, actorName]) => {
+      if (actorName) {
+        params.set(roleName, actorName);
+      }
+    });
+
+    const queryString = params.toString();
+    const shareUrl = queryString
+      ? `${window.location.origin}${pathname}?${queryString}`
+      : `${window.location.origin}${pathname}`;
+
+    await navigator.clipboard.writeText(shareUrl);
+    setCopyMessage("Link copied");
+
+    setTimeout(() => {
+      setCopyMessage("");
+    }, 1500);
   }
 
   return (
@@ -97,7 +80,7 @@ export default function MovieCastingPage({
         </button>
 
         <button
-          onClick={handleCopyLink}
+          onClick={handleCopyShareLink}
           style={{
             padding: "0.5rem 0.75rem",
             cursor: "pointer",
@@ -106,6 +89,8 @@ export default function MovieCastingPage({
           Copy share link
         </button>
       </div>
+
+      {copyMessage && <p>{copyMessage}</p>}
 
       {roles.map((role: any) => (
         <RoleCastingCard
