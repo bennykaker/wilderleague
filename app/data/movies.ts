@@ -48,5 +48,26 @@ export const movies: Record<string, MovieData> = {
       { name: "Carey Mulligan", cost: 7, image: "/test.jpg" },
       { name: "Sterling K. Brown", cost: 6, image: "/test.jpg" },
     ],
-  },
+  },godfather: {
+  slug: "godfather",
+  title: "The Godfather",
+  budget: 70,
+  roles: [
+    "Michael Corleone",
+    "Vito Corleone",
+    "Sonny Corleone",
+    "Tom Hagen",
+    "Kay Adams",
+    "Connie Corleone",
+  ],
+  defaultCastTitle: "My Godfather Cast",
+  actors: [
+    { name: "Adam Driver", cost: 10, image: "/test.jpg" },
+    { name: "Oscar Isaac", cost: 9, image: "/test.jpg" },
+    { name: "Florence Pugh", cost: 9, image: "/test.jpg" },
+    { name: "Paul Mescal", cost: 8, image: "/test.jpg" },
+    { name: "Jodie Comer", cost: 8, image: "/test.jpg" },
+    { name: "Mahershala Ali", cost: 10, image: "/test.jpg" },
+  ],
+},
 };
