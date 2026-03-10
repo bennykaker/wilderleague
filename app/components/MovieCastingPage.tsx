@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoleCastingCard from "./RoleCastingCard";
 
 export default function MovieCastingPage({
@@ -12,7 +12,19 @@ export default function MovieCastingPage({
   roles: any[];
   actors: any[];
 }) {
+  const storageKey = `cast:${projectTitle}`;
   const [selections, setSelections] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      setSelections(JSON.parse(saved));
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(selections));
+  }, [selections, storageKey]);
 
   function handleSelect(roleName: string, actorName: string) {
     setSelections((prev) => ({
@@ -23,6 +35,7 @@ export default function MovieCastingPage({
 
   function handleReset() {
     setSelections({});
+    localStorage.removeItem(storageKey);
   }
 
   return (
