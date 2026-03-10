@@ -21,9 +21,24 @@ export default function MovieCastingPage({
     }));
   }
 
+  function handleReset() {
+    setSelections({});
+  }
+
   return (
     <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
       <h1>{projectTitle}</h1>
+
+      <button
+        onClick={handleReset}
+        style={{
+          marginBottom: "1rem",
+          padding: "0.5rem 0.75rem",
+          cursor: "pointer",
+        }}
+      >
+        Reset cast
+      </button>
 
       {roles.map((role: any) => (
         <RoleCastingCard
