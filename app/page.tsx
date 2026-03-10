@@ -4,16 +4,20 @@ import MovieSearch from "./components/MovieSearch";
 export default function HomePage() {
   const roles = getRoles();
 
-  const movies = Array.from(
-    new Set(roles.map((r: any) => r.project_title))
-  ).sort();
+  const moviesRoles: Record<string, number> = {};
+
+  roles.forEach((r: any) => {
+    moviesRoles[r.project_title] =
+      (moviesRoles[r.project_title] || 0) + 1;
+  });
+
+  const movies = Object.keys(moviesRoles).sort();
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ padding: "2rem", maxWidth: "900px", margin: "0 auto" }}>
       <h1>Wilderleague</h1>
-      <p>Choose a movie to cast:</p>
 
-      <MovieSearch movies={movies} />
+      <MovieSearch movies={movies} moviesRoles={moviesRoles} />
     </div>
   );
 }

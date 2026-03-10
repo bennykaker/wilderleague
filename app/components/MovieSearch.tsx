@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { slugify } from "../data/slugify";
 
-export default function MovieSearch({ movies }: { movies: string[] }) {
+export default function MovieSearch({
+  movies,
+  moviesRoles,
+}: {
+  movies: string[];
+  moviesRoles: Record<string, number>;
+}) {
   const [query, setQuery] = useState("");
 
   const filteredMovies = movies.filter((movie) =>
@@ -35,24 +41,30 @@ export default function MovieSearch({ movies }: { movies: string[] }) {
           gap: "1rem",
         }}
       >
-        {filteredMovies.map((movie) => (
-          <Link
-            key={movie}
-            href={`/${slugify(movie)}`}
-            style={{
-              display: "block",
-              padding: "1.25rem",
-              border: "1px solid #ccc",
-              borderRadius: "10px",
-              textDecoration: "none",
-              background: "#f8f8f8",
-              color: "#111",
-              fontWeight: 600,
-            }}
-          >
-            {movie}
-          </Link>
-        ))}
+        {filteredMovies.map((movie) => {
+          const roleCount = moviesRoles[movie] || 0;
+
+          return (
+            <Link
+              key={movie}
+              href={`/${slugify(movie)}`}
+              style={{
+                display: "block",
+                padding: "1.25rem",
+                border: "1px solid #ccc",
+                borderRadius: "10px",
+                textDecoration: "none",
+                background: "#f8f8f8",
+                color: "#111",
+              }}
+            >
+              <div style={{ fontWeight: 600 }}>{movie}</div>
+              <div style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+                {roleCount} roles
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </>
   );
