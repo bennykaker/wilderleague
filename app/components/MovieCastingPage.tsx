@@ -52,11 +52,13 @@ export default function MovieCastingPage({
     });
 
     const queryString = params.toString();
+
     const shareUrl = queryString
       ? `${window.location.origin}${pathname}?${queryString}`
       : `${window.location.origin}${pathname}`;
 
     await navigator.clipboard.writeText(shareUrl);
+
     setCopyMessage("Link copied");
 
     setTimeout(() => {
@@ -103,22 +105,39 @@ export default function MovieCastingPage({
         />
       ))}
 
-      <div
-        style={{
-          marginTop: "2rem",
-          paddingTop: "1rem",
-          borderTop: "2px solid #ddd",
-        }}
-      >
-        <h2>Your Cast</h2>
+     <div
+  style={{
+    marginTop: "2rem",
+    padding: "1.5rem",
+    border: "2px solid #444",
+    borderRadius: "10px",
+    background: "#f5f5f5",
+    color: "#111",
+  }}
+>
+  <h2 style={{ marginBottom: "1rem", color: "#111" }}>
+    Your Cast — {projectTitle}
+  </h2>
 
-        {roles.map((role: any) => (
-          <p key={role.character_name}>
-            <strong>{role.character_name}:</strong>{" "}
-            {selections[role.character_name] || "—"}
-          </p>
-        ))}
-      </div>
+  {roles.map((role: any) => (
+    <div
+      key={role.character_name}
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "0.5rem 0",
+        borderBottom: "1px solid #ccc",
+        color: "#111",
+      }}
+    >
+      <strong style={{ color: "#111" }}>{role.character_name}</strong>
+
+      <span style={{ color: "#111" }}>
+        {selections[role.character_name] || "—"}
+      </span>
+    </div>
+  ))}
+</div>
     </div>
   );
 }
