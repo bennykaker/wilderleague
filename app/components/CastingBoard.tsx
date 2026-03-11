@@ -20,6 +20,14 @@ export default function CastingBoard({ actors, roles }: any) {
     });
   }
 
+  function clearRole(roleKey: string) {
+    const nextCasting = { ...casting };
+    delete nextCasting[roleKey];
+    setCasting(nextCasting);
+  }
+
+  const castCount = Object.keys(casting).length;
+
   return (
     <div
       style={{
@@ -31,6 +39,66 @@ export default function CastingBoard({ actors, roles }: any) {
       }}
     >
       <h1 style={{ color: "#fff" }}>Wilderleague</h1>
+
+      <div
+        style={{
+          background: "#1b1b1b",
+          border: "1px solid #444",
+          borderRadius: "10px",
+          padding: "16px",
+          marginBottom: "24px",
+        }}
+      >
+        <h2 style={{ marginTop: 0 }}>Your Cast</h2>
+
+        {castCount === 0 ? (
+          <div style={{ opacity: 0.75 }}>No roles cast yet.</div>
+        ) : (
+          <div style={{ display: "grid", gap: "10px" }}>
+            {roles.map((role: any, i: number) => {
+              const roleKey = role.role_id || `role-${i}`;
+              const selectedActorName = casting[roleKey];
+              if (!selectedActorName) return null;
+
+              const selectedActor = actors.find(
+                (actor: any) => actor.name === selectedActorName
+              );
+
+              return (
+                <div
+                  key={`summary-${roleKey}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "10px",
+                    background: "#222",
+                    borderRadius: "8px",
+                  }}
+                >
+                  {selectedActor?.headshot_url ? (
+                    <img
+                      src={selectedActor.headshot_url}
+                      alt={selectedActor.name}
+                      width={56}
+                      style={{ borderRadius: "6px" }}
+                    />
+                  ) : null}
+
+                  <div>
+                    <div>
+                      <strong>{role.role_name}</strong> — {selectedActorName}
+                    </div>
+                    <div style={{ opacity: 0.7, fontSize: "14px" }}>
+                      Original: {role.original_actor}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
       <h2>Roles</h2>
 
@@ -60,7 +128,15 @@ export default function CastingBoard({ actors, roles }: any) {
               </div>
             </div>
 
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px", alignItems: "center" }}>
+            <div
+              style={{
+                marginTop: "10px",
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
               <select
                 value={selectedActorName}
                 onChange={(e) =>
@@ -79,7 +155,10 @@ export default function CastingBoard({ actors, roles }: any) {
               >
                 <option value="">Select actor</option>
                 {actors.map((actor: any, j: number) => (
-                  <option key={`${actor.tmdb_id || "actor"}-${j}`} value={actor.name}>
+                  <option
+                    key={`${actor.tmdb_id || "actor"}-${j}`}
+                    value={actor.name}
+                  >
                     {actor.name}
                   </option>
                 ))}
@@ -96,7 +175,21 @@ export default function CastingBoard({ actors, roles }: any) {
                   cursor: "pointer",
                 }}
               >
-                {isActive ? "Selecting from actors below" : "Pick from actor grid"}
+                {isActive ? "Selecting from actor grid" : "Pick from actor grid"}
+              </button>
+
+              <button
+                onClick={() => clearRole(roleKey)}
+                style={{
+                  padding: "8px 12px",
+                  background: "#333",
+                  color: "#fff",
+                  border: "1px solid #555",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Clear
               </button>
             </div>
 
@@ -111,6 +204,7 @@ export default function CastingBoard({ actors, roles }: any) {
               >
                 <img
                   src={selectedActor.headshot_url}
+                  alt={selectedActor.name}
                   width={80}
                   style={{ borderRadius: "6px" }}
                 />
@@ -124,15 +218,11 @@ export default function CastingBoard({ actors, roles }: any) {
       })}
 
       <h2>Available Actors</h2>
-      {activeRoleKey ? (
-        <div style={{ marginBottom: "12px", opacity: 0.8 }}>
-          Click an actor card to cast the currently selected role.
-        </div>
-      ) : (
-        <div style={{ marginBottom: "12px", opacity: 0.8 }}>
-          Choose “Pick from actor grid” on a role, then click an actor.
-        </div>
-      )}
+      <div style={{ marginBottom: "12px", opacity: 0.8 }}>
+        {activeRoleKey
+          ? "Click an actor card to cast the selected role."
+          : 'Choose "Pick from actor grid" on a role, then click an actor.'}
+      </div>
 
       <div
         style={{
@@ -162,6 +252,7 @@ export default function CastingBoard({ actors, roles }: any) {
             >
               <img
                 src={actor.headshot_url}
+                alt={actor.name}
                 width={100}
                 style={{ borderRadius: "6px", display: "block" }}
               />
