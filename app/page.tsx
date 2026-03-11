@@ -1,23 +1,42 @@
-import { getRoles } from "./data/loadData";
-import MovieSearch from "./components/MovieSearch";
+import { getActors } from "./data/actors";
+import { getRoles } from "./data/roles";
 
-export default function HomePage() {
+export default function Page() {
+  const actors = getActors();
   const roles = getRoles();
 
-  const moviesRoles: Record<string, number> = {};
-
-  roles.forEach((r: any) => {
-    moviesRoles[r.project_title] =
-      (moviesRoles[r.project_title] || 0) + 1;
-  });
-
-  const movies = Object.keys(moviesRoles).sort();
-
   return (
-    <div style={{ padding: "2rem", maxWidth: "900px", margin: "0 auto" }}>
+    <div style={{ padding: "20px" }}>
       <h1>Wilderleague</h1>
 
-      <MovieSearch movies={movies} moviesRoles={moviesRoles} />
+      <h2>Roles</h2>
+      <div style={{ marginBottom: "40px" }}>
+        {roles.map((role: any, i: number) => (
+          <div key={i} style={{ marginBottom: "12px" }}>
+            <strong>{role.role_name}</strong> — original: {role.original_actor}
+          </div>
+        ))}
+      </div>
+
+      <h2>Actors</h2>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(5, 1fr)",
+          gap: "20px",
+        }}
+      >
+        {actors.map((actor: any, i: number) => (
+          <div key={i}>
+            <img
+              src={actor.headshot_url?.trim()}
+              alt={actor.name}
+              width={120}
+            />
+            <div>{actor.name}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
