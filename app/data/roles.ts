@@ -11,5 +11,8 @@ export function getRoles() {
     skipEmptyLines: true,
   });
 
-  return parsed.data;
+  return parsed.data as {
+    role_name: string;
+    original_actor?: string;
+  }[];
 }

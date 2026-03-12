@@ -1,4 +1,4 @@
-role_id,movie_id,movie_title,role_name,original_actor,role_type,notes
-role_001,matrix_1999,The Matrix,Neo,Keanu Reeves,,
-role_002,matrix_1999,The Matrix,Trinity,Carrie-Anne Moss,,
-role_003,matrix_1999,The Matrix,Morpehus,Laurence Fishburne,,
+role_name,original_actor
+Neo,Keanu Reeves
+Trinity,Carrie-Anne Moss
+Morpheus,Laurence Fishburne

@@ -11,5 +11,9 @@ export function getActors() {
     skipEmptyLines: true,
   });
 
-  return parsed.data;
+  return (parsed.data as any[]).map((actor, index) => ({
+    ...actor,
+    actor_id: actor.actor_id || String(actor.tmdb_id || actor.name || index),
+    popularity: actor.popularity ? Number(actor.popularity) : undefined,
+  }));
 }
