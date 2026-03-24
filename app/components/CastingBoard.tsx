@@ -355,36 +355,36 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               <div
                 key={role.role_name}
                 style={{
-                  border: '1px solid rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.13)',
                   borderRadius: '16px',
                   padding: '18px 20px',
-                  background: '#111115',
+                  background: '#22222e',
                 }}
               >
-                <div style={{ fontSize: '11px', color: '#52525b', marginBottom: '14px', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>
+                <div style={{ fontSize: '12px', color: '#a1a1aa', marginBottom: '14px', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700 }}>
                   {role.role_name}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
                   {/* Original actor */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                    <div style={{ width: '64px', height: '90px', borderRadius: '8px', background: '#1c1c1e', overflow: 'hidden', flexShrink: 0 }}>
+                    <div style={{ width: '64px', height: '90px', borderRadius: '8px', background: '#2a2a38', overflow: 'hidden', flexShrink: 0 }}>
                       {role.original_actor_image ? (
                         <img src={role.original_actor_image} alt={role.original_actor} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '18px' }}>?</div>
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#71717a', fontSize: '18px' }}>?</div>
                       )}
                     </div>
                     <div>
-                      <div style={{ fontSize: '10px', color: '#3f3f46', marginBottom: '3px' }}>Original</div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#52525b', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '3px' }}>Original</div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#94a3b8', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {role.original_actor}
                       </div>
                     </div>
                   </div>
 
                   {/* Arrow */}
-                  <div style={{ color: '#27272a', fontSize: '18px', flexShrink: 0, paddingTop: '32px' }}>→</div>
+                  <div style={{ color: '#52525b', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
 
                   {/* Slots column */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -464,7 +464,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                               transition: 'border-color 0.12s, background 0.12s',
                             }}
                           >
-                            <span style={{ fontSize: '9px', color: '#3f3f46', flexShrink: 0, fontWeight: 600 }}>{slot + 1}</span>
+                            <span style={{ fontSize: '11px', color: '#71717a', flexShrink: 0, fontWeight: 700 }}>{slot + 1}</span>
                             {actor ? (
                               <>
                                 <div
@@ -496,13 +496,13 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                                 </div>
                                 <button
                                   onClick={() => clearSlot(role.role_name, slot)}
-                                  style={{ background: 'none', border: 'none', color: '#52525b', cursor: 'pointer', fontSize: '12px', lineHeight: 1, padding: '1px', flexShrink: 0 }}
+                                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '14px', lineHeight: 1, padding: '1px', flexShrink: 0 }}
                                 >
                                   ×
                                 </button>
                               </>
                             ) : (
-                              <span style={{ fontSize: '9px', color: '#2a2a2e', fontStyle: 'italic' }}>
+                              <span style={{ fontSize: '11px', color: '#52525b', fontStyle: 'italic' }}>
                                 {isDragOver ? 'drop here' : slot === 1 ? '2nd choice' : '3rd choice'}
                               </span>
                             )}
@@ -943,11 +943,11 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
           <div style={{ fontSize: '13px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginBottom: '3px' }}>
             ${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#3f3f46', fontWeight: 400 }}> est</span>}
           </div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {actor.name}
           </div>
           {isPrimary && (
-            <div style={{ fontSize: '10px', color: '#3f3f46', marginTop: '4px' }}>drag away to remove</div>
+            <div style={{ fontSize: '11px', color: '#71717a', marginTop: '4px' }}>drag away to remove</div>
           )}
         </div>
         <button
