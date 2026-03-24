@@ -8,6 +8,7 @@ export type CastActor = {
   image: string
   popularity: number
   cost: number
+  salaryConfirmed?: boolean
 }
 
 export type CastRole = {
@@ -314,7 +315,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
                           )}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>${castActor.cost}M</div>
+                          <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>${castActor.cost}M{!castActor.salaryConfirmed && <span style={{ color: '#3f3f46', fontWeight: 400 }}> est</span>}</div>
                           <div style={{ fontSize: '12px', fontWeight: 600, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {castActor.name}
                           </div>
@@ -475,7 +476,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
                       {actor.name}
                     </div>
                     <div style={{ fontSize: '10px', color: '#52525b', fontVariantNumeric: 'tabular-nums' }}>
-                      ${actor.cost}M
+                      ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '9px' }}> est</span>}
                     </div>
                   </div>
                 </div>
@@ -517,7 +518,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
                     </div>
                   </div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: actor ? '#4ade80' : '#27272a', fontVariantNumeric: 'tabular-nums' }}>
-                    {actor ? `$${actor.cost}M` : '—'}
+                    {actor ? <>{`$${actor.cost}M`}{!actor.salaryConfirmed && <span style={{ fontSize: '10px', fontWeight: 400, color: '#3f3f46' }}> est</span>}</> : '—'}
                   </div>
                 </div>
               )

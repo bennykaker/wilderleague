@@ -22,6 +22,8 @@ export interface EnrichedActor {
   career_stage?: string
   casting_profile?: string
   deep_dive_date?: string
+  salary_estimate?: number
+  salary_confirmed?: boolean
 }
 
 function popularityToCost(pop: number): number {
@@ -50,6 +52,7 @@ export function getEnrichedActors(): EnrichedActor[] {
     .filter(row => row.name?.trim())
     .map(row => {
       const pop = parseFloat(row.popularity ?? '0') || 0
+      const salaryEst = row.salary_estimate ? parseFloat(row.salary_estimate) || undefined : undefined
       return {
         name: row.name.trim(),
         tmdb_id: row.tmdb_id?.trim() ?? '',
@@ -61,7 +64,7 @@ export function getEnrichedActors(): EnrichedActor[] {
         known_for: row.known_for?.trim() ?? '',
         keywords: row.keywords?.trim() ?? '',
         notes: row.notes?.trim() ?? '',
-        cost: popularityToCost(pop),
+        cost: salaryEst ?? popularityToCost(pop),
         archetype: row.archetype?.trim() || undefined,
         strengths: row.strengths?.trim() || undefined,
         weaknesses: row.weaknesses?.trim() || undefined,
@@ -70,6 +73,8 @@ export function getEnrichedActors(): EnrichedActor[] {
         career_stage: row.career_stage?.trim() || undefined,
         casting_profile: row.casting_profile?.trim() || undefined,
         deep_dive_date: row.deep_dive_date?.trim() || undefined,
+        salary_estimate: row.salary_estimate ? parseFloat(row.salary_estimate) || undefined : undefined,
+        salary_confirmed: row.salary_confirmed === 'true' || row.salary_confirmed === '1',
       }
     })
     .sort((a, b) => b.popularity - a.popularity)

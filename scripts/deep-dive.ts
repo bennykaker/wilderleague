@@ -48,6 +48,8 @@ interface ActorRow {
   career_stage?: string
   casting_profile?: string
   deep_dive_date?: string
+  salary_estimate?: string
+  salary_confirmed?: string
 }
 
 interface CastingProfile {
@@ -58,6 +60,7 @@ interface CastingProfile {
   signature_quality: string
   career_stage: string
   casting_profile: string
+  salary_estimate: number
 }
 
 async function generateProfile(actor: ActorRow): Promise<CastingProfile> {
@@ -80,6 +83,7 @@ Write a professional casting profile covering:
 5. Signature quality — the single thing that makes them distinctive
 6. Career stage — one of: rising, peak, established, legacy
 7. Casting profile — 3-4 sentences of Marlowe's honest assessment. Direct, specific, no filler.
+8. Salary estimate — realistic per-film fee in USD millions as a number (e.g. 0.5 for $500K, 5 for $5M, 20 for $20M). Base this on their career stage, known credits, and box office standing. Use your best judgment — this is an estimate for a casting game.
 
 Return ONLY this JSON (no markdown):
 {
@@ -89,7 +93,8 @@ Return ONLY this JSON (no markdown):
   "best_cast_as": "comma-separated role types",
   "signature_quality": "one sentence",
   "career_stage": "rising|peak|established|legacy",
-  "casting_profile": "3-4 sentence Marlowe assessment"
+  "casting_profile": "3-4 sentence Marlowe assessment",
+  "salary_estimate": 5
 }`
 
   const message = await client.messages.create({
@@ -139,6 +144,7 @@ async function main() {
       actor.signature_quality = profile.signature_quality
       actor.career_stage = profile.career_stage
       actor.casting_profile = profile.casting_profile
+      actor.salary_estimate = profile.salary_estimate?.toString() ?? ''
       actor.deep_dive_date = new Date().toISOString().split('T')[0]
       console.log(`done (${profile.archetype})`)
     } catch (err) {

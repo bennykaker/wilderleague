@@ -12,6 +12,7 @@ export default function MatrixPage() {
     image: a.headshot_url,
     popularity: a.popularity,
     cost: a.cost,
+    salaryConfirmed: a.salary_confirmed,
   }));
 
   return (

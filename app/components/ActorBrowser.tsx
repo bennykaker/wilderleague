@@ -150,7 +150,9 @@ function ActorCard({ actor }: { actor: EnrichedActor }) {
           <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: '#52525b', marginBottom: '8px' }}>
             {actor.gender && <span>{actor.gender}</span>}
             {actor.birth_year && <span>b. {actor.birth_year}</span>}
-            <span style={{ color: '#4ade80', fontWeight: 700 }}>${actor.cost}M</span>
+            <span style={{ color: '#4ade80', fontWeight: 700 }}>
+              ${actor.cost}M{!actor.salary_confirmed && <span style={{ color: '#3f3f46', fontWeight: 400, fontSize: '10px' }}> est</span>}
+            </span>
           </div>
           {tags.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
