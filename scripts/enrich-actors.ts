@@ -2,11 +2,12 @@
  * Builds a rich actor pool from TMDB.
  * Run with: npm run enrich-actors
  *
- * Phase 1: Fetch top 2,000 actors from TMDB popular list (bulk, fast)
+ * Phase 1: Fetch top 10,000 actors from TMDB popular list (bulk, fast)
  *          → gets name, photo, gender, known_for, popularity
- * Phase 2: Fetch detailed bio + birth year for top 500
+ * Phase 2: Fetch detailed bio + birth year for top 1,000
  *          → individual calls, rate-limited
  *
+ * Merges with existing data/enriched-actors.csv — deep-dive profiles are preserved.
  * Writes: data/enriched-actors.csv
  */
 
@@ -26,8 +27,8 @@ function getToken(): string {
 
 const TOKEN = getToken()
 const DELAY_MS = 260  // ~3.8 req/s, well under TMDB's 40/10s limit
-const TOTAL_ACTORS = 2000
-const DETAIL_THRESHOLD = 500  // fetch full bio for top N by popularity
+const TOTAL_ACTORS = 10000
+const DETAIL_THRESHOLD = 1000  // fetch full bio for top N by popularity
 
 if (!TOKEN) {
   console.error('TMDB_API_KEY not found in env or .env.local')
@@ -177,10 +178,25 @@ async function main() {
   }
   console.log('\n')
 
-  // Build output rows
+  // Load existing data to preserve deep-dive profiles
+  type ExistingRow = Record<string, string>
+  const existingMap = new Map<string, ExistingRow>()
+  if (fs.existsSync(outPath)) {
+    const raw = fs.readFileSync(outPath, 'utf8')
+    const parsed = Papa.parse<ExistingRow>(raw, { header: true, skipEmptyLines: true })
+    for (const row of parsed.data) {
+      if (row.tmdb_id) existingMap.set(row.tmdb_id, row)
+    }
+    console.log(`Loaded ${existingMap.size} existing actors to merge with.`)
+  }
+
+  // Build output rows — merge fresh TMDB data with preserved deep-dive fields
+  const deepDiveFields = ['archetype', 'strengths', 'weaknesses', 'best_cast_as', 'signature_quality', 'career_stage', 'casting_profile', 'deep_dive_date', 'salary_estimate', 'salary_confirmed']
+
   const rows = bulkActors.map(actor => {
     const detail = details.get(actor.id)
     const pop = actor.popularity
+    const existing = existingMap.get(String(actor.id))
 
     // Fallback known_for from bulk data
     const bulkKnownFor = actor.known_for
@@ -198,21 +214,32 @@ async function main() {
     }
     const bulkKeywords = ['actor', ...Object.entries(bulkGenreCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([g]) => g)].join('; ')
 
-    return {
+    const row: Record<string, string> = {
       name: actor.name,
       tmdb_id: String(actor.id),
       headshot_url: actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : '',
       popularity: pop.toFixed(4),
       cost: String(popularityToCost(pop)),
       gender: genderLabel(actor.gender),
-      birth_year: detail?.birth_year ?? '',
-      biography: detail?.biography ?? '',
-      known_for: detail?.known_for_credits ?? bulkKnownFor,
-      keywords: detail?.keywords ?? bulkKeywords,
-      notes: '',
-      ui_status: '',
+      birth_year: detail?.birth_year ?? existing?.birth_year ?? '',
+      biography: detail?.biography ?? existing?.biography ?? '',
+      known_for: detail?.known_for_credits ?? existing?.known_for ?? bulkKnownFor,
+      keywords: detail?.keywords ?? existing?.keywords ?? bulkKeywords,
+      notes: existing?.notes ?? '',
+      ui_status: existing?.ui_status ?? '',
     }
+
+    // Preserve deep-dive fields from existing data
+    for (const field of deepDiveFields) {
+      row[field] = existing?.[field] ?? ''
+    }
+
+    return row
   })
+
+  // Track new vs updated
+  const newCount = rows.filter(r => !existingMap.has(r.tmdb_id)).length
+  console.log(`${newCount} new actors added, ${rows.length - newCount} updated.`)
 
   const csv = Papa.unparse(rows)
   fs.writeFileSync(outPath, csv, 'utf8')
