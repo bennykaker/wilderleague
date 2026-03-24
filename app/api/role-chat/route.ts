@@ -23,6 +23,7 @@ interface RoleChatRequest {
   query?: string
   pickedActor?: string
   pickedActorCost?: number
+  excludeActors?: string[]
 }
 
 interface RoleChatResponse {
@@ -70,7 +71,7 @@ function selectPool(actors: EnrichedActor[], query: string, limit = 200): Enrich
 
 export async function POST(request: NextRequest) {
   const body = await request.json() as RoleChatRequest
-  const { action, role, movie, originalActor, query = '', pickedActor, pickedActorCost } = body
+  const { action, role, movie, originalActor, query = '', pickedActor, pickedActorCost, excludeActors = [] } = body
 
   if (!action || !role) {
     return Response.json({ reply: '', actors: [] })
@@ -78,7 +79,9 @@ export async function POST(request: NextRequest) {
 
   const allActors = getEnrichedActors()
   const pool = selectPool(allActors, query || role)
-  const poolText = pool.map(formatActor).join('\n')
+  const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
+  const filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
+  const poolText = filteredPool.map(formatActor).join('\n')
   const allNames = new Set(allActors.map(a => a.name))
 
   const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.`

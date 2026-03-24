@@ -37,9 +37,10 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
   const [chatMessages, setChatMessages] = useState<Record<string, ChatMsg[]>>({})
   const [aiLoading, setAiLoading] = useState(false)
   const [query, setQuery] = useState('')
-  const [visibleActors, setVisibleActors] = useState<CastActor[]>(actors.slice(0, 12))
+  const [visibleActors, setVisibleActors] = useState<CastActor[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
   const [showExportCard, setShowExportCard] = useState(false)
+  const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   const assignedNames = new Set(Object.values(selections).filter(Boolean))
@@ -54,7 +55,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
   useEffect(() => {
     setQuery('')
     setIsFiltered(false)
-    setVisibleActors(actors.slice(0, 12))
+    setVisibleActors([])
     setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
 
     const role = roles.find(r => r.role_name === activeRole)
@@ -83,12 +84,16 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           [activeRole]: [{ text: reply, suggestion: data.suggestion ?? null }],
         }))
         if (data.actors?.length) {
-          const nameSet = new Set<string>(data.actors)
           const picks = (data.actors as string[])
             .map(name => actors.find(a => a.name === name))
             .filter((a): a is CastActor => Boolean(a))
           setVisibleActors(picks)
           setIsFiltered(true)
+          setSuggestedPerRole(prev => {
+            const existing = prev[activeRole] ?? []
+            const existingNames = new Set(existing.map(a => a.name))
+            return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
+          })
         }
       })
       .catch(err => {
@@ -123,6 +128,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           movie: title,
           originalActor: role?.original_actor ?? '',
           query,
+          excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
         }),
       })
       const data = await res.json()
@@ -138,6 +144,11 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
         .filter((a): a is CastActor => Boolean(a))
       setVisibleActors(picks)
       setIsFiltered(true)
+      setSuggestedPerRole(prev => {
+        const existing = prev[activeRole] ?? []
+        const existingNames = new Set(existing.map(a => a.name))
+        return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
+      })
     } catch {}
     finally { setAiLoading(false) }
   }
@@ -415,21 +426,21 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
             </button>
             {isFiltered && (
               <button
-                onClick={() => { setVisibleActors(actors.slice(0, 12)); setIsFiltered(false); setQuery('') }}
+                onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
                 style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '13px', cursor: 'pointer', flexShrink: 0 }}
               >
-                Reset
+                Clear
               </button>
             )}
           </div>
 
           {/* Count */}
           <div style={{ fontSize: '11px', color: '#3f3f46' }}>
-            {isFiltered ? 'AI suggestions — drag to cast' : `Top ${visibleActors.length} actors`}
+            {aiLoading ? '' : isFiltered ? `${visibleActors.length} suggestions — drag to cast` : visibleActors.length === 0 ? 'Search or ask Marlowe for suggestions' : `${visibleActors.length} actors`}
           </div>
 
           {/* Actor grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px', minHeight: visibleActors.length === 0 && !aiLoading ? '0' : undefined }}>
             {visibleActors.map((actor, i) => {
               const isAssigned = assignedNames.has(actor.name)
               const isDragging = draggingActor === actor.name
@@ -483,6 +494,38 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
               )
             })}
           </div>
+          {/* Passed on */}
+          {(() => {
+            const castInRole = selections[activeRole]
+            const passed = (suggestedPerRole[activeRole] ?? []).filter(a => a.name !== castInRole && !visibleActors.find(v => v.name === a.name))
+            if (passed.length === 0) return null
+            return (
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
+                <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3f3f46', marginBottom: '10px' }}>
+                  Passed on · Second look?
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {passed.map(actor => (
+                    <button
+                      key={actor.name}
+                      onClick={() => assignActorToRole(activeRole, actor.name)}
+                      title={`Cast ${actor.name} as ${activeRole}`}
+                      style={{ display: 'flex', alignItems: 'center', gap: '7px', background: '#111115', border: '1px solid #27272a', borderRadius: '8px', padding: '5px 9px 5px 5px', cursor: 'pointer' }}
+                    >
+                      <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
+                        {actor.image
+                          ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '9px' }}>?</div>
+                        }
+                      </div>
+                      <span style={{ fontSize: '11px', color: '#71717a', whiteSpace: 'nowrap' }}>{actor.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
         </div>
       </div>
 
@@ -556,6 +599,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           movie: title,
           originalActor: role?.original_actor ?? '',
           query: q,
+          excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
         }),
       })
       const data = await res.json()
@@ -571,6 +615,11 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           .filter((a): a is CastActor => Boolean(a))
         setVisibleActors(picks)
         setIsFiltered(true)
+        setSuggestedPerRole(prev => {
+          const existing = prev[activeRole] ?? []
+          const existingNames = new Set(existing.map(a => a.name))
+          return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
+        })
       }
     } catch {}
     finally { setAiLoading(false) }
