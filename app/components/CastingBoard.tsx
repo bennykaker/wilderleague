@@ -337,14 +337,15 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       </div>
 
       {/* Body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '420px 1fr', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', flex: 1, minHeight: 0 }}>
 
         {/* ── Left: Cast board ── */}
-        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '4px' }}>
+        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto' }}>
+          <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '12px' }}>
             Cast board
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '10px' }}>
           {roles.map(role => {
             const slots = getSlots(role.role_name)
             const primaryName = slots[0]
@@ -514,6 +515,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               </div>
             )
           })}
+          </div>
         </div>
 
         {/* ── Right: Actor finder ── */}
