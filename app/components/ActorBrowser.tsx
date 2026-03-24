@@ -168,6 +168,11 @@ function ActorCard({ actor }: { actor: EnrichedActor }) {
         {/* Expanded bio */}
         {expanded && (
           <div style={{ padding: '0 12px 12px', borderTop: '1px solid #1c1c1e' }} onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setExpanded(false)}
+              style={{ float: 'right', marginTop: '10px', background: 'none', border: 'none', color: '#52525b', fontSize: '18px', cursor: 'pointer', lineHeight: 1, padding: '0 2px' }}
+              aria-label="Close"
+            >×</button>
 
             {/* Marlowe's casting profile */}
             {actor.casting_profile && (
