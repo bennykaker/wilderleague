@@ -86,8 +86,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           const picks = (data.actors as string[])
             .map(name => actors.find(a => a.name === name))
             .filter((a): a is CastActor => Boolean(a))
-          const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
-          setVisibleActors([...picks, ...rest].slice(0, 12))
+          setVisibleActors(picks)
           setIsFiltered(true)
         }
       })
