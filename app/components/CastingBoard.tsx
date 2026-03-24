@@ -461,19 +461,38 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                               gap: '5px',
                               minHeight: '32px',
                               transition: 'border-color 0.12s, background 0.12s',
-                              cursor: actor ? 'default' : 'default',
                             }}
                           >
                             <span style={{ fontSize: '9px', color: '#3f3f46', flexShrink: 0, fontWeight: 600 }}>{slot + 1}</span>
                             {actor ? (
                               <>
-                                <div style={{ width: '20px', height: '28px', borderRadius: '3px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
-                                  {actor.image
-                                    ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                    : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
-                                  }
+                                <div
+                                  draggable
+                                  onDragStart={e => {
+                                    e.stopPropagation()
+                                    e.dataTransfer.setData('text/plain', actor.name)
+                                    e.dataTransfer.effectAllowed = 'move'
+                                    setDraggingActor(actor.name)
+                                    setDraggingFromSlot({ role: role.role_name, slot })
+                                    dropSucceededRef.current = false
+                                  }}
+                                  onDragEnd={() => {
+                                    if (!dropSucceededRef.current && draggingFromSlot?.role === role.role_name && draggingFromSlot?.slot === slot) {
+                                      clearSlot(role.role_name, slot)
+                                    }
+                                    setDraggingActor(null)
+                                    setDraggingFromSlot(null)
+                                  }}
+                                  style={{ display: 'flex', alignItems: 'center', gap: '5px', flex: 1, minWidth: 0, cursor: 'grab' }}
+                                >
+                                  <div style={{ width: '20px', height: '28px', borderRadius: '3px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
+                                    {actor.image
+                                      ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
+                                      : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
+                                    }
+                                  </div>
+                                  <span style={{ fontSize: '10px', color: '#94a3b8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.name}</span>
                                 </div>
-                                <span style={{ fontSize: '10px', color: '#94a3b8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.name}</span>
                                 <button
                                   onClick={() => clearSlot(role.role_name, slot)}
                                   style={{ background: 'none', border: 'none', color: '#52525b', cursor: 'pointer', fontSize: '12px', lineHeight: 1, padding: '1px', flexShrink: 0 }}
