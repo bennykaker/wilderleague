@@ -1,7 +1,18 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest } from 'next/server'
+import fs from 'fs'
+import path from 'path'
 
-const client = new Anthropic()
+function getApiKey(): string {
+  if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
+  try {
+    const file = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf8')
+    const match = file.match(/^ANTHROPIC_API_KEY=(.+)$/m)
+    return match?.[1]?.trim() ?? ''
+  } catch { return '' }
+}
+
+const client = new Anthropic({ apiKey: getApiKey() })
 
 interface RoleChatRequest {
   action: 'describe' | 'search' | 'react'
