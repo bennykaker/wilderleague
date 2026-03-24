@@ -19,9 +19,12 @@ export default function HomePage() {
           <h1 style={{ fontSize: '42px', fontWeight: 900, lineHeight: 1.05, margin: '0 0 14px' }}>
             Recast movies.<br />Under constraint.
           </h1>
-          <p style={{ fontSize: '16px', color: '#71717a', maxWidth: '520px', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: '16px', color: '#71717a', maxWidth: '520px', lineHeight: 1.6, margin: '0 0 20px' }}>
             Pick a movie. Drag actors into iconic roles. Work within the budget. Share your cast.
           </p>
+          <Link href="/actors" style={{ fontSize: '13px', color: '#52525b', textDecoration: 'none', borderBottom: '1px solid #27272a', paddingBottom: '2px' }}>
+            Browse actor pool →
+          </Link>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
