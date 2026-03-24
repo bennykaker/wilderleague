@@ -9,6 +9,11 @@ import {
   DragOverlay,
   useDraggable,
   useDroppable,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import type { Movie } from '../data/movies'
@@ -29,6 +34,12 @@ export default function CastingPage({ movie, actors }: Props) {
   const [aiReply, setAiReply] = useState<string | null>(null)
   const [isFiltered, setIsFiltered] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor)
+  )
 
   const castNames = new Set(Object.values(selections).filter(Boolean))
 
@@ -152,7 +163,7 @@ export default function CastingPage({ movie, actors }: Props) {
     : new Set<string>()
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#09090b', color: '#f8fafc' }}>
 
         {/* Header */}
