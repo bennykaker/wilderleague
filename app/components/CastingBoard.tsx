@@ -354,11 +354,14 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             return (
               <div
                 key={role.role_name}
+                onClick={() => setActiveRole(role.role_name)}
                 style={{
-                  border: '1px solid rgba(255,255,255,0.13)',
+                  border: `1px solid ${activeRole === role.role_name ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.13)'}`,
                   borderRadius: '16px',
                   padding: '18px 20px',
-                  background: '#22222e',
+                  background: activeRole === role.role_name ? '#1a2035' : '#22222e',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s, background 0.15s',
                 }}
               >
                 <div style={{ fontSize: '16px', color: '#e2e8f0', marginBottom: '14px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 800 }}>
