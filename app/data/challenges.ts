@@ -9,7 +9,10 @@ export interface Challenge {
   description: string
   badge: string
   movie_slug: string
+  // Explicit name allowlist (fallback / override)
   actor_pool: string[]
+  // Filter by known_for tags (populated by seed-challenge-actors script)
+  actor_filter?: { known_for_tag?: string; show_names?: string[] }
   active: boolean
   starts: string
   ends: string

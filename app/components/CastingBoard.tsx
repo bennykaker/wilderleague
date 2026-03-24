@@ -186,6 +186,12 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       setVisibleActors(picks)
       setIsFiltered(true)
       setSuggestedPerRole(prev => ({ ...prev, [activeRole]: picks }))
+    } else if (challenge) {
+      // For challenges the actor pool IS the suggestion list — show everyone
+      const available = actors.filter(a => !blockedActors.has(a.name))
+      setVisibleActors(available)
+      setIsFiltered(true)
+      setSuggestedPerRole(prev => ({ ...prev, [activeRole]: available }))
     } else {
       setVisibleActors([])
     }
