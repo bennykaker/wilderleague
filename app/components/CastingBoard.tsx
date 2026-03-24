@@ -109,6 +109,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
 
   async function handleSearch() {
     if (!query.trim()) return
+    setVisibleActors([])
     setAiLoading(true)
     const role = roles.find(r => r.role_name === activeRole)
     try {
@@ -131,15 +132,12 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply, suggestion: data.suggestion }],
         }))
       }
-      if (data.actors?.length) {
-        const nameSet = new Set<string>(data.actors)
-        const picks = (data.actors as string[])
-          .map(name => actors.find(a => a.name === name))
-          .filter((a): a is CastActor => Boolean(a))
-        const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
-        setVisibleActors([...picks, ...rest].slice(0, 12))
-        setIsFiltered(true)
-      }
+      const pickedNames: string[] = data.actors ?? []
+      const picks = pickedNames
+        .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
+        .filter((a): a is CastActor => Boolean(a))
+      setVisibleActors(picks)
+      setIsFiltered(true)
     } catch {}
     finally { setAiLoading(false) }
   }
@@ -545,6 +543,7 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
 
   async function handleSearchWithQuery(q: string) {
     if (!q.trim()) return
+    setVisibleActors([])
     setAiLoading(true)
     const role = roles.find(r => r.role_name === activeRole)
     try {
@@ -568,12 +567,10 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
         }))
       }
       if (data.actors?.length) {
-        const nameSet = new Set<string>(data.actors)
         const picks = (data.actors as string[])
-          .map(name => actors.find(a => a.name === name))
+          .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
           .filter((a): a is CastActor => Boolean(a))
-        const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
-        setVisibleActors([...picks, ...rest].slice(0, 12))
+        setVisibleActors(picks)
         setIsFiltered(true)
       }
     } catch {}
