@@ -1,693 +1,578 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import ActorCardModal from "./ActorCardModal";
+import { useState, useEffect, useRef } from 'react'
 
-type Actor = {
-  actor_id?: string;
-  id?: string;
-  tmdb_id?: string | number;
-  name: string;
-  image?: string;
-  headshot_url?: string;
-  profile_path?: string;
-  birthYear?: number;
-  birth_year?: number;
-  nationality?: string;
-  knownFor?: string[];
-  known_for?: string;
-  salaryMin?: number;
-  salaryMax?: number;
-  salary_min?: number;
-  salary_max?: number;
-  popularity?: number | string;
-  notes?: string;
-  ui_status?: string;
-};
-
-type Role = {
-  role_name: string;
-  original_actor?: string;
-};
-
-type CastingBoardProps = {
-  actors?: Actor[];
-  roles?: Role[];
-  title?: string;
-  challenge?: string;
-  budget?: string;
-};
-
-function normalizeImage(actor: Actor) {
-  if (actor.image) return actor.image;
-  if (actor.headshot_url) return actor.headshot_url;
-  if (actor.profile_path) {
-    if (actor.profile_path.startsWith("http")) return actor.profile_path;
-    return `https://image.tmdb.org/t/p/w500${actor.profile_path}`;
-  }
-  return "";
+export type CastActor = {
+  id: string
+  name: string
+  image: string
+  popularity: number
+  cost: number
 }
 
-function normalizeKnownFor(actor: Actor) {
-  if (actor.knownFor && Array.isArray(actor.knownFor)) return actor.knownFor;
-  if (actor.known_for) {
-    return actor.known_for
-      .split(";")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
+export type CastRole = {
+  role_name: string
+  original_actor: string
+  original_actor_image?: string
 }
 
-function normalizeBirthYear(actor: Actor) {
-  return actor.birthYear ?? actor.birth_year;
+type ChatMsg = {
+  text: string
+  suggestion?: string | null
 }
 
-function normalizeSalaryMin(actor: Actor) {
-  return actor.salaryMin ?? actor.salary_min;
+type Props = {
+  actors: CastActor[]
+  roles: CastRole[]
+  title: string
+  budget: number
 }
 
-function normalizeSalaryMax(actor: Actor) {
-  return actor.salaryMax ?? actor.salary_max;
-}
+export default function CastingBoard({ actors, roles, title, budget }: Props) {
+  const [selections, setSelections] = useState<Record<string, string>>({})
+  const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
+  const [dragOverRole, setDragOverRole] = useState<string | null>(null)
+  const [draggingActor, setDraggingActor] = useState<string | null>(null)
+  const [chatMessages, setChatMessages] = useState<Record<string, ChatMsg[]>>({})
+  const [aiLoading, setAiLoading] = useState(false)
+  const [query, setQuery] = useState('')
+  const [visibleActors, setVisibleActors] = useState<CastActor[]>(actors.slice(0, 12))
+  const [isFiltered, setIsFiltered] = useState(false)
+  const [showExportCard, setShowExportCard] = useState(false)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
-function normalizeActor(actor: Actor, index: number): Actor {
-  return {
-    ...actor,
-    id:
-      actor.id ??
-      actor.actor_id ??
-      String(actor.tmdb_id ?? actor.name ?? index),
-    image: normalizeImage(actor),
-    knownFor: normalizeKnownFor(actor),
-    birthYear: normalizeBirthYear(actor),
-    salaryMin: normalizeSalaryMin(actor),
-    salaryMax: normalizeSalaryMax(actor),
-  };
-}
+  const assignedNames = new Set(Object.values(selections).filter(Boolean))
 
-export default function CastingBoard({
-  actors = [],
-  roles = [],
-  title = "Casting Board",
-  challenge = "Recast the movie with a new cast.",
-  budget = "$25M",
-}: CastingBoardProps) {
-  const normalizedActors = useMemo(
-    () => actors.map((actor, index) => normalizeActor(actor, index)),
-    [actors]
-  );
+  const spent = Object.values(selections).reduce((sum, name) => {
+    return sum + (actors.find(a => a.name === name)?.cost ?? 0)
+  }, 0)
+  const remaining = budget - spent
+  const overBudget = remaining < 0
 
-  const normalizedRoles = useMemo(() => {
-    if (roles.length > 0) return roles;
+  // Fetch role description when active role changes
+  useEffect(() => {
+    setQuery('')
+    setIsFiltered(false)
+    setVisibleActors(actors.slice(0, 12))
+    setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
 
-    return [
-      { role_name: "Neo", original_actor: "Keanu Reeves" },
-      { role_name: "Trinity", original_actor: "Carrie-Anne Moss" },
-      { role_name: "Morpheus", original_actor: "Laurence Fishburne" },
-    ];
-  }, [roles]);
+    const role = roles.find(r => r.role_name === activeRole)
+    if (!role) return
 
-  const [selectedActor, setSelectedActor] = useState<Actor | null>(null);
-  const [selections, setSelections] = useState<Record<string, string>>({});
-  const [draggingActorId, setDraggingActorId] = useState<string | null>(null);
-  const [dragOverRole, setDragOverRole] = useState<string | null>(null);
+    setAiLoading(true)
+    let cancelled = false
 
-  function handleSelect(roleName: string, actorName: string) {
-    setSelections((prev) => ({
-      ...prev,
-      [roleName]: actorName,
-    }));
-  }
+    fetch('/api/role-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'describe',
+        role: activeRole,
+        movie: title,
+        originalActor: role.original_actor,
+        actors: actors.map(a => a.name),
+      }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return
+        if (data.reply) {
+          setChatMessages(prev => ({
+            ...prev,
+            [activeRole]: [{ text: data.reply, suggestion: data.suggestion }],
+          }))
+        }
+        if (data.actors?.length) {
+          const nameSet = new Set<string>(data.actors)
+          const picks = (data.actors as string[])
+            .map(name => actors.find(a => a.name === name))
+            .filter((a): a is CastActor => Boolean(a))
+          const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
+          setVisibleActors([...picks, ...rest].slice(0, 12))
+          setIsFiltered(true)
+        }
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setAiLoading(false) })
 
-  function clearRole(roleName: string) {
-    setSelections((prev) => {
-      const next = { ...prev };
-      delete next[roleName];
-      return next;
-    });
-  }
+    return () => { cancelled = true }
+  }, [activeRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function resetCast() {
-    setSelections({});
+  // Scroll chat to bottom when messages change
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages])
+
+  async function handleSearch() {
+    if (!query.trim()) return
+    setAiLoading(true)
+    const role = roles.find(r => r.role_name === activeRole)
+    try {
+      const res = await fetch('/api/role-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'search',
+          role: activeRole,
+          movie: title,
+          originalActor: role?.original_actor ?? '',
+          query,
+          actors: actors.map(a => a.name),
+        }),
+      })
+      const data = await res.json()
+      if (data.reply) {
+        setChatMessages(prev => ({
+          ...prev,
+          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply, suggestion: data.suggestion }],
+        }))
+      }
+      if (data.actors?.length) {
+        const nameSet = new Set<string>(data.actors)
+        const picks = (data.actors as string[])
+          .map(name => actors.find(a => a.name === name))
+          .filter((a): a is CastActor => Boolean(a))
+        const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
+        setVisibleActors([...picks, ...rest].slice(0, 12))
+        setIsFiltered(true)
+      }
+    } catch {}
+    finally { setAiLoading(false) }
   }
 
   function assignActorToRole(roleName: string, actorName: string) {
-    setSelections((prev) => {
-      const next: Record<string, string> = {};
-
-      for (const [existingRole, existingActor] of Object.entries(prev)) {
-        if (existingActor !== actorName) {
-          next[existingRole] = existingActor;
-        }
+    setSelections(prev => {
+      const next: Record<string, string> = {}
+      for (const [r, a] of Object.entries(prev)) {
+        if (a !== actorName) next[r] = a
       }
-
-      next[roleName] = actorName;
-      return next;
-    });
+      next[roleName] = actorName
+      return next
+    })
+    const role = roles.find(r => r.role_name === roleName)
+    const actor = actors.find(a => a.name === actorName)
+    fetch('/api/role-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'react',
+        role: roleName,
+        movie: title,
+        originalActor: role?.original_actor ?? '',
+        pickedActor: actorName,
+        pickedActorCost: actor?.cost,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.reply) {
+          setChatMessages(prev => ({
+            ...prev,
+            [roleName]: [...(prev[roleName] ?? []), { text: data.reply, suggestion: data.suggestion }],
+          }))
+          // Switch to the role that was just cast to show the reaction
+          setActiveRole(roleName)
+        }
+      })
+      .catch(() => {})
   }
 
-  function handleDragStart(actor: Actor) {
-    setDraggingActorId(actor.id ?? null);
-  }
-
-  function handleDragEnd() {
-    setDraggingActorId(null);
-    setDragOverRole(null);
+  function clearRole(roleName: string) {
+    setSelections(prev => {
+      const next = { ...prev }
+      delete next[roleName]
+      return next
+    })
   }
 
   async function copyShareLink() {
+    const params = new URLSearchParams()
+    for (const [role, name] of Object.entries(selections)) {
+      if (name) params.set(role, name)
+    }
+    const url = `${window.location.origin}/matrix?${params.toString()}`
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      alert("Page link copied.");
+      await navigator.clipboard.writeText(url)
+      alert('Link copied to clipboard.')
     } catch {
-      alert("Could not copy link.");
+      alert(url)
     }
   }
 
-  const assignedActorNames = new Set(Object.values(selections));
+  const currentMessages = chatMessages[activeRole] ?? []
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background:
-          "linear-gradient(180deg, #0f172a 0%, #111827 45%, #0b1220 100%)",
-        color: "#f9fafb",
-        padding: "32px 24px 48px",
-      }}
-    >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <div
-          style={{
-            marginBottom: "28px",
-            padding: "24px",
-            borderRadius: "20px",
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 12px 40px rgba(0,0,0,0.25)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "12px",
-              marginBottom: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "12px",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#93c5fd",
-              }}
-            >
-              Wilderleague
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#09090b', color: '#f8fafc', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+
+      {/* Header */}
+      <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+        <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</div>
+        <div style={{ flex: 1 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ fontSize: '13px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+            ${remaining}M left
+          </div>
+          <div style={{ width: '80px' }}>
+            <div style={{ height: '3px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${Math.min((spent / budget) * 100, 100)}%`, background: overBudget ? '#ef4444' : '#22c55e', transition: 'width 0.2s' }} />
             </div>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                onClick={resetCast}
-                style={{
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(255,255,255,0.04)",
-                  color: "#e5e7eb",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  padding: "10px 14px",
-                  borderRadius: "999px",
-                  cursor: "pointer",
-                }}
-              >
-                Reset cast
-              </button>
-
-              <button
-                onClick={copyShareLink}
-                style={{
-                  border: "1px solid rgba(59,130,246,0.35)",
-                  background: "rgba(59,130,246,0.12)",
-                  color: "#bfdbfe",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  padding: "10px 14px",
-                  borderRadius: "999px",
-                  cursor: "pointer",
-                }}
-              >
-                Copy page link
-              </button>
-
-              <Link
-                href="/"
-                style={{
-                  textDecoration: "none",
-                  color: "#e5e7eb",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  padding: "10px 14px",
-                  borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(255,255,255,0.04)",
-                }}
-              >
-                ← Home
-              </Link>
-            </div>
+            <div style={{ fontSize: '10px', color: '#3f3f46', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
-
-          <h1
-            style={{
-              margin: 0,
-              fontSize: "36px",
-              lineHeight: 1.1,
-              fontWeight: 800,
-            }}
+          <button
+            onClick={() => setShowExportCard(true)}
+            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 13px', color: '#a1a1aa', fontSize: '12px', cursor: 'pointer' }}
           >
-            {title}
-          </h1>
-
-          <div
-            style={{
-              marginTop: "12px",
-              color: "#d1d5db",
-              fontSize: "16px",
-              lineHeight: 1.5,
-              maxWidth: "760px",
-            }}
+            Export card
+          </button>
+          <button
+            onClick={copyShareLink}
+            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
           >
-            {challenge}
-          </div>
-
-          <div
-            style={{
-              marginTop: "18px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              padding: "10px 14px",
-              borderRadius: "999px",
-              background: "rgba(59,130,246,0.12)",
-              border: "1px solid rgba(59,130,246,0.25)",
-              color: "#bfdbfe",
-              fontSize: "14px",
-              fontWeight: 600,
-            }}
-          >
-            Estimated cast budget: {budget}
-          </div>
+            Share ↗
+          </button>
         </div>
+      </div>
 
-        <div
-          style={{
-            marginBottom: "32px",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: "18px",
-          }}
-        >
-          {normalizedRoles.map((role, index) => {
-            const selectedActorName = selections[role.role_name];
-            const selectedActorForRole = normalizedActors.find(
-              (actor) => actor.name === selectedActorName
-            );
-            const isDragOver = dragOverRole === role.role_name;
+      {/* Body */}
+      <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', flex: 1, minHeight: 0 }}>
+
+        {/* ── Left: Cast board ── */}
+        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '4px' }}>
+            Cast board
+          </div>
+
+          {roles.map(role => {
+            const castActorName = selections[role.role_name]
+            const castActor = castActorName ? actors.find(a => a.name === castActorName) : undefined
+            const isDragOver = dragOverRole === role.role_name
 
             return (
               <div
-                key={`${role.role_name}-${index}`}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOverRole(role.role_name);
-                }}
-                onDragEnter={(e) => {
-                  e.preventDefault();
-                  setDragOverRole(role.role_name);
-                }}
-                onDragLeave={() => {
-                  setDragOverRole((current) =>
-                    current === role.role_name ? null : current
-                  );
-                }}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  const actorName = e.dataTransfer.getData("text/plain");
-
-                  if (actorName) {
-                    assignActorToRole(role.role_name, actorName);
-                  }
-
-                  setDragOverRole(null);
-                  setDraggingActorId(null);
+                key={role.role_name}
+                onDragOver={e => { e.preventDefault(); setDragOverRole(role.role_name) }}
+                onDragEnter={e => { e.preventDefault(); setDragOverRole(role.role_name) }}
+                onDragLeave={() => setDragOverRole(prev => prev === role.role_name ? null : prev)}
+                onDrop={e => {
+                  e.preventDefault()
+                  const actorName = e.dataTransfer.getData('text/plain')
+                  if (actorName) assignActorToRole(role.role_name, actorName)
+                  setDragOverRole(null)
                 }}
                 style={{
-                  background: isDragOver
-                    ? "rgba(59,130,246,0.12)"
-                    : "rgba(255,255,255,0.04)",
-                  border: isDragOver
-                    ? "1px solid rgba(96,165,250,0.65)"
-                    : "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "18px",
-                  padding: "18px",
+                  border: `1px solid ${isDragOver ? '#3b82f6' : 'rgba(255,255,255,0.07)'}`,
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  background: isDragOver ? 'rgba(59,130,246,0.08)' : '#111115',
+                  transition: 'border-color 0.12s, background 0.12s',
                 }}
               >
-                <div
-                  style={{
-                    fontSize: "12px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    color: "#9ca3af",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Role
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 800,
-                    marginBottom: "8px",
-                  }}
-                >
+                <div style={{ fontSize: '10px', color: '#52525b', marginBottom: '8px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {role.role_name}
                 </div>
 
-                <div
-                  style={{
-                    color: "#cbd5e1",
-                    fontSize: "14px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  Original: {role.original_actor ?? "Unknown"}
-                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
 
-                <div
-                  style={{
-                    marginBottom: "14px",
-                    minHeight: "92px",
-                    borderRadius: "14px",
-                    border: isDragOver
-                      ? "1px dashed rgba(147,197,253,0.9)"
-                      : "1px dashed rgba(255,255,255,0.16)",
-                    background: isDragOver
-                      ? "rgba(30,41,59,0.85)"
-                      : "rgba(15,23,42,0.55)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: selectedActorForRole
-                      ? "space-between"
-                      : "center",
-                    gap: "12px",
-                    padding: "12px",
-                  }}
-                >
-                  {selectedActorForRole ? (
-                    <>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                        }}
-                      >
-                        {selectedActorForRole.image && (
-                          <img
-                            src={selectedActorForRole.image}
-                            alt={selectedActorForRole.name}
-                            style={{
-                              width: "44px",
-                              height: "66px",
-                              objectFit: "cover",
-                              borderRadius: "8px",
-                            }}
-                          />
-                        )}
+                  {/* Original actor */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                    <div style={{ width: '40px', height: '56px', borderRadius: '6px', background: '#1c1c1e', overflow: 'hidden', flexShrink: 0 }}>
+                      {role.original_actor_image ? (
+                        <img
+                          src={role.original_actor_image}
+                          alt={role.original_actor}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '16px' }}>?</div>
+                      )}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: '10px', color: '#3f3f46' }}>Original</div>
+                      <div style={{ fontSize: '12px', fontWeight: 600, color: '#71717a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {role.original_actor}
+                      </div>
+                    </div>
+                  </div>
 
-                        <div>
-                          <div
-                            style={{
-                              fontSize: "12px",
-                              color: "#9ca3af",
-                              marginBottom: "4px",
-                            }}
-                          >
-                            Recast
-                          </div>
-                          <div
-                            style={{
-                              fontSize: "14px",
-                              color: "#86efac",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {selectedActorForRole.name}
+                  {/* Arrow */}
+                  <div style={{ color: '#27272a', fontSize: '14px', flexShrink: 0 }}>→</div>
+
+                  {/* New cast slot */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    {castActor ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '40px', height: '56px', borderRadius: '6px', background: '#1c1c1e', overflow: 'hidden', flexShrink: 0 }}>
+                          {castActor.image ? (
+                            <img
+                              src={castActor.image}
+                              alt={castActor.name}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                          ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '10px' }}>?</div>
+                          )}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '11px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>${castActor.cost}M</div>
+                          <div style={{ fontSize: '12px', fontWeight: 600, color: '#e2e8f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {castActor.name}
                           </div>
                         </div>
+                        <button
+                          onClick={() => clearRole(role.role_name)}
+                          style={{ background: 'none', border: 'none', color: '#3f3f46', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '2px', flexShrink: 0 }}
+                        >
+                          ×
+                        </button>
                       </div>
-
-                      <button
-                        onClick={() => clearRole(role.role_name)}
-                        style={{
-                          border: "1px solid rgba(255,255,255,0.12)",
-                          background: "rgba(255,255,255,0.05)",
-                          color: "#f9fafb",
-                          borderRadius: "10px",
-                          padding: "8px 10px",
-                          cursor: "pointer",
-                          fontSize: "12px",
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </>
-                  ) : (
-                    <div
-                      style={{
-                        fontSize: "13px",
-                        color: isDragOver ? "#bfdbfe" : "#9ca3af",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Drag an actor here
-                    </div>
-                  )}
+                    ) : (
+                      <div style={{
+                        height: '56px',
+                        borderRadius: '6px',
+                        border: `1px dashed ${isDragOver ? '#3b82f6' : '#27272a'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '11px',
+                        color: isDragOver ? '#60a5fa' : '#3f3f46',
+                        fontStyle: 'italic',
+                      }}>
+                        {isDragOver ? 'drop here' : 'drag here'}
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                <select
-                  value={selections[role.role_name] ?? ""}
-                  onChange={(e) => handleSelect(role.role_name, e.target.value)}
-                  style={{
-                    width: "100%",
-                    borderRadius: "12px",
-                    padding: "12px 14px",
-                    background: "#111827",
-                    color: "#f9fafb",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                    fontSize: "15px",
-                    outline: "none",
-                  }}
-                >
-                  <option value="">Select actor</option>
-                  {normalizedActors
-                    .filter((actor) => {
-                      const selectedElsewhere = Object.entries(selections).some(
-                        ([selectedRole, selectedActorName]) =>
-                          selectedRole !== role.role_name &&
-                          selectedActorName === actor.name
-                      );
-
-                      return !selectedElsewhere;
-                    })
-                    .map((actor, j) => (
-                      <option
-                        key={`${actor.tmdb_id || actor.id || "actor"}-${j}`}
-                        value={actor.name}
-                      >
-                        {actor.name}
-                      </option>
-                    ))}
-                </select>
               </div>
-            );
+            )
           })}
         </div>
 
-        <div
-          style={{
-            marginBottom: "14px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontSize: "24px",
-              fontWeight: 800,
-            }}
-          >
-            Actor Pool
-          </h2>
+        {/* ── Right: Actor finder ── */}
+        <div style={{ padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-          <div
-            style={{
-              color: "#9ca3af",
-              fontSize: "14px",
-            }}
-          >
-            Drag actors into roles or click for details
+          {/* Role selector */}
+          <div>
+            <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>
+              Working on
+            </div>
+            <select
+              value={activeRole}
+              onChange={e => setActiveRole(e.target.value)}
+              style={{ width: '100%', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '9px 13px', color: '#f8fafc', fontSize: '14px', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
+            >
+              {roles.map(r => (
+                <option key={r.role_name} value={r.role_name}>{r.role_name}</option>
+              ))}
+            </select>
           </div>
-        </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-            gap: "18px",
-          }}
-        >
-          {normalizedActors.map((actor, index) => {
-            const isAssigned = assignedActorNames.has(actor.name);
-            const isDragging = draggingActorId === actor.id;
+          {/* AI chat */}
+          <div style={{ background: '#111115', border: '1px solid #27272a', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px', minHeight: '80px' }}>
+            {aiLoading && currentMessages.length === 0 && (
+              <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>Thinking…</div>
+            )}
+            {currentMessages.map((msg, i) => (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
+                    AI
+                  </span>
+                  <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.55 }}>{msg.text}</div>
+                </div>
+                {msg.suggestion && (
+                  <button
+                    onClick={() => { setQuery(msg.suggestion!); handleSearchWithQuery(msg.suggestion!) }}
+                    style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
+                  >
+                    💬 {msg.suggestion}
+                  </button>
+                )}
+              </div>
+            ))}
+            {aiLoading && currentMessages.length > 0 && (
+              <div style={{ fontSize: '12px', color: '#52525b', fontStyle: 'italic' }}>Thinking…</div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
 
-            return (
-              <div
-                key={`${actor.id || actor.name}-${index}`}
-                draggable={!isAssigned}
-                onDragStart={(e) => {
-                  if (isAssigned) {
-                    e.preventDefault();
-                    return;
-                  }
-
-                  e.dataTransfer.setData("text/plain", actor.name);
-                  e.dataTransfer.effectAllowed = "move";
-                  handleDragStart(actor);
-                }}
-                onDragEnd={handleDragEnd}
-                style={{
-                  background: isAssigned
-                    ? "rgba(255,255,255,0.02)"
-                    : "rgba(255,255,255,0.04)",
-                  border: isDragging
-                    ? "1px solid rgba(96,165,250,0.7)"
-                    : "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: "16px",
-                  padding: "10px",
-                  color: "#f9fafb",
-                  opacity: isAssigned ? 0.45 : isDragging ? 0.6 : 1,
-                  cursor: isAssigned ? "not-allowed" : "grab",
-                }}
+          {/* Search */}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
+              placeholder='e.g. "young, intense, physical presence"'
+              style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '9px 13px', color: '#f8fafc', fontSize: '13px', outline: 'none' }}
+            />
+            <button
+              onClick={handleSearch}
+              disabled={aiLoading || !query.trim()}
+              style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '9px 16px', fontSize: '13px', fontWeight: 600, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
+            >
+              Search
+            </button>
+            {isFiltered && (
+              <button
+                onClick={() => { setVisibleActors(actors.slice(0, 12)); setIsFiltered(false); setQuery('') }}
+                style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '13px', cursor: 'pointer', flexShrink: 0 }}
               >
-                <button
-                  onClick={() => setSelectedActor(actor)}
+                Reset
+              </button>
+            )}
+          </div>
+
+          {/* Count */}
+          <div style={{ fontSize: '11px', color: '#3f3f46' }}>
+            {isFiltered ? 'AI suggestions — drag to cast' : `Top ${visibleActors.length} actors`}
+          </div>
+
+          {/* Actor grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px' }}>
+            {visibleActors.map((actor, i) => {
+              const isAssigned = assignedNames.has(actor.name)
+              const isDragging = draggingActor === actor.name
+              const isAiPick = isFiltered && i < 8
+
+              return (
+                <div
+                  key={actor.name}
+                  draggable={!isAssigned}
+                  onDragStart={e => {
+                    if (isAssigned) { e.preventDefault(); return }
+                    e.dataTransfer.setData('text/plain', actor.name)
+                    e.dataTransfer.effectAllowed = 'move'
+                    setDraggingActor(actor.name)
+                  }}
+                  onDragEnd={() => setDraggingActor(null)}
                   style={{
-                    display: "block",
-                    width: "100%",
-                    background: "transparent",
-                    border: "none",
-                    padding: 0,
-                    textAlign: "left",
-                    color: "inherit",
-                    cursor: "pointer",
+                    border: `1px solid ${isAiPick ? 'rgba(59,130,246,0.45)' : '#27272a'}`,
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    background: isAssigned ? '#0d0d0f' : isAiPick ? 'rgba(15,26,48,1)' : '#18181b',
+                    opacity: isAssigned ? 0.3 : isDragging ? 0.35 : 1,
+                    cursor: isAssigned ? 'default' : 'grab',
+                    transition: 'opacity 0.15s',
+                    userSelect: 'none',
                   }}
                 >
-                  <div
-                    style={{
-                      width: "100%",
-                      aspectRatio: "2 / 3",
-                      overflow: "hidden",
-                      borderRadius: "12px",
-                      background: "#1f2937",
-                      marginBottom: "10px",
-                    }}
-                  >
+                  <div style={{ aspectRatio: '2/3', background: '#111115', overflow: 'hidden' }}>
                     {actor.image ? (
                       <img
                         src={actor.image}
                         alt={actor.name}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
+                        draggable={false}
                       />
                     ) : (
-                      <div
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#9ca3af",
-                          fontSize: "13px",
-                        }}
-                      >
-                        No image
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '11px' }}>
+                        No photo
                       </div>
                     )}
                   </div>
-
-                  <div
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 700,
-                      lineHeight: 1.3,
-                      marginBottom: "4px",
-                    }}
-                  >
-                    {actor.name}
+                  <div style={{ padding: '8px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#f1f5f9', lineHeight: 1.3, marginBottom: '2px' }}>
+                      {actor.name}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#52525b', fontVariantNumeric: 'tabular-nums' }}>
+                      ${actor.cost}M
+                    </div>
                   </div>
-
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#9ca3af",
-                    }}
-                  >
-                    {actor.birthYear ?? "Year unknown"}
-                  </div>
-                </button>
-
-                <div
-                  style={{
-                    marginTop: "8px",
-                    fontSize: "11px",
-                    color: isAssigned ? "#fca5a5" : "#93c5fd",
-                    fontWeight: 600,
-                  }}
-                >
-                  {isAssigned ? "Already cast" : "Drag to cast"}
                 </div>
-              </div>
-            );
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      {selectedActor && (
-        <ActorCardModal
-          actor={selectedActor}
-          onClose={() => setSelectedActor(null)}
-        />
+      {/* Export card modal */}
+      {showExportCard && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}
+          onClick={() => setShowExportCard(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid #27272a', borderRadius: '16px', padding: '28px', width: '360px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '10px' }}>
+              Wilderleague
+            </div>
+            <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px' }}>
+              {title}
+            </div>
+
+            {roles.map(role => {
+              const actorName = selections[role.role_name]
+              const actor = actorName ? actors.find(a => a.name === actorName) : undefined
+              return (
+                <div
+                  key={role.role_name}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #1c1c1e' }}
+                >
+                  <div>
+                    <div style={{ fontSize: '10px', color: '#52525b', marginBottom: '2px' }}>{role.role_name}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: actorName ? '#f1f5f9' : '#3f3f46', fontStyle: actorName ? 'normal' : 'italic' }}>
+                      {actorName ?? 'Uncast'}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: actor ? '#4ade80' : '#27272a', fontVariantNumeric: 'tabular-nums' }}>
+                    {actor ? `$${actor.cost}M` : '—'}
+                  </div>
+                </div>
+              )
+            })}
+
+            <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
+                ${spent}M / ${budget}M
+              </div>
+              <button
+                onClick={copyShareLink}
+                style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Copy share link ↗
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
-  );
+  )
+
+  async function handleSearchWithQuery(q: string) {
+    if (!q.trim()) return
+    setAiLoading(true)
+    const role = roles.find(r => r.role_name === activeRole)
+    try {
+      const res = await fetch('/api/role-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'search',
+          role: activeRole,
+          movie: title,
+          originalActor: role?.original_actor ?? '',
+          query: q,
+          actors: actors.map(a => a.name),
+        }),
+      })
+      const data = await res.json()
+      if (data.reply) {
+        setChatMessages(prev => ({
+          ...prev,
+          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply, suggestion: data.suggestion }],
+        }))
+      }
+      if (data.actors?.length) {
+        const nameSet = new Set<string>(data.actors)
+        const picks = (data.actors as string[])
+          .map(name => actors.find(a => a.name === name))
+          .filter((a): a is CastActor => Boolean(a))
+        const rest = actors.filter(a => !nameSet.has(a.name)).slice(0, 6)
+        setVisibleActors([...picks, ...rest].slice(0, 12))
+        setIsFiltered(true)
+      }
+    } catch {}
+    finally { setAiLoading(false) }
+  }
 }

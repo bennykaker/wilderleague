@@ -1,4 +1,5 @@
-role_name,original_actor
-Neo,Keanu Reeves
-Trinity,Carrie-Anne Moss
-Morpheus,Laurence Fishburne
+role_name,original_actor,original_actor_image
+Neo,Keanu Reeves,https://image.tmdb.org/t/p/w500/8RZLOyYGsoRe9p44q3xin9QkMHv.jpg
+Trinity,Carrie-Anne Moss,
+Morpheus,Laurence Fishburne,
+Agent Smith,Hugo Weaving,
