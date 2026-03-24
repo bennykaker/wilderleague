@@ -76,12 +76,11 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
       .then(r => r.json())
       .then(data => {
         if (cancelled) return
-        if (data.reply) {
-          setChatMessages(prev => ({
-            ...prev,
-            [activeRole]: [{ text: data.reply, suggestion: data.suggestion }],
-          }))
-        }
+        const reply = data.reply || data.error || 'No response from AI.'
+        setChatMessages(prev => ({
+          ...prev,
+          [activeRole]: [{ text: reply, suggestion: data.suggestion ?? null }],
+        }))
         if (data.actors?.length) {
           const nameSet = new Set<string>(data.actors)
           const picks = (data.actors as string[])
@@ -92,7 +91,13 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           setIsFiltered(true)
         }
       })
-      .catch(() => {})
+      .catch(err => {
+        if (cancelled) return
+        setChatMessages(prev => ({
+          ...prev,
+          [activeRole]: [{ text: `Error: ${err?.message ?? 'fetch failed'}`, suggestion: null }],
+        }))
+      })
       .finally(() => { if (!cancelled) setAiLoading(false) })
 
     return () => { cancelled = true }

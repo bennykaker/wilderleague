@@ -98,7 +98,7 @@ Return ONLY this JSON (no markdown, no explanation):
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       console.error('No JSON in role-chat response:', text)
-      return Response.json({ reply: '', actors: [] })
+      return Response.json({ error: `Unexpected AI response: ${text.slice(0, 120)}`, reply: '', actors: [] })
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as RoleChatResponse
@@ -112,6 +112,7 @@ Return ONLY this JSON (no markdown, no explanation):
     })
   } catch (err) {
     console.error('Role chat error:', err)
-    return Response.json({ reply: '', actors: [] })
+    const msg = err instanceof Error ? err.message : String(err)
+    return Response.json({ error: msg, reply: '', actors: [] })
   }
 }
