@@ -22,18 +22,27 @@ type ChatMsg = {
   suggestion?: string | null
 }
 
+type ChallengeInfo = {
+  id: string
+  label: string
+  headline: string
+  description: string
+  badge: string
+}
+
 type Props = {
   actors: CastActor[]
   roles: CastRole[]
   title: string
   budget: number
   preloadedSuggestions?: Record<string, string[]>
+  challenge?: ChallengeInfo
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
 type Selections = Record<string, string[]>
 
-export default function CastingBoard({ actors, roles, title, budget, preloadedSuggestions = {} }: Props) {
+export default function CastingBoard({ actors, roles, title, budget, preloadedSuggestions = {}, challenge }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -339,6 +348,18 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
           </button>
         </div>
       </div>
+
+      {/* Challenge banner */}
+      {challenge && (
+        <div style={{ padding: '10px 24px', background: 'rgba(251,191,36,0.07)', borderBottom: '1px solid rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          <span style={{ fontSize: '20px' }}>{challenge.badge}</span>
+          <div>
+            <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
+            <span style={{ fontSize: '14px', color: '#fef3c7', fontWeight: 700 }}>{challenge.headline}</span>
+          </div>
+          <div style={{ fontSize: '13px', color: '#d97706', marginLeft: '4px' }}>— {challenge.description}</div>
+        </div>
+      )}
 
       {/* Body */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0 }}>

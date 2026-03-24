@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { getTitles } from './data/titles'
+import { getActiveChallenge } from './data/challenges'
 
 export default function HomePage() {
   const all = getTitles()
   const featured = all.slice(0, 5)
+  const challenge = getActiveChallenge()
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
@@ -12,12 +14,14 @@ export default function HomePage() {
         .title-card:hover { border-color: rgba(255,255,255,0.18) !important; }
         .poster-card { transition: transform 0.15s, box-shadow 0.15s; }
         .poster-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.6) !important; }
+        .challenge-card:hover { border-color: rgba(251,191,36,0.5) !important; background: rgba(251,191,36,0.08) !important; }
       `}</style>
 
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
 
-        {/* Header */}
-        <div style={{ marginBottom: '52px' }}>
+        {/* Header row: branding + weekly challenge */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '52px' }}>
+          <div style={{ flex: 1 }}>
           <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '12px' }}>
             Wilderleague
           </div>
@@ -30,6 +34,34 @@ export default function HomePage() {
           <Link href="/actors" style={{ fontSize: '13px', color: '#52525b', textDecoration: 'none', borderBottom: '1px solid #27272a', paddingBottom: '2px' }}>
             Browse actor pool →
           </Link>
+          </div>
+
+          {/* Weekly challenge card */}
+          {challenge && (
+            <Link href={`/challenge/${challenge.id}`} style={{ textDecoration: 'none', flexShrink: 0, width: '300px' }}>
+              <div className="challenge-card" style={{
+                border: '1px solid rgba(251,191,36,0.3)',
+                borderRadius: '16px',
+                padding: '20px',
+                background: 'rgba(251,191,36,0.05)',
+                transition: 'border-color 0.15s, background 0.15s',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '22px' }}>{challenge.badge}</span>
+                  <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{challenge.label}</span>
+                </div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: '#fef3c7', lineHeight: 1.3, marginBottom: '8px' }}>
+                  {challenge.headline}
+                </div>
+                <div style={{ fontSize: '13px', color: '#d97706', lineHeight: 1.5, marginBottom: '16px' }}>
+                  {challenge.description}
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#fbbf24' }}>
+                  Take the challenge →
+                </div>
+              </div>
+            </Link>
+          )}
         </div>
 
         {/* Featured poster strip */}
