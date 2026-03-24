@@ -14,6 +14,14 @@ export interface EnrichedActor {
   keywords: string
   notes: string
   cost: number
+  archetype?: string
+  strengths?: string
+  weaknesses?: string
+  best_cast_as?: string
+  signature_quality?: string
+  career_stage?: string
+  casting_profile?: string
+  deep_dive_date?: string
 }
 
 function popularityToCost(pop: number): number {
@@ -54,6 +62,14 @@ export function getEnrichedActors(): EnrichedActor[] {
         keywords: row.keywords?.trim() ?? '',
         notes: row.notes?.trim() ?? '',
         cost: popularityToCost(pop),
+        archetype: row.archetype?.trim() || undefined,
+        strengths: row.strengths?.trim() || undefined,
+        weaknesses: row.weaknesses?.trim() || undefined,
+        best_cast_as: row.best_cast_as?.trim() || undefined,
+        signature_quality: row.signature_quality?.trim() || undefined,
+        career_stage: row.career_stage?.trim() || undefined,
+        casting_profile: row.casting_profile?.trim() || undefined,
+        deep_dive_date: row.deep_dive_date?.trim() || undefined,
       }
     })
     .sort((a, b) => b.popularity - a.popularity)
