@@ -1,73 +1,70 @@
-export type Actor = {
-  name: string;
-  cost: number;
-  image: string;
-};
+export interface Movie {
+  slug: string
+  title: string
+  year: number
+  budget: number
+  roles: string[]
+  originalCast: Record<string, string>
+  logline: string
+}
 
-export type MovieData = {
-  slug: string;
-  title: string;
-  budget: number;
-  roles: string[];
-  actors: Actor[];
-  defaultCastTitle: string;
-};
-
-export const movies: Record<string, MovieData> = {
+export const movies: Record<string, Movie> = {
   matrix: {
-    slug: "matrix",
-    title: "The Matrix",
-    budget: 90,
-    roles: ["Neo", "Trinity", "Morpheus", "Agent Smith"],
-    defaultCastTitle: "My Matrix Cast",
-    actors: [
-      { name: "Dev Patel", cost: 8, image: "/test.jpg" },
-      { name: "Jodie Comer", cost: 7, image: "/test.jpg" },
-      { name: "Mahershala Ali", cost: 10, image: "/test.jpg" },
-      { name: "Cillian Murphy", cost: 9, image: "/test.jpg" },
-      { name: "Florence Pugh", cost: 10, image: "/test.jpg" },
-      { name: "Oscar Isaac", cost: 8, image: "/test.jpg" },
-    ],
+    slug: 'matrix',
+    title: 'The Matrix',
+    year: 1999,
+    budget: 100,
+    logline: 'A computer hacker discovers reality is a simulation and joins a rebellion.',
+    roles: ['Neo', 'Trinity', 'Morpheus', 'Agent Smith'],
+    originalCast: {
+      'Neo': 'Keanu Reeves',
+      'Trinity': 'Carrie-Anne Moss',
+      'Morpheus': 'Laurence Fishburne',
+      'Agent Smith': 'Hugo Weaving',
+    },
   },
-
-  apartment: {
-    slug: "apartment",
-    title: "The Apartment",
-    budget: 35,
-    roles: ["C.C. Baxter", "Fran Kubelik", "Jeff D. Sheldrake", "Dr. Dreyfuss"],
-    defaultCastTitle: "My Apartment Cast",
-    actors: [
-      { name: "Paul Mescal", cost: 8, image: "/test.jpg" },
-      { name: "Daisy Edgar-Jones", cost: 7, image: "/test.jpg" },
-      { name: "Jon Hamm", cost: 6, image: "/test.jpg" },
-      { name: "John Turturro", cost: 4, image: "/test.jpg" },
-      { name: "Glen Powell", cost: 9, image: "/test.jpg" },
-      { name: "Jodie Comer", cost: 8, image: "/test.jpg" },
-      { name: "Bryan Cranston", cost: 7, image: "/test.jpg" },
-      { name: "Mark Ruffalo", cost: 8, image: "/test.jpg" },
-      { name: "Carey Mulligan", cost: 7, image: "/test.jpg" },
-      { name: "Sterling K. Brown", cost: 6, image: "/test.jpg" },
-    ],
-  },godfather: {
-  slug: "godfather",
-  title: "The Godfather",
-  budget: 70,
-  roles: [
-    "Michael Corleone",
-    "Vito Corleone",
-    "Sonny Corleone",
-    "Tom Hagen",
-    "Kay Adams",
-    "Connie Corleone",
-  ],
-  defaultCastTitle: "My Godfather Cast",
-  actors: [
-    { name: "Adam Driver", cost: 10, image: "/test.jpg" },
-    { name: "Oscar Isaac", cost: 9, image: "/test.jpg" },
-    { name: "Florence Pugh", cost: 9, image: "/test.jpg" },
-    { name: "Paul Mescal", cost: 8, image: "/test.jpg" },
-    { name: "Jodie Comer", cost: 8, image: "/test.jpg" },
-    { name: "Mahershala Ali", cost: 10, image: "/test.jpg" },
-  ],
-},
-};
+  godfather: {
+    slug: 'godfather',
+    title: 'The Godfather',
+    year: 1972,
+    budget: 80,
+    logline: 'The patriarch of an organized crime dynasty transfers control to his reluctant son.',
+    roles: ['Michael Corleone', 'Vito Corleone', 'Sonny Corleone', 'Tom Hagen', 'Kay Adams'],
+    originalCast: {
+      'Michael Corleone': 'Al Pacino',
+      'Vito Corleone': 'Marlon Brando',
+      'Sonny Corleone': 'James Caan',
+      'Tom Hagen': 'Robert Duvall',
+      'Kay Adams': 'Diane Keaton',
+    },
+  },
+  pulpfiction: {
+    slug: 'pulpfiction',
+    title: 'Pulp Fiction',
+    year: 1994,
+    budget: 80,
+    logline: 'Intertwining stories of criminals, a boxer, and hitmen in Los Angeles.',
+    roles: ['Vincent Vega', 'Jules Winnfield', 'Mia Wallace', 'Butch Coolidge', 'Marsellus Wallace'],
+    originalCast: {
+      'Vincent Vega': 'John Travolta',
+      'Jules Winnfield': 'Samuel L. Jackson',
+      'Mia Wallace': 'Uma Thurman',
+      'Butch Coolidge': 'Bruce Willis',
+      'Marsellus Wallace': 'Ving Rhames',
+    },
+  },
+  diehard: {
+    slug: 'diehard',
+    title: 'Die Hard',
+    year: 1988,
+    budget: 70,
+    logline: 'A New York cop battles terrorists who have taken over a Los Angeles skyscraper.',
+    roles: ['John McClane', 'Hans Gruber', 'Al Powell', 'Holly Gennaro'],
+    originalCast: {
+      'John McClane': 'Bruce Willis',
+      'Hans Gruber': 'Alan Rickman',
+      'Al Powell': 'Reginald VelJohnson',
+      'Holly Gennaro': 'Bonnie Bedelia',
+    },
+  },
+}
