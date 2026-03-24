@@ -46,6 +46,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
   const [isFiltered, setIsFiltered] = useState(false)
   const [showExportCard, setShowExportCard] = useState(false)
   const [showBlockedModal, setShowBlockedModal] = useState(false)
+  const [confirmBan, setConfirmBan] = useState<string | null>(null)
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -308,7 +309,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               onClick={() => setShowBlockedModal(true)}
               style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '8px', padding: '6px 10px', color: '#f87171', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
-              🚫 {blockedActors.size} blocked
+              🚫 {blockedActors.size} banned
             </button>
           )}
           <div style={{ fontSize: '13px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
@@ -631,8 +632,8 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                       </div>
                       {!isAssigned && (
                         <button
-                          onClick={e => { e.stopPropagation(); blockActor(actor.name) }}
-                          title={`Never show ${actor.name}`}
+                          onClick={e => { e.stopPropagation(); setConfirmBan(actor.name) }}
+                          title={`Ban ${actor.name} from your talent pool`}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '11px', lineHeight: 1, color: '#3f3f46', opacity: 0.6 }}
                         >
                           🚫
@@ -749,6 +750,41 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
         </div>
       )}
 
+      {/* Ban confirmation dialog */}
+      {confirmBan && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}
+          onClick={() => setConfirmBan(null)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '16px', padding: '28px 28px 24px', width: '340px', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '28px', marginBottom: '12px' }}>🚫</div>
+            <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>
+              Ban {confirmBan}?
+            </div>
+            <div style={{ fontSize: '13px', color: '#71717a', marginBottom: '24px', lineHeight: 1.5 }}>
+              They won't appear in any suggestion grid. You can unban them any time from the banned actors list.
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setConfirmBan(null)}
+                style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px', fontSize: '13px', color: '#a1a1aa', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { blockActor(confirmBan); setConfirmBan(null) }}
+                style={{ flex: 1, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '10px', padding: '10px', fontSize: '13px', color: '#f87171', cursor: 'pointer', fontWeight: 700 }}
+              >
+                Ban permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Blocked actors modal */}
       {showBlockedModal && (
         <div
@@ -760,7 +796,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700 }}>Never show</div>
+              <div style={{ fontSize: '14px', fontWeight: 700 }}>Banned actors</div>
               <button onClick={() => setShowBlockedModal(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '18px', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ fontSize: '12px', color: '#52525b', marginBottom: '14px' }}>
