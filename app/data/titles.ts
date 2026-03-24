@@ -46,6 +46,29 @@ export function getTitle(slug: string): Title | null {
   return getTitles().find(t => t.slug === slug) ?? null
 }
 
+export interface Suggestion {
+  role_name: string
+  actors: string[]
+}
+
+let _suggestions: Record<string, string>[] | null = null
+
+export function getSuggestionsForTitle(slug: string): Record<string, string[]> {
+  if (!_suggestions) {
+    const filePath = path.join(process.cwd(), 'data', 'role-suggestions.csv')
+    if (!fs.existsSync(filePath)) return {}
+    const file = fs.readFileSync(filePath, 'utf8')
+    _suggestions = Papa.parse<Record<string, string>>(file, { header: true, skipEmptyLines: true }).data
+  }
+  const result: Record<string, string[]> = {}
+  _suggestions
+    .filter(r => r.movie_slug === slug)
+    .forEach(r => {
+      result[r.role_name] = (r.suggestions ?? '').split(';').map(s => s.trim()).filter(Boolean)
+    })
+  return result
+}
+
 export function getRolesForTitle(slug: string): Role[] {
   if (!_roles) {
     const file = fs.readFileSync(path.join(process.cwd(), 'data', 'roles.csv'), 'utf8')

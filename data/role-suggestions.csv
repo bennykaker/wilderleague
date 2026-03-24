@@ -1,0 +1,345 @@
+movie_slug,role_name,original_actor,suggestions
+the-matrix,Neo,Keanu Reeves,Tom Holland; Jacob Elordi; Andrew Garfield; Jake Gyllenhaal; Ansel Elgort
+the-matrix,Morpheus,Laurence Fishburne,Denzel Washington; Idris Elba; Morgan Freeman; Liam Neeson; Mahershala Ali; Sterling K. Brown
+the-matrix,Trinity,Carrie-Anne Moss,Zendaya; Charlize Theron; Ana de Armas; Rebecca Ferguson; Scarlett Johansson; Elizabeth Olsen; Hailee Steinfeld; Alicia Vikander
+the-matrix,Agent Smith,Hugo Weaving,Tom Hardy; Jude Law; Mark Strong; Jon Bernthal; Michael Shannon; Mads Mikkelsen; Ralph Fiennes
+the-matrix,Oracle,Gloria Foster,Toni Collette; Michelle Pfeiffer; Julianne Moore; Jamie Lee Curtis; Meryl Streep; Kate Winslet; Frances McDormand; Cate Blanchett
+the-matrix,Cypher,Joe Pantoliano,Shia LaBeouf; Walton Goggins; Edward Norton; Jesse Plemons; Joaquin Phoenix; Michael Shannon; Jack O'Connell
+the-matrix,Tank,Marcus Chong,John Cena; Dave Bautista; Jason Momoa; Dwayne Johnson; Alan Ritchson; Vin Diesel; Tyrese Gibson
+terminator-2,The Terminator,Arnold Schwarzenegger,Jason Statham; Dave Bautista; Dolph Lundgren; Jean-Claude Van Damme; Jet Li; Scott Adkins; Vin Diesel; Tom Hardy
+terminator-2,Sarah Connor,Linda Hamilton,Charlize Theron; Jessica Biel; Michelle Pfeiffer; Rosamund Pike; Rebecca Ferguson; Ana de Armas; Angelina Jolie; Kate Winslet
+terminator-2,John Connor,Edward Furlong,Tom Holland; Jacob Elordi; Finn Wolfhard; Joe Keery; Noah Fearnley; Jack O'Connell; Andrew Garfield
+terminator-2,T-1000,Robert Patrick,Tom Cruise; Jake Gyllenhaal; Ryan Gosling; Cillian Murphy; Jude Law; Tom Hardy; Barry Keoghan; Benedict Cumberbatch
+terminator-2,Dr. Silberman,Earl Boen,Morgan Freeman; Tom Hanks; Ed Harris; Kevin Bacon; George Clooney; Ralph Fiennes; Kurt Russell; J.K. Simmons
+terminator-2,Miles Dyson,Joe Morton,Denzel Washington; Idris Elba; Dwayne Johnson; Dave Bautista; Giancarlo Esposito
+terminator-2,Tarissa Dyson,S. Epatha Merkerson,Halle Berry; Zoe Saldaña; Regina King; Lupita Nyong'o; Jurnee Smollett; Kerry Washington
+aliens,Ripley,Sigourney Weaver,Charlize Theron; Rebecca Ferguson; Morena Baccarin; Emilia Clarke; Rosamund Pike; Rachel McAdams; Kate Winslet; Zoe Saldaña
+aliens,Newt,Carrie Henn,Mckenna Grace; Elle Fanning; Sadie Sink; Millie Bobby Brown; Emma Myers; Dafne Keen; Paisley Cadorath; Isabel May
+aliens,Corporal Hicks,Michael Biehn,Pedro Pascal; Jake Gyllenhaal; Tom Hardy; Alan Ritchson; Jack O'Connell; Jesse Plemons; Josh Brolin; Jon Bernthal
+aliens,Burke,Paul Reiser,Cillian Murphy; Simon Baker; Barry Keoghan; Aidan Gillen; Jude Law; Edward Norton; Mark Strong; Javier Bardem
+aliens,Bishop,Lance Henriksen,Udo Kier; Tony Leung Chiu-wai; Ralph Fiennes; Mads Mikkelsen; Benedict Cumberbatch; Jude Law; Willem Dafoe
+aliens,Private Hudson,Bill Paxton,Shia LaBeouf; Walton Goggins; Jensen Ackles; Tyriq Withers; Nicholas Brendon; Joe Keery; Finn Wolfhard
+aliens,Lieutenant Gorman,William Hope,Liam Neeson; Ed Harris; Kevin Bacon; George Clooney; Matthew McConaughey; Sam Elliott; Stephen Graham; Chris Hemsworth
+blade-runner,Deckard,Harrison Ford,Ryan Gosling; Jake Gyllenhaal; Matthew McConaughey; Jude Law; Tom Hardy; Pedro Pascal; Edward Norton; Jon Bernthal
+blade-runner,Batty,Rutger Hauer,Tom Hardy; Jason Momoa; Vin Diesel; Dave Bautista; Idris Elba; Javier Bardem; Mads Mikkelsen; Ralph Fiennes
+blade-runner,Rachael,Sean Young,Ana de Armas; Rebecca Ferguson; Emilia Clarke; Anya Taylor-Joy; Emma Stone; Scarlett Johansson; Margot Robbie; Elle Fanning
+blade-runner,Gaff,Edward James Olmos,Jude Law; Aidan Gillen; Mark Strong; Tony Leung Chiu-wai; Cillian Murphy; Benedict Cumberbatch; Pedro Pascal; Jack O'Connell
+blade-runner,Bryant,M. Emmet Walsh,Morgan Freeman; Denzel Washington; Liam Neeson; Ed Harris; Michael Shannon; Walton Goggins; Kevin Bacon; Jeffrey Dean Morgan
+blade-runner,Pris,Daryl Hannah,Charlize Theron; Megan Fox; Zoe Saldaña; Penélope Cruz; Angelina Jolie; Halle Berry; Milla Jovovich
+blade-runner,Sebastian,William Sanderson,Jacob Elordi; Jack O'Connell; Hayden Christensen; Theo James; Andrew Garfield; Tom Holland; Joseph Gordon-Levitt
+the-dark-knight,Bruce Wayne,Christian Bale,Ryan Gosling; Jake Gyllenhaal; Michael Fassbender; Tom Hardy; Andrew Garfield
+the-dark-knight,Joker,Heath Ledger,Joaquin Phoenix; Barry Keoghan; Jack O'Connell; Edward Norton; Adrien Brody; Jude Law; Walton Goggins; Stephen Graham
+the-dark-knight,Harvey Dent,Aaron Eckhart,Josh Brolin; Michael Fassbender; Luke Evans; Jon Bernthal; Jack O'Connell; Jude Law
+the-dark-knight,Alfred,Michael Caine,Ralph Fiennes; Liam Neeson; Kurt Russell; Harrison Ford; Sam Elliott; John Lithgow; Javier Bardem; Ed Harris
+the-dark-knight,Rachel,Maggie Gyllenhaal,Rachel McAdams; Rebecca Ferguson; Rosamund Pike; Jessica Chastain; Emilia Clarke; Margot Robbie; Ana de Armas
+the-dark-knight,Gordon,Gary Oldman,Mark Strong; Brian Cox; David Morse; Paul Giamatti; Michael Shannon; Timothy Spall
+the-dark-knight,Lucius Fox,Morgan Freeman,Denzel Washington; Idris Elba; James Earl Jones; Giancarlo Esposito
+inception,Dom Cobb,Leonardo DiCaprio,Ryan Gosling; Jake Gyllenhaal; Pedro Pascal; Jude Law; Edward Norton; Matthew McConaughey; Benedict Cumberbatch; Mads Mikkelsen
+inception,Arthur,Joseph Gordon-Levitt,Tom Holland; Barry Keoghan; Andrew Garfield; Jacob Elordi; Joe Keery; Finn Wolfhard; Jack O'Connell; Jesse Plemons
+inception,Saito,Ken Watanabe,Tony Leung Chiu-wai; Ken Watanabe; Hiroyuki Sanada; Randall Park
+inception,Eames,Tom Hardy,Tom Hardy; Jason Statham; Karl Urban; Dave Bautista
+inception,Ariadne,Elliot Page,Zendaya; Madelyn Cline; Hailee Steinfeld; Anya Taylor-Joy; Zoe Saldaña; Emilia Clarke; Jenna Ortega
+inception,Yusuf,Dileep Rao,Riz Ahmed; Dev Patel; Ahmed El Awadi; Ranveer Singh; Abhishek Bachchan
+inception,"Robert Fischer, Jr.",Cillian Murphy,Cillian Murphy; Nicholas Hoult; Ansel Elgort; Harry Styles; Kit Harington
+interstellar,Cooper,Matthew McConaughey,Ryan Gosling; Jake Gyllenhaal; Tom Hardy; Jude Law; Andrew Garfield; Hayden Christensen
+interstellar,Brand,Anne Hathaway,Ana de Armas; Rebecca Ferguson; Charlize Theron; Rosamund Pike; Penélope Cruz; Rachel Weisz; Emilia Clarke; Zoe Saldaña
+interstellar,Professor Brand,Michael Caine,
+interstellar,Murph,Jessica Chastain,Jennifer Lawrence; Sadie Sink; Hailee Steinfeld; Anya Taylor-Joy; Madelyn Cline; Zendaya; Millie Bobby Brown; Elle Fanning
+interstellar,Tom,Casey Affleck,Jack O'Connell; Nicholas Hoult; Shia LaBeouf; Jesse Plemons; Jacob Elordi; Deng Kai; Zhang Linghe; Chen Zheyuan
+interstellar,Doyle,Wes Bentley,Jon Bernthal; Walton Goggins; Aidan Gillen; Josh Brolin; Stephen Graham; Mark Strong; Jeffrey Dean Morgan; Barry Keoghan
+interstellar,Getty,Topher Grace,Finn Wolfhard; Tom Holland; Noah Fearnley; Tyriq Withers; Hudson Williams; Lin Muran; Suppakarn Jirachotikul; Wanpichit Nimitparkpoom
+mad-max-fury-road,Max Rockatansky,Tom Hardy,Tom Hardy; Jake Gyllenhaal; Pedro Pascal; Joel Edgerton; Jon Bernthal; Scott Adkins; Jack O'Connell; Theo James
+mad-max-fury-road,Imperator Furiosa,Charlize Theron,Charlize Theron; Zoe Saldaña; Rebecca Ferguson; Lena Headey; Rosamund Pike; Ana de Armas; Jessica Biel; Samara Weaving
+mad-max-fury-road,Nux,Nicholas Hoult,Nicholas Hoult; Tom Holland; Jacob Elordi; Finn Wolfhard; Tyriq Withers; Noah Fearnley; Hudson Williams; Suppakarn Jirachotikul
+mad-max-fury-road,Immortan Joe,Hugh Keays-Byrne,Javier Bardem; Ralph Fiennes; Ed Harris; Clint Eastwood; Liam Neeson; Mark Strong; Aidan Gillen; Jeffrey Dean Morgan
+mad-max-fury-road,Slit,Josh Helman,Josh Brolin; Jesse Plemons; Walton Goggins; Shia LaBeouf; Barry Keoghan; Paul Anderson; Giulio Berruti
+mad-max-fury-road,Rictus Erectus,Nathan Jones,Dave Bautista; Jason Momoa; Dwayne Johnson; Alan Ritchson; Vin Diesel; John Cena; Dolph Lundgren; Jean-Claude Van Damme
+mad-max-fury-road,Toast the Knowing,Zoë Kravitz,Zoë Kravitz; Jenna Ortega; Madelyn Cline; Sadie Sink; Elle Fanning; Dafne Keen; Emma Myers; Margaret Qualley
+jurassic-park,Grant,Sam Neill,Pedro Pascal; Jake Gyllenhaal; Matthew McConaughey; Edward Norton; Andrew Garfield; Jude Law; Jack O'Connell; Jesse Plemons
+jurassic-park,Ellie,Laura Dern,Anne Hathaway; Rachel McAdams; Jennifer Connelly; Rebecca Ferguson; Amy Adams; Emilia Clarke; Rosamund Pike; Margaret Qualley
+jurassic-park,Malcolm,Jeff Goldblum,Benedict Cumberbatch; Jim Carrey; Nicolas Cage; Javier Bardem; Mark Strong; Aidan Gillen; Jeremy Irons; Jon Bernthal
+jurassic-park,Hammond,Richard Attenborough,Morgan Freeman; Harrison Ford; Kurt Russell; Sam Elliott; Ed Harris; Denzel Washington; Liam Neeson; Tom Hanks
+jurassic-park,Muldoon,Bob Peck,Jason Statham; Vin Diesel; Dave Bautista; Dolph Lundgren; Walton Goggins; Mads Mikkelsen; Scott Adkins; Michael Shannon
+jurassic-park,Gennaro,Martin Ferrero,Javier Bardem; Tony Leung Chiu-wai; Theo James; Michele Morrone; Jacob Elordi; Ranveer Singh; Hrithik Roshan; Akshay Kumar
+jurassic-park,Wu,BD Wong,Tony Leung Chiu-wai; Deng Kai; Chen Zheyuan; Song Weilong; Zhang Linghe; Ji Chang-wook; He Yu
+gladiator,Maximus,Russell Crowe,Hugh Jackman; Jake Gyllenhaal; Tom Hardy; Pedro Pascal; Aaron Paul; Michael Fassbender; Luke Evans
+gladiator,Commodus,Joaquin Phoenix,Cillian Murphy; Barry Keoghan; Edward Norton; Jude Law; Michael Fassbender; Aidan Gillen; Jack O'Connell
+gladiator,Lucilla,Connie Nielsen,Charlize Theron; Rebecca Ferguson; Rosamund Pike; Kate Winslet; Rachel Weisz; Penélope Cruz; Keira Knightley; Michelle Pfeiffer
+gladiator,Proximo,Oliver Reed,Morgan Freeman; Tom Hanks; Michael Fassbender; Brad Pitt; Liam Neeson; Kurt Russell; Denzel Washington
+gladiator,Marcus Aurelius,Richard Harris,Morgan Freeman; Liam Neeson; Ed Harris; Sam Elliott; Richard Gere; Harrison Ford; Al Pacino; Michael Caine
+gladiator,Gracchus,Derek Jacobi,Ralph Fiennes; Mark Strong; Jude Law; Cillian Murphy; Aidan Gillen; Stephen Graham
+gladiator,Juba,Djimon Hounsou,Idris Elba; Dwayne Johnson; Denzel Washington; Jason Momoa; Prabhas; Mahershala Ali
+the-godfather,Don Vito Corleone,Marlon Brando,Morgan Freeman; Tom Hanks; Liam Neeson; Sam Elliott; Ed Harris; Richard Gere; Harrison Ford; Denzel Washington
+the-godfather,Michael Corleone,Al Pacino,Cillian Murphy; Jake Gyllenhaal; Jon Bernthal; Andrew Garfield; Tobey Maguire; Jude Law
+the-godfather,Sonny Corleone,James Caan,Jason Momoa; Vin Diesel; Idris Elba; Chris Hemsworth; Dave Bautista; Dwayne Johnson; Javier Bardem; Mads Mikkelsen
+the-godfather,Tom Hagen,Robert Duvall,Ralph Fiennes; Mark Strong; Benedict Cumberbatch; Josh Brolin; Edward Norton; Adrien Brody; Eric Dane; Tony Leung Chiu-wai
+the-godfather,Clemenza,Richard S. Castellano,Sylvester Stallone; Steven Seagal; Jean-Claude Van Damme; Clint Eastwood; Mel Gibson; Kurt Russell; Bruce Willis; Arnold Schwarzenegger
+the-godfather,Kay Adams,Diane Keaton,Rachel McAdams; Anne Hathaway; Keira Knightley; Rachel Weisz; Diane Lane; Jennifer Connelly; Rebecca Ferguson
+the-godfather,Connie Corleone Rizzi,Talia Shire,Margaret Qualley; Anya Taylor-Joy; Elle Fanning; Dakota Fanning; Hailee Steinfeld; Samara Weaving; Madelyn Cline; Lily James
+the-godfather-ii,Don Michael Corleone,Al Pacino,Leonardo DiCaprio; Jake Gyllenhaal; Tom Hardy; Cillian Murphy; Andrew Garfield
+the-godfather-ii,Tom Hagen,Robert Duvall,Tom Hanks; Matt Damon; Edward Norton; Michael Shannon; John Turturro; Philip Seymour Hoffman
+the-godfather-ii,Kay Corleone,Diane Keaton,Margot Robbie; Uma Thurman; Keira Knightley; Rachel McAdams; Kate Hudson; Charlize Theron; Rebecca Ferguson; Lupita Nyong'o
+the-godfather-ii,Vito Corleone,Robert De Niro,Liam Neeson; Jack Nicholson; Tommy Lee Jones; Morgan Freeman; Denzel Washington; John Lithgow
+the-godfather-ii,Frederico 'Fredo' Corleone,John Cazale,Barry Keoghan; Jacob Elordi; Ansel Elgort; Tom Holland; Dev Patel
+the-godfather-ii,Constanzia 'Connie' Corleone,Talia Shire,Penélope Cruz; Scarlett Johansson; Emilia Clarke; Rosamund Pike; Rebecca Ferguson
+the-godfather-ii,Hyman Roth,Lee Strasberg,Richard Gere; Al Pacino; Tom Cruise; Sylvester Stallone; Ed Harris; Kevin Bacon; J.K. Simmons; Michael Keaton
+goodfellas,James Conway,Robert De Niro,Al Pacino; Jon Bernthal; Jack O'Connell; Javier Bardem; Mads Mikkelsen
+goodfellas,Henry Hill,Ray Liotta,Jake Gyllenhaal; Leonardo DiCaprio; Andrew Garfield; Jack O'Connell; Michael Fassbender; Ryan Gosling; Tobey Maguire; Jesse Plemons
+goodfellas,Tommy DeVito,Joe Pesci,Barry Keoghan; Edward Norton; Walton Goggins; Shia LaBeouf; Elijah Wood; Alexander Skarsgård
+goodfellas,Karen Hill,Lorraine Bracco,Ana de Armas; Anya Taylor-Joy; Rebecca Ferguson; Penélope Cruz; Scarlett Johansson; Rosamund Pike; Rachel McAdams; Emma Stone
+goodfellas,Paul Cicero,Paul Sorvino,Al Pacino; Sylvester Stallone; Liam Neeson; Tom Hanks; Sam Elliott; Ed Harris; Morgan Freeman; Clint Eastwood
+goodfellas,Frankie Carbone,Frank Sivero,Jack O'Connell; Barry Keoghan; Jesse Plemons; Joseph Gordon-Levitt; Michael Shannon; Jon Bernthal; Joel Edgerton
+goodfellas,Sonny Bunz,Tony Darrow,Jack O'Connell; Walton Goggins; Barry Keoghan; Finn Wolfhard; Tyriq Withers; Dylan Wang; Hudson Williams
+pulp-fiction,Vincent Vega,John Travolta,Ryan Gosling; Jake Gyllenhaal; Jude Law; Tom Hardy; Pedro Pascal; Jon Bernthal; Jack O'Connell; Jesse Plemons
+pulp-fiction,Jules Winnfield,Samuel L. Jackson,Denzel Washington; Idris Elba; Sterling K. Brown; Mahershala Ali; Giancarlo Esposito; David Oyelowo
+pulp-fiction,Mia Wallace,Uma Thurman,Scarlett Johansson; Penélope Cruz; Ana de Armas; Rebecca Ferguson; Rachel McAdams; Margot Robbie; Charlize Theron; Rosamund Pike
+pulp-fiction,Butch Coolidge,Bruce Willis,Tom Hardy; Chris Evans; Ben Affleck; Josh Brolin; Riz Ahmed
+pulp-fiction,Marsellus Wallace,Ving Rhames,Vin Diesel; Dwayne Johnson; Idris Elba; Jason Momoa; Dave Bautista; Giancarlo Esposito; Don Cheadle
+pulp-fiction,The Wolf,Harvey Keitel,Tom Cruise; Jude Law; Mark Strong; Ralph Fiennes; Mads Mikkelsen; Christoph Waltz
+pulp-fiction,Lance,Eric Stoltz,Barry Keoghan; Jacob Elordi; Tom Holland; Andrew Garfield; Dev Patel
+schindlers-list,Oskar Schindler,Liam Neeson,Liam Neeson; Tom Hanks; Ralph Fiennes; Jude Law; Edward Norton; Jake Gyllenhaal; Pedro Pascal; Jon Bernthal
+schindlers-list,Itzhak Stern,Ben Kingsley,Adrien Brody; Benedict Cumberbatch; Tony Leung Chiu-wai; Mark Strong; Stephen Graham; Aidan Gillen; Walton Goggins; Jack O'Connell
+schindlers-list,Amon Goeth,Ralph Fiennes,Ralph Fiennes; Tom Hardy; Cillian Murphy; Michael Shannon; Mads Mikkelsen; Jack O'Connell; Barry Keoghan; Edward Norton
+schindlers-list,Emilie Schindler,Caroline Goodall,Kate Winslet; Rachel Weisz; Rosamund Pike; Rebecca Ferguson; Jennifer Connelly; Charlize Theron; Diane Lane; Rachel McAdams
+schindlers-list,Poldek Pfefferberg,Jonathan Sagall,Jesse Plemons; Theo James; Jacob Elordi; Michele Morrone; Song Weilong; Chen Zheyuan; Edward Chen; Deng Kai
+schindlers-list,Helen Hirsch,Embeth Davidtz,Anya Taylor-Joy; Elle Fanning; Hailee Steinfeld; Madelyn Cline; Emilia Clarke; Zendaya; Elle Chapman; Minami Hamabe
+schindlers-list,Viktoria Klonowska,Małgorzata Gebel,Ana de Armas; Penélope Cruz; Eiza González; Margot Robbie; Samara Weaving; Emilia Clarke; Anya Taylor-Joy; Margaret Qualley
+shawshank-redemption,Andy Dufresne,Tim Robbins,Ryan Gosling; Jake Gyllenhaal; Andrew Garfield; Tom Hardy; Benedict Cumberbatch; Edward Norton; Jude Law; Cillian Murphy
+shawshank-redemption,Ellis Boyd 'Red' Redding,Morgan Freeman,Denzel Washington; Idris Elba; Liam Neeson; Mahershala Ali; Giancarlo Esposito; Lance Reddick
+shawshank-redemption,Warden Norton,Bob Gunton,Ed Harris; Mark Strong; Walton Goggins; Aidan Gillen; Ralph Fiennes; Mads Mikkelsen; Javier Bardem; Josh Brolin
+shawshank-redemption,Heywood,William Sadler,Jon Bernthal; Jesse Plemons; Jack O'Connell; Barry Keoghan; Shia LaBeouf; Riz Ahmed; Michael Shannon
+shawshank-redemption,Captain Byron T. Hadley,Clancy Brown,Jason Statham; Alan Ritchson; Vin Diesel; Dave Bautista; Dolph Lundgren; Scott Adkins; Jean-Claude Van Damme
+shawshank-redemption,Tommy,Gil Bellows,Tom Holland; Jacob Elordi; Barry Keoghan; Nicholas Hoult; Ansel Elgort
+shawshank-redemption,Brooks Hatlen,James Whitmore,Kurt Russell; Harrison Ford; Clint Eastwood; Sam Elliott; Richard Gere; Tom Wilkinson
+silence-of-the-lambs,Clarice Starling,Jodie Foster,Scarlett Johansson; Emma Stone; Anya Taylor-Joy; Rebecca Ferguson; Hailee Steinfeld; Rachel McAdams; Claire Danes; Keira Knightley
+silence-of-the-lambs,Dr. Hannibal Lecter,Anthony Hopkins,Javier Bardem; Ralph Fiennes; Mads Mikkelsen; Benedict Cumberbatch; Mark Strong; Cillian Murphy; Tom Hardy; Jon Bernthal
+silence-of-the-lambs,Jack Crawford,Scott Glenn,Denzel Washington; Morgan Freeman; Keanu Reeves; Liam Neeson; Ed Harris; Harrison Ford; Sam Elliott; Stephen Graham
+silence-of-the-lambs,Jame Gumb,Ted Levine,Barry Keoghan; Jack O'Connell; Jacob Elordi; Jesse Plemons; Shia LaBeouf; Nicolas Cage; Jake Gyllenhaal; Walton Goggins
+silence-of-the-lambs,Dr. Frederick Chilton,Anthony Heald,Simon Baker; Aidan Gillen; Jude Law; Andrew Garfield; Jeffrey Dean Morgan; Josh Brolin; James Marsden; Theo James
+silence-of-the-lambs,Catherine Martin,Brooke Smith,Elle Fanning; Madelyn Cline; Ester Expósito; Jenna Ortega; Emma Myers; Dafne Keen; Isabel May; Ivanna Sakhno
+silence-of-the-lambs,Senator Ruth Martin,Diane Baker,Julianne Moore; Michelle Pfeiffer; Frances McDormand; Amy Madigan; Meryl Streep; Jennifer Connelly; Kate Winslet; Diane Lane
+no-country-for-old-men,Anton Chigurh,Javier Bardem,Javier Bardem; Tom Hardy; Mads Mikkelsen; Ralph Fiennes; Cillian Murphy; Jon Bernthal; Jack O'Connell; Pedro Pascal
+no-country-for-old-men,Ed Tom Bell,Tommy Lee Jones,Sam Elliott; Ed Harris; Kurt Russell; Harrison Ford; Clint Eastwood; Kevin Bacon; Liam Neeson; Mel Gibson
+no-country-for-old-men,Llewelyn Moss,Josh Brolin,Josh Brolin; Jake Gyllenhaal; Ryan Gosling; Andrew Garfield; Jesse Plemons; Shia LaBeouf; Matthew McConaughey; Theo James
+no-country-for-old-men,Carson Wells,Woody Harrelson,Woody Harrelson; George Clooney; Simon Baker; Jude Law; Matthew McConaughey; Walton Goggins; Jeffrey Dean Morgan; Ben Affleck
+no-country-for-old-men,Carla Jean Moss,Kelly Macdonald,Rosamund Pike; Jennifer Connelly; Margot Robbie; Keira Knightley; Margaret Qualley; Anya Taylor-Joy; Samara Weaving; Rachel McAdams
+no-country-for-old-men,Wendell,Garret Dillahunt,Walton Goggins; Mark Strong; Scott Adkins; Barry Keoghan; Jack O'Connell; Jesse Plemons; Nicholas Hoult; Stephen Graham
+no-country-for-old-men,Loretta Bell,Tess Harper,Amy Madigan; Michelle Pfeiffer; Jamie Lee Curtis; Lena Headey; Jennifer Jason Leigh; Frances McDormand; Julianne Moore; Jacqueline Bisset
+there-will-be-blood,Daniel Plainview,Daniel Day-Lewis,Leonardo DiCaprio; Jake Gyllenhaal; Tom Hardy; Matthew McConaughey; Javier Bardem; Edward Norton; Jon Bernthal; Jack O'Connell
+there-will-be-blood,Paul Sunday / Eli Sunday,Paul Dano,Jacob Elordi; Finn Wolfhard; Tom Holland; Noah Fearnley; Zhang Linghe; Chen Zheyuan; Hudson Williams
+there-will-be-blood,Henry,Kevin J. O'Connor,Walton Goggins; Clint Eastwood; Sam Elliott; Liam Neeson; Ed Harris; Kevin Bacon; Mark Strong; Stephen Graham
+there-will-be-blood,Fletcher Hamilton,Ciarán Hinds,Lance Reddick; Denzel Washington; Woody Harrelson; Mads Mikkelsen; Ralph Fiennes; Pedro Pascal; Aidan Gillen
+there-will-be-blood,H.W. Plainview,Dillon Freasier,Mckenna Grace; Bodhi Rae Breathnach; Hudson Williams; Paisley Cadorath; Wanpichit Nimitparkpoom; Suppakarn Jirachotikul; Lin Muran
+there-will-be-blood,Elizabeth,Hope Elizabeth Reeves,Rebecca Ferguson; Charlize Theron; Nicole Kidman; Rachel McAdams; Annabelle Wallis; Samara Weaving; Emilia Clarke; Rosamund Pike
+there-will-be-blood,Mary Sunday,Colleen Foy,Amy Madigan; Jamie Lee Curtis; Michelle Pfeiffer; Jennifer Jason Leigh; Jacqueline Bisset; Amanda Peet; Melanie Griffith; Lena Headey
+fargo,Marge Gunderson,Frances McDormand,Frances McDormand; Amy Adams; Amy Madigan; Rebecca Ferguson; Rachel McAdams; Julianne Moore; Emma Thompson; Diane Lane
+fargo,Jerry Lundegaard,William H. Macy,Jesse Plemons; Jake Gyllenhaal; Edward Norton; Jack O'Connell; Tom Hardy; Andrew Garfield; Simon Baker; Jon Bernthal
+fargo,Carl Showalter,Steve Buscemi,Shia LaBeouf; Barry Keoghan; Walton Goggins; Nicholas Hoult; Elijah Wood; Jack Black; Adrien Brody; Hayden Christensen
+fargo,Gaear Grimsrud,Peter Stormare,Tom Hardy; Joel Edgerton; Mark Strong; Mads Mikkelsen; Benedict Cumberbatch; Javier Bardem; Udo Kier; Willem Dafoe
+fargo,Wade Gustafson,Harve Presnell,Kurt Russell; Sam Elliott; Clint Eastwood; Ed Harris; Kevin Bacon; Bruce Willis; Harrison Ford; Morgan Freeman
+fargo,Norm Gunderson,John Carroll Lynch,Kevin Bacon; John Travolta; Jim Carrey; Adam Sandler; Woody Harrelson; Matthew McConaughey; George Clooney; Eddie Murphy
+fargo,Jean Lundegaard,Kristin Rudrüd,Emma Stone; Jennifer Connelly; Rachel McAdams; Rebecca Ferguson; Amanda Seyfried; Samara Weaving; Margaret Qualley; Eva Green
+jaws,Brody,Roy Scheider,Tom Hanks; Jake Gyllenhaal; Matt Damon; Edward Norton; Jon Bernthal; Andrew Garfield; Jesse Plemons; Jack O'Connell
+jaws,Quint,Robert Shaw,Tom Hardy; Liam Neeson; Kurt Russell; Sam Elliott; Kevin Bacon; Ed Harris; Jude Law; Ralph Fiennes
+jaws,Hooper,Richard Dreyfuss,Ryan Gosling; Pedro Pascal; Cillian Murphy; Barry Keoghan; Joseph Gordon-Levitt
+jaws,Ellen Brody,Lorraine Gary,Rebecca Ferguson; Rachel McAdams; Charlize Theron; Jennifer Connelly; Rosamund Pike; Rachel Weisz; Kate Winslet; Nicole Kidman
+jaws,Vaughn,Murray Hamilton,Jim Carrey; George Clooney; John Travolta; Tom Cruise; Richard Gere; Harrison Ford; Woody Harrelson; Matthew McConaughey
+jaws,Hendricks,Jeffrey Kramer,Tom Holland; Shia LaBeouf; Jacob Elordi; Ansel Elgort
+jaws,Chrissie,Susan Backlinie,Sydney Sweeney; Madelyn Cline; Jenna Ortega; Elle Fanning; Sadie Sink; Anya Taylor-Joy; Zendaya; Hailee Steinfeld
+the-shining,Jack Torrance,Jack Nicholson,Jake Gyllenhaal; Michael Shannon; Jon Bernthal; Edward Norton; Joaquin Phoenix; Matthew McConaughey
+the-shining,Wendy Torrance,Shelley Duvall,Rebecca Ferguson; Nicole Kidman; Kate Winslet; Rachel Weisz; Jennifer Connelly; Toni Collette; Cate Blanchett; Rosamund Pike
+the-shining,Danny,Danny Lloyd,Jacob Tremblay; Noah Schnapp; Jaeden Martell; Mckenna Grace; Elle Fanning
+the-shining,Hallorann,Scatman Crothers,Denzel Washington; Morgan Freeman; Idris Elba; Liam Neeson; Terry Crews; David Oyelowo
+the-shining,Ullman,Barry Nelson,Tom Hanks; Jude Law; Simon Baker; Geoffrey Rush; Ralph Fiennes
+the-shining,Grady,Philip Stone,Ed Harris; Mark Strong; Stephen Graham; Michael Shannon; David Dastmalchian; Brian Cox; Walton Goggins; Aidan Gillen
+the-shining,Lloyd,Joe Turkel,Joe Keery; Tobey Maguire; Jack O'Connell; Andrew Garfield; Hayden Christensen; Jesse Plemons; Jack Huston; Nicholas Hoult
+se7en,Somerset,Morgan Freeman,Morgan Freeman; Denzel Washington; Liam Neeson; Tom Hanks; Ed Harris; Sam Elliott; Harrison Ford
+se7en,Mills,Brad Pitt,Jake Gyllenhaal; Andrew Garfield; Jack O'Connell; Jesse Plemons; Jon Bernthal; Barry Keoghan; Jacob Elordi; Joseph Gordon-Levitt
+se7en,Tracy,Gwyneth Paltrow,Ana de Armas; Rebecca Ferguson; Anya Taylor-Joy; Rosamund Pike; Rachel McAdams; Margot Robbie; Emilia Clarke; Jessica Chastain
+se7en,Officer Davis,John Cassini,Jon Bernthal; Walton Goggins; Aidan Gillen; Mark Strong; Stephen Graham; Yahya Abdul-Mateen II
+se7en,Dr. O'Neill,Peter Crombie,Peter Sarsgaard; Michael Shannon; Brian Cox; David Morse; Lance Reddick; John Turturro
+se7en,Dr. Santiago,Reg E. Cathey,Michael Peña; John Leguizamo; Benicio Del Toro; Diego Luna; Gael García Bernal; Pedro Pascal
+se7en,Police Captain,R. Lee Ermey,Kurt Russell; Clint Eastwood; Mel Gibson; Arnold Schwarzenegger; Al Pacino; Bruce Willis; Sylvester Stallone; Jack Nicholson
+heat,Lt. Vincent Hanna,Al Pacino,Denzel Washington; Pedro Pascal; Idris Elba; Jude Law; Jon Bernthal; Mark Strong; Benedict Cumberbatch; Ed Harris
+heat,Neil McCauley,Robert De Niro,Jake Gyllenhaal; Tom Hardy; Leonardo DiCaprio; Matthew McConaughey; Andrew Garfield; Jack O'Connell; Tobey Maguire; Adrien Brody
+heat,Chris Shiherlis,Val Kilmer,Ryan Gosling; Tom Cruise; Brad Pitt; Shia LaBeouf; Nathan Fillion; Ben Affleck; Jesse Plemons; Josh Brolin
+heat,Nate,Jon Voight,Walton Goggins; Kevin Bacon; Michael C. Hall; Stephen Graham; Scott Adkins; Woody Harrelson; Jeffrey Dean Morgan; Vin Diesel
+heat,Michael Cheritto,Tom Sizemore,Tom Hardy; Michele Morrone; Javier Bardem; Dave Bautista; Dolph Lundgren; Jean-Claude Van Damme; Mads Mikkelsen
+heat,Justine,Diane Venora,Rebecca Ferguson; Jennifer Connelly; Penélope Cruz; Emma Stone; Ana de Armas; Rachel McAdams; Eva Green; Charlize Theron
+heat,Eady,Amy Brenneman,Anya Taylor-Joy; Zendaya; Hailee Steinfeld; Madelyn Cline; Elle Fanning; Emma Myers; Sydney Sweeney; Sadie Sink
+rear-window,L.B. Jefferies,James Stewart,Ryan Gosling; Jake Gyllenhaal; Tom Hanks; Matthew McConaughey; Jude Law; Andrew Garfield; Edward Norton; Benedict Cumberbatch
+rear-window,Lisa Fremont,Grace Kelly,Margot Robbie; Rachel McAdams; Penélope Cruz; Keira Knightley; Jessica Biel; Kate Winslet; Rebecca Ferguson; Rosamund Pike
+rear-window,Thomas Doyle,Wendell Corey,Ed Harris; Tom Cruise; Richard Gere; Kevin Bacon; Aidan Gillen; Mark Strong; J.K. Simmons; Woody Harrelson
+rear-window,Stella,Thelma Ritter,Meryl Streep; Frances McDormand; Jamie Lee Curtis; Michelle Pfeiffer; Amy Madigan; Jennifer Jason Leigh; Melanie Griffith; Kathy Bates
+rear-window,Lars Thorwald,Raymond Burr,Tom Hardy; Javier Bardem; Mads Mikkelsen; Ralph Fiennes; Jon Bernthal; Joaquin Phoenix; Michael Shannon
+rear-window,Miss Lonelyhearts,Judith Evelyn,Winona Ryder; Claire Danes; Samara Weaving; Annabelle Wallis; Eva Green; Natalie Dormer; Emilia Clarke; Elizabeth Olsen
+rear-window,Miss Torso,Georgine Darcy,Sydney Sweeney; Anya Taylor-Joy; Zendaya; Elle Fanning; Madelyn Cline; Hailee Steinfeld; Alexandra Daddario; Megan Fox
+psycho,Norman Bates,Anthony Perkins,Cillian Murphy; Barry Keoghan; Edward Norton; Jake Gyllenhaal; Adam Pearson; Jon Bernthal; Jack O'Connell
+psycho,Marion Crane,Janet Leigh,Scarlett Johansson; Anya Taylor-Joy; Margot Robbie; Ana de Armas; Emma Stone; Rebecca Ferguson; Rachel McAdams; Amanda Seyfried
+psycho,Lila Crane,Vera Miles,Elle Fanning; Sadie Sink; Madelyn Cline; Jenna Ortega; Hailee Steinfeld; Zendaya; Sydney Sweeney; Margaret Qualley
+psycho,Sam Loomis,John Gavin,Jake Gyllenhaal; Ryan Gosling; Simon Baker; James Marsden; Andrew Garfield; Theo James; Jesse Plemons; Nicholas Hoult
+psycho,Milton Arbogast,Martin Balsam,Morgan Freeman; Liam Neeson; Tom Hanks; Ed Harris; Kevin Bacon; J.K. Simmons; Walton Goggins; Stephen Graham
+psycho,Al Chambers,John McIntire,Sam Elliott; Clint Eastwood; Kurt Russell; Harrison Ford; Bruce Willis; Woody Harrelson; Mel Gibson; Matthew McConaughey
+psycho,Fred Richman,Simon Oakland,Mark Strong; Michael Shannon; Aidan Gillen; Benedict Cumberbatch; Ralph Fiennes; Javier Bardem; Mads Mikkelsen; Tony Leung Chiu-wai
+ferris-buellers-day-off,Ferris Bueller,Matthew Broderick,Tom Holland; Ryan Gosling; Jacob Elordi; Andrew Garfield; Jake Gyllenhaal; Zac Efron; Joe Keery
+ferris-buellers-day-off,Cameron Frye,Alan Ruck,Finn Wolfhard; Barry Keoghan; Jack O'Connell; Aidan Gillen; Nicholas Hoult; Elliot Page; Jesse Plemons; Edward Norton
+ferris-buellers-day-off,Sloane Peterson,Mia Sara,Zendaya; Madelyn Cline; Sadie Sink; Anya Taylor-Joy; Elle Fanning; Hailee Steinfeld; Margaret Qualley; Dafne Keen
+ferris-buellers-day-off,Ed Rooney,Jeffrey Jones,Ed Harris; Walton Goggins; J.K. Simmons; Mark Strong; Jude Law; Jon Bernthal; Sam Elliott; Stephen Graham
+ferris-buellers-day-off,Jeanie Bueller,Jennifer Grey,Jennifer Grey; Winona Ryder; Claire Danes; Rachel McAdams; Katie Holmes; Natalie Dormer; Keira Knightley; Jennifer Jason Leigh
+ferris-buellers-day-off,Katie Bueller,Cindy Pickett,Amy Madigan; Amy Adams; Diane Lane; Rachel Weisz; Kate Winslet; Michelle Pfeiffer; Jacqueline Bisset; Amanda Peet
+ferris-buellers-day-off,Tom Bueller,Lyman Ward,Keanu Reeves; Tom Hanks; Harrison Ford; Kevin Bacon; Matthew McConaughey; George Clooney; Mel Gibson; Richard Gere
+the-big-lebowski,The Dude,Jeff Bridges,Matthew McConaughey; Woody Harrelson; Sam Elliott; Kevin Bacon; Jack Black; Elijah Wood; Adam Sandler
+the-big-lebowski,Walter Sobchak,John Goodman,Tom Hardy; Jon Bernthal; Walton Goggins; Jack O'Connell; Josh Brolin; Scott Adkins; Stephen Graham
+the-big-lebowski,Maude Lebowski,Julianne Moore,Julianne Moore; Uma Thurman; Rebecca Ferguson; Rachel McAdams; Rosamund Pike; Kate Winslet; Rachel Weisz; Penélope Cruz
+the-big-lebowski,Donny,Steve Buscemi,Elijah Wood; Barry Keoghan; Finn Wolfhard; Tom Holland; Jacob Elordi; Joe Keery; Noah Fearnley
+the-big-lebowski,The Big Lebowski,David Huddleston,Morgan Freeman; Liam Neeson; Ed Harris; Harrison Ford; Bruce Willis; Al Pacino; Kurt Russell
+the-big-lebowski,Brandt,Philip Seymour Hoffman,Philip Seymour Hoffman; Andrew Garfield; Edward Norton; Cillian Murphy; Jude Law; Aidan Gillen; Benedict Cumberbatch; Mark Strong
+the-big-lebowski,Bunny Lebowski,Tara Reid,Alexandra Daddario; Megan Fox; Jessica Alba; Ali Larter; Samara Weaving; Arielle Kebbel; Annabelle Wallis
+groundhog-day,Phil Connors,Bill Murray,Ryan Gosling; Jake Gyllenhaal; Matthew McConaughey; Jude Law; Tom Cruise; Leonardo DiCaprio; Cillian Murphy; Simon Baker
+groundhog-day,Rita Hanson,Andie MacDowell,Emma Stone; Rachel McAdams; Anne Hathaway; Margot Robbie; Rebecca Ferguson; Anya Taylor-Joy; Penélope Cruz; Keira Knightley
+groundhog-day,Larry,Chris Elliott,Jack Black; Walton Goggins; Jesse Plemons; Kevin Bacon; Shia LaBeouf; Adam Sandler; Kevin Hart; John Cena
+groundhog-day,Ned Ryerson,Stephen Tobolowsky,Mark Strong; Aidan Gillen; Stephen Graham; Edward Norton; Jon Bernthal; Barry Keoghan
+groundhog-day,Buster Green,Brian Doyle-Murray,Ed Harris; Kurt Russell; Harrison Ford; Sam Elliott; Mel Gibson; Liam Neeson; Kevin Bacon; Clint Eastwood
+groundhog-day,Nancy Taylor,Marita Geraghty,Ginnifer Goodwin; Amanda Seyfried; Hailee Steinfeld; Alexandra Daddario; Arielle Kebbel; Samara Weaving; Annabelle Wallis; Rachel McAdams
+groundhog-day,Mme Lancaster,Angela Paton,Jamie Lee Curtis; Amy Madigan; Frances McDormand; Emma Thompson; Jacqueline Bisset; Diane Lane; Joan Van Ark; Lynda Bellingham
+superbad,Seth,Jonah Hill,Jack Black; Adam Sandler; Shia LaBeouf; Jesse Plemons; Andrew Garfield; Nicholas Hoult; Joe Keery; Finn Wolfhard
+superbad,Evan,Michael Cera,Tom Holland; Jacob Elordi; Barry Keoghan; Song Weilong; Chen Zheyuan; Dylan Wang; Edward Chen
+superbad,Fogell,Christopher Mintz-Plasse,Elijah Wood; Hayden Christensen; Elliot Page; Dev Patel; Alfred Molina; Anton Yelchin
+superbad,Officer Slater,Bill Hader,Simon Baker; Jon Bernthal; Walton Goggins; Mark Strong; Jude Law; Pedro Pascal; Jake Gyllenhaal; Theo James
+superbad,Officer Michaels,Seth Rogen,Kevin Bacon; Ed Harris; Jeffrey Dean Morgan; Kevin Hart; Woody Harrelson; Matthew McConaughey; Jim Carrey; Dwayne Johnson
+superbad,Becca,Martha MacIsaac,Elle Fanning; Hailee Steinfeld; Sadie Sink; Madelyn Cline; Zendaya; Isabel May; Emma Myers; Anya Taylor-Joy
+superbad,Jules,Emma Stone,Emma Stone; Zoe Saldaña; Jenna Ortega; Margot Robbie; Margaret Qualley; Rachel McAdams; Amanda Seyfried; Samara Weaving
+raiders-of-the-lost-ark,Indiana Jones,Harrison Ford,Ryan Gosling; Jake Gyllenhaal; Tom Cruise; Pedro Pascal; Matthew McConaughey; Jude Law
+raiders-of-the-lost-ark,Marion Ravenwood,Karen Allen,Rachel Weisz; Keira Knightley; Ana de Armas; Rebecca Ferguson; Charlize Theron; Michelle Pfeiffer; Eva Green; Penélope Cruz
+raiders-of-the-lost-ark,Dr. René Belloq,Paul Freeman,Javier Bardem; Cillian Murphy; Mark Strong; Mads Mikkelsen; Ralph Fiennes; Ed Harris; Adrien Brody; Tom Hiddleston
+raiders-of-the-lost-ark,Sallah,John Rhys-Davies,Denzel Washington; Idris Elba; Dwayne Johnson; Morgan Freeman; Liam Neeson
+raiders-of-the-lost-ark,Major Arnold Toht,Ronald Lacey,Jack O'Connell; Walton Goggins; Aidan Gillen; Jon Bernthal; Barry Keoghan; Jesse Plemons; Nicholas Hoult
+raiders-of-the-lost-ark,Colonel Dietrich,Wolf Kahler,Tom Hardy; Michael Shannon; Boyd Holbrook; Aaron Paul; Alexander Skarsgård; Edgar Ramírez
+raiders-of-the-lost-ark,Gobler,Anthony Higgins,David Dastmalchian; Brian Cox; Cary Elwes; Michael Stuhlbarg; Steven Berkoff
+the-empire-strikes-back,Luke Skywalker,Mark Hamill,Tom Holland; Jacob Elordi; Hayden Christensen; Joe Keery; Andrew Garfield; Finn Wolfhard; Elijah Wood; Barry Keoghan
+the-empire-strikes-back,Han Solo,Harrison Ford,Ryan Gosling; Jake Gyllenhaal; Theo James; Tom Hardy; Jude Law
+the-empire-strikes-back,Princess Leia,Carrie Fisher,Natalie Portman; Emma Watson; Margot Robbie; Emilia Clarke; Charlize Theron; Rachel McAdams; Kristen Stewart; Rosamund Pike
+the-empire-strikes-back,Lando Calrissian,Billy Dee Williams,Idris Elba; Tony Leung Chiu-wai; Denzel Washington; Cillian Murphy; Dwayne Johnson; Aidan Gillen; George Clooney
+the-empire-strikes-back,C-3PO,Anthony Daniels,Benedict Cumberbatch; Mark Strong; Ralph Fiennes; Jude Law; Jim Carrey; Eddie Redmayne; Tilda Swinton
+the-empire-strikes-back,Darth Vader,David Prowse,Arnold Schwarzenegger; Dolph Lundgren; Jason Momoa; Dave Bautista; Vin Diesel; Jean-Claude Van Damme; Chuck Norris; Alan Ritchson
+the-empire-strikes-back,Chewbacca,Peter Mayhew,Jason Momoa; Dave Bautista; Dwayne Johnson; John Cena; Vin Diesel; Alan Ritchson; Terry Crews
+back-to-the-future,Marty McFly,Michael J. Fox,Tom Holland; Jacob Elordi; Andrew Garfield; Elijah Wood; Joe Keery; Finn Wolfhard; Zac Efron
+back-to-the-future,Emmett Brown,Christopher Lloyd,Keanu Reeves; Johnny Depp; Jim Carrey; Nicolas Cage; Jude Law; Benedict Cumberbatch; Edward Norton; Ralph Fiennes
+back-to-the-future,George McFly,Crispin Glover,Edward Norton; Jesse Plemons; Jack O'Connell; Simon Baker; Hayden Christensen; Jon Bernthal; Aidan Gillen; Walton Goggins
+back-to-the-future,Lorraine Baines,Lea Thompson,Zendaya; Anya Taylor-Joy; Elle Fanning; Madelyn Cline; Margaret Qualley; Hailee Steinfeld; Ivanna Sakhno; Samara Weaving
+back-to-the-future,Jennifer Parker,Claudia Wells,Jenna Ortega; Sadie Sink; Mckenna Grace; Elle Fanning; Madelyn Cline; Emma Myers; Millie Bobby Brown; Ester Expósito
+back-to-the-future,Biff Tannen,Thomas F. Wilson,Jason Statham; Alan Ritchson; Dave Bautista; Chris Hemsworth; Jason Momoa; Vin Diesel; Dwayne Johnson
+back-to-the-future,Dave McFly,Marc McClure,Nicholas Hoult; Jesse Plemons; Jack O'Connell; Tyriq Withers; Hudson Williams; Song Weilong; Chen Zheyuan; Giulio Berruti
+fellowship-of-the-ring,Frodo,Elijah Wood,Tom Holland; Elijah Wood; Jacob Elordi; Finn Wolfhard; Noah Fearnley; Tyriq Withers; Hudson Williams; Zhang Linghe
+fellowship-of-the-ring,Gandalf,Ian McKellen,Morgan Freeman; Liam Neeson; Tom Hanks; Harrison Ford; Jude Law; Ed Harris; Kevin Bacon; Ralph Fiennes
+fellowship-of-the-ring,Aragorn,Viggo Mortensen,Jake Gyllenhaal; Pedro Pascal; Charlie Hunnam; Matt Damon; Jon Bernthal; Andrew Garfield
+fellowship-of-the-ring,Sam,Sean Astin,Jack O'Connell; Jesse Plemons; Hayden Christensen; Barry Keoghan; Michele Morrone; Song Weilong; Chen Zheyuan; Theo James
+fellowship-of-the-ring,Bilbo,Ian Holm,Martin Freeman; Simon Baker; Adrien Brody; Tobey Maguire; Leonardo DiCaprio; Mark Strong; Joaquin Phoenix; Jeremy Renner
+fellowship-of-the-ring,Arwen,Liv Tyler,Anya Taylor-Joy; Zendaya; Emma Stone; Rebecca Ferguson; Ana de Armas; Elle Fanning; Hailee Steinfeld; Rosamund Pike
+fellowship-of-the-ring,Saruman,Christopher Lee,Mark Strong; Javier Bardem; Mads Mikkelsen; Ralph Fiennes; Christoph Waltz; Toni Collette; Willem Dafoe; Alan Rickman
+the-princess-bride,Westley,Cary Elwes,Tom Holland; Jacob Elordi; Andrew Garfield; Jake Gyllenhaal; Hayden Christensen; Theo James; Joe Keery
+the-princess-bride,The Princess Bride,Robin Wright,Anya Taylor-Joy; Zendaya; Hailee Steinfeld; Elle Fanning; Sadie Sink; Madelyn Cline; Jenna Ortega; Emma Stone
+the-princess-bride,Inigo Montoya,Mandy Patinkin,Pedro Pascal; Jake Gyllenhaal; Jon Bernthal; Barry Keoghan; Jack O'Connell; Jesse Plemons; Aidan Gillen
+the-princess-bride,Prince Humperdinck,Chris Sarandon,Cillian Murphy; Tom Hardy; Benedict Cumberbatch; Jude Law; Mark Strong; Mads Mikkelsen; Ralph Fiennes; Javier Bardem
+the-princess-bride,Count Rugen,Christopher Guest,Walton Goggins; Edward Norton; Josh Brolin; Adrien Brody; Joaquin Phoenix; Michael Shannon; Luke Evans
+the-princess-bride,Vizzini,Wallace Shawn,Jim Carrey; Jack Black; Danny McBride; Woody Harrelson; Kevin Hart; Adam Sandler; Nicolas Cage; Michael Shannon
+the-princess-bride,Fezzik,André Roussimoff,Jason Momoa; Alan Ritchson; Dave Bautista; Dwayne Johnson; Vin Diesel; Jason Statham; Sylvester Stallone; John Cena
+chinatown,J.J. 'Jake' Gittes,Jack Nicholson,Ryan Gosling; Jake Gyllenhaal; Pedro Pascal; Jude Law; Jon Bernthal; Jack O'Connell; Aidan Gillen; Jesse Plemons
+chinatown,Evelyn Cross Mulwray,Faye Dunaway,Rebecca Ferguson; Rachel McAdams; Rosamund Pike; Kate Winslet; Nicole Kidman; Charlize Theron; Eva Green; Rachel Weisz
+chinatown,Lieutenant Lou Escobar,Perry Lopez,Denzel Washington; Idris Elba; Walton Goggins; Sterling K. Brown; Giancarlo Esposito; David Oyelowo
+chinatown,Russ Yelburton,John Hillerman,Ed Harris; Kurt Russell; Harrison Ford; Sam Elliott; Kevin Bacon; Bruce Willis; Richard Gere; Mel Gibson
+chinatown,Ida Sessions,Diane Ladd,Frances McDormand; Jacqueline Bisset; Amy Madigan; Michelle Pfeiffer; Lena Headey; Jennifer Jason Leigh; Diane Lane; Jamie Lee Curtis
+chinatown,Claude Mulvihill,Roy Jenson,Mark Strong; Tom Hardy; Javier Bardem; Benedict Cumberbatch; Ralph Fiennes; Stephen Graham; David Dastmalchian; Paul Anderson
+chinatown,Detective Loach,Richard Bakalyan,Woody Harrelson; Josh Brolin; Chris Evans; Adrien Brody; Jack Black; Matthew McConaughey; Ben Affleck; Clint Eastwood
+apocalypse-now,Captain Benjamin Willard,Martin Sheen,Leonardo DiCaprio; Jake Gyllenhaal; Tom Hardy; Edward Norton; Jon Bernthal; Jack O'Connell; Andrew Garfield
+apocalypse-now,Colonel Walter Kurtz,Marlon Brando,Javier Bardem; Ralph Fiennes; Mads Mikkelsen; Ed Harris; Liam Neeson; Richard Gere; Lance Reddick; Michael Shannon
+apocalypse-now,Jay 'Chef' Hicks,Frederic Forrest,Jon Bernthal; Pedro Pascal; Walton Goggins; Jesse Plemons; Josh Brolin; Jeremy Strong; Barry Keoghan
+apocalypse-now,Chief Phillips,Albert Hall,Denzel Washington; Morgan Freeman; Idris Elba; Woody Harrelson; Jeffrey Wright
+apocalypse-now,Tyrone 'Clean' Miller,Laurence Fishburne,Shia LaBeouf; Noah Fearnley; Jacob Elordi; Tom Holland; Deng Kai; Zhang Linghe; Tyriq Withers; Hudson Williams
+apocalypse-now,Lance B. Johnson,Sam Bottoms,Tom Holland; Jacob Elordi; Finn Wolfhard; Ansel Elgort; Zhang Linghe; Chen Zheyuan; Song Weilong
+apocalypse-now,Lieutenant Colonel Bill Kilgore,Robert Duvall,Tom Cruise; Brad Pitt; Kurt Russell; Bruce Willis; Mel Gibson; Arnold Schwarzenegger; Chuck Norris; Jean-Claude Van Damme
+alien,Dallas,Tom Skerritt,Pedro Pascal; Jake Gyllenhaal; Tom Hardy; Jude Law; Jon Bernthal; Jack O'Connell; Andrew Garfield; Benedict Cumberbatch
+alien,Ripley,Sigourney Weaver,Charlize Theron; Rebecca Ferguson; Scarlett Johansson; Ana de Armas; Rosamund Pike; Rachel Weisz; Keira Knightley; Emilia Clarke
+alien,Lambert,Veronica Cartwright,Zoe Saldaña; Zendaya; Hailee Steinfeld; Jurnee Smollett; Elizabeth Olsen; Samara Weaving; Anya Taylor-Joy; Elle Fanning
+alien,Brett,Harry Dean Stanton,Edward Norton; Walton Goggins; Jesse Plemons; Stephen Graham; Barry Keoghan; Aidan Gillen; Jeffrey Dean Morgan; Scott Adkins
+alien,Kane,John Hurt,Cillian Murphy; Joseph Gordon-Levitt; Dev Patel; Ansel Elgort
+alien,Ash,Ian Holm,Michael Fassbender; Adam Driver; Nikolaj Coster-Waldau; Michael Shannon; Brian Cox; Ralph Fiennes
+alien,Parker,Yaphet Kotto,Idris Elba; Mahershala Ali; Donald Glover; Denzel Washington
+the-sopranos,Tony Soprano,James Gandolfini,Leonardo DiCaprio; Jon Bernthal; Jake Gyllenhaal; Josh Brolin; Javier Bardem; Matthew McConaughey; Al Pacino; Pedro Pascal
+the-sopranos,Carmela Soprano,Edie Falco,Nicole Kidman; Kate Winslet; Julianne Moore; Rachel Weisz; Charlize Theron; Penélope Cruz; Rebecca Ferguson; Jennifer Connelly
+the-sopranos,Meadow Soprano,Jamie-Lynn Sigler,Madelyn Cline; Hailee Steinfeld; Anya Taylor-Joy; Zendaya; Sydney Sweeney; Samara Weaving; Margaret Qualley
+the-sopranos,A.J. Soprano,Robert Iler,Jacob Elordi; Tom Holland; Finn Wolfhard; Noah Fearnley; Song Weilong; Tyriq Withers; Hudson Williams; Deng Kai
+the-sopranos,Jennifer Melfi,Lorraine Bracco,Ana de Armas; Emilia Clarke; Morena Baccarin; Amanda Seyfried; Annabelle Wallis; Katie Holmes; Rosamund Pike; Kelly Reilly
+the-sopranos,Christopher Moltisanti,Michael Imperioli,Barry Keoghan; Jack O'Connell; Andrew Garfield; Shia LaBeouf; Michele Morrone; Giulio Berruti; Jesse Plemons; Theo James
+the-sopranos,Silvio Dante,Steven Van Zandt,Tony Leung Chiu-wai; Mark Strong; Mads Mikkelsen; Walton Goggins; Ed Harris; Aidan Gillen; Simon Baker; Richard Gere
+breaking-bad,Walter White,Bryan Cranston,Bryan Cranston; Jon Bernthal; Matthew McConaughey; Mark Strong; Jude Law; Ralph Fiennes; Mads Mikkelsen; Pedro Pascal
+breaking-bad,Jesse Pinkman,Aaron Paul,Aaron Paul; Jacob Elordi; Jack O'Connell; Barry Keoghan; Joe Keery; Tyriq Withers; Noah Fearnley; Andrew Garfield
+breaking-bad,Skyler White,Anna Gunn,Anna Gunn; Rebecca Ferguson; Rosamund Pike; Rachel McAdams; Kate Winslet; Ana de Armas; Annabelle Wallis; Claire Danes
+breaking-bad,Walter White Jr.,RJ Mitte,RJ Mitte; Tom Holland; Deng Kai; Jacob Elordi; Zhang Linghe; Noah Fearnley; Hudson Williams; Tyriq Withers
+breaking-bad,Hank Schrader,Dean Norris,Dean Norris; Jon Bernthal; Walton Goggins; Jesse Plemons; Jeffrey Dean Morgan; Ed Harris; Sam Elliott; Kevin Bacon
+breaking-bad,Marie Schrader,Betsy Brandt,Betsy Brandt; Amy Madigan; Kaley Cuoco; Penélope Cruz; Emilia Clarke; Marisa Tomei; Kelly Reilly; Sela Ward
+breaking-bad,Saul Goodman,Bob Odenkirk,Bob Odenkirk; Jim Carrey; Jack Black; Adam Sandler; Kevin Hart; Michael Shannon; Woody Harrelson
+the-wire,Jimmy McNulty,Dominic West,Jake Gyllenhaal; Jon Bernthal; Andrew Garfield; Edward Norton; Ben Affleck; Jesse Plemons; Jack O'Connell; Joe Keery
+the-wire,Cedric Daniels,Lance Reddick,Idris Elba; Denzel Washington; Morgan Freeman; Javier Bardem; Sterling K. Brown; Mads Mikkelsen; Pedro Pascal
+the-wire,Kima Greggs,Sonja Sohn,Jurnee Smollett; Charlize Theron; Zoe Saldaña; Halle Berry; Regina King; Angela Bassett
+the-wire,Bunk Moreland,Wendell Pierce,Walton Goggins; Woody Harrelson; Kevin Bacon; Kurt Russell; Sam Elliott; Matthew McConaughey; Ed Harris
+the-wire,Omar Little,Michael Kenneth Williams,Barry Keoghan; Jack O'Connell; Shia LaBeouf; Elijah Wood; Tyler Hoechlin; Tom Holland
+the-wire,Rhonda Pearlman,Deirdre Lovejoy,Rachel McAdams; Rebecca Ferguson; Ana de Armas; Rosamund Pike; Keira Knightley; Amy Adams; Kate Winslet
+the-wire,Bubbles,Andre Royo,Ben Affleck; Aaron Paul; Paul Dano; Adam Pearson; Michael Shannon; Joaquin Phoenix
+game-of-thrones,Tyrion 'The Halfman' Lannister,Peter Dinklage,Peter Dinklage; Danny DeVito; Warwick Davis
+game-of-thrones,Jon Snow,Kit Harington,Kit Harington; Jack O'Connell; Jacob Elordi; Hayden Christensen; Theo James; Song Weilong; Chen Zheyuan; Tian Xuning
+game-of-thrones,Sir Jaime 'Kingslayer' Lannister,Nikolaj Coster-Waldau,Nikolaj Coster-Waldau; Simon Baker; Jake Gyllenhaal; Jude Law; Jon Bernthal; Mark Strong; Pedro Pascal; Michele Morrone
+game-of-thrones,Cersei Lannister,Lena Headey,Lena Headey; Charlize Theron; Penélope Cruz; Rebecca Ferguson; Rachel Weisz; Kate Winslet; Rosamund Pike; Eva Green
+game-of-thrones,Daenerys Targaryen,Emilia Clarke,Emilia Clarke; Anya Taylor-Joy; Elle Fanning; Margot Robbie; Zendaya; Emma Stone; Lily James; Tian Xiwei
+game-of-thrones,Davos Seaworth,Liam Cunningham,Liam Cunningham; Tom Hanks; Liam Neeson; Ed Harris; Sam Elliott; Kevin Bacon; Kurt Russell; Harrison Ford
+game-of-thrones,Arya Stark,Maisie Williams,Sadie Sink; Jenna Ortega; Dafne Keen; Emma Myers; Millie Bobby Brown; Ella Purnell; Elle Chapman
+the-west-wing,Josiah Bartlet,Martin Sheen,Tom Hanks; Harrison Ford; Denzel Washington; Richard Gere; Matt Damon; George Clooney; Jude Law; Ralph Fiennes
+the-west-wing,C.J. Cregg,Allison Janney,Sandra Bullock; Jennifer Aniston; Nicole Kidman; Rachel McAdams; Amy Adams; Kate Hudson; Diane Lane; Claire Danes
+the-west-wing,Leo McGarry,John Spencer,Morgan Freeman; Liam Neeson; Kurt Russell; Ed Harris; Sam Elliott; Jack O'Connell; Jon Bernthal; Walton Goggins
+the-west-wing,Josh Lyman,Bradley Whitford,Jake Gyllenhaal; Andrew Garfield; Joseph Gordon-Levitt; Aaron Paul; Jesse Plemons; Theo James
+the-west-wing,Will Bailey,Joshua Malina,Tom Holland; Jacob Elordi; Dacre Montgomery; Barry Keoghan; Dev Patel; Jack Lowden; Nicholas Hoult
+the-west-wing,Arnold Vinick,Alan Alda,Alan Ritchson; Mark Harmon; Jeff Daniels; David Morse
+the-west-wing,Matthew Santos,Jimmy Smits,Pedro Pascal; Michael Peña; Yahya Abdul-Mateen II
+mad-men,Don Draper,Jon Hamm,Ryan Gosling; Jake Gyllenhaal; Pedro Pascal; Jude Law; Jon Bernthal; Andrew Garfield; Tom Hardy; Cillian Murphy
+mad-men,Peggy Olson,Elisabeth Moss,Emma Stone; Anya Taylor-Joy; Hailee Steinfeld; Rebecca Ferguson; Margot Robbie; Rachel McAdams; Margaret Qualley; Keira Knightley
+mad-men,Pete Campbell,Vincent Kartheiser,Jesse Plemons; Nicholas Hoult; Theo James; Jacob Elordi; Jack O'Connell; Joe Keery; Barry Keoghan; Aidan Gillen
+mad-men,Betty Draper,January Jones,Nicole Kidman; Kate Winslet; Charlize Theron; Rachel Weisz; Claire Danes; Eva Green; Diane Lane; Jennifer Connelly
+mad-men,Joan Holloway,Christina Hendricks,Scarlett Johansson; Ana de Armas; Penélope Cruz; Morena Baccarin; Emilia Clarke; Rosamund Pike; Michelle Pfeiffer; Zoe Saldaña
+mad-men,Ken Cosgrove,Aaron Staton,Simon Baker; Mark Strong; Walton Goggins; Ed Harris; Javier Bardem; Mads Mikkelsen; Ralph Fiennes; Idris Elba
+mad-men,Harry Crane,Rich Sommer,Jim Carrey; Jack Black; John Travolta; Ben Affleck; Chris Evans; Jeremy Renner; Kevin Bacon
+succession,Kendall Roy,Jeremy Strong,Jake Gyllenhaal; Edward Norton; Andrew Garfield; Jon Bernthal; Jack O'Connell; Jesse Plemons; Theo James
+succession,Roman Roy,Kieran Culkin,Barry Keoghan; Finn Wolfhard; Tyriq Withers; Noah Fearnley; Jacob Elordi; Song Weilong; Chen Zheyuan; Hudson Williams
+succession,Siobhan 'Shiv' Roy,Sarah Snook,Anne Hathaway; Rachel McAdams; Margot Robbie; Rebecca Ferguson; Charlize Theron; Rosamund Pike; Kate Mara; Margaret Qualley
+succession,Logan Roy,Brian Cox,Denzel Washington; Harrison Ford; Javier Bardem; Ralph Fiennes; Al Pacino; Sam Elliott
+succession,Tom Wambsgans,Matthew Macfadyen,Simon Baker; James Marsden; Jude Law; Aidan Gillen; Mark Strong; Benedict Cumberbatch; Mads Mikkelsen; Theo James
+succession,Connor Roy,Alan Ruck,Kurt Russell; Richard Gere; Robert Redford; Eric Roberts; David Morse; Michael Shannon; Matthew McConaughey
+succession,Gerri Kellman,J. Smith-Cameron,Jacqueline Bisset; Jamie Lee Curtis; Michelle Pfeiffer; Julianne Moore; Frances McDormand; Meryl Streep; Amy Adams; Kate Winslet
+seinfeld,Jerry Seinfeld,Jerry Seinfeld,Ryan Gosling; Jake Gyllenhaal; Andrew Garfield; Simon Baker; James Marsden; Joe Keery; Jesse Plemons; Finn Wolfhard
+seinfeld,George Costanza,Jason Alexander,Jack Black; Adam Sandler; Jonah Hill; Seth Rogen; Woody Harrelson; Kevin Hart; Paul Rudd; Jack O'Connell
+seinfeld,Cosmo Kramer,Michael Richards,Nicolas Cage; Jim Carrey; Johnny Depp; Adrien Brody; Edward Norton; Matthew McConaughey; Jude Law
+seinfeld,Elaine Benes,Julia Louis-Dreyfus,Scarlett Johansson; Emma Stone; Margot Robbie; Anne Hathaway; Jennifer Aniston; Rachel McAdams; Kate Winslet; Reese Witherspoon
+the-office,Dwight Schrute,Rainn Wilson,Alan Ritchson; Jon Bernthal; Jack O'Connell; Jesse Plemons; Walton Goggins; Mark Strong; Stephen Graham; Scott Adkins
+the-office,Jim Halpert,John Krasinski,Ryan Gosling; Jake Gyllenhaal; Andrew Garfield; James Marsden; Theo James; Dylan Wang; Joe Keery; Jacob Elordi
+the-office,Pam Beesly,Jenna Fischer,Emma Stone; Rachel McAdams; Anya Taylor-Joy; Samara Weaving; Jenna Ortega; Madelyn Cline; Margaret Qualley; Lily James
+the-office,Andy Bernard,Ed Helms,Simon Baker; Pedro Pascal; Jude Law; Benedict Cumberbatch; Mads Mikkelsen; Aidan Gillen; Nicholas Hoult; Josh Brolin
+arrested-development,Michael Bluth,Jason Bateman,Ryan Gosling; Jake Gyllenhaal; Andrew Garfield; Jesse Plemons; Edward Norton; Jude Law; Jon Bernthal; Hayden Christensen
+arrested-development,Lindsay Bluth Fünke,Portia De Rossi,Margot Robbie; Charlize Theron; Reese Witherspoon; Rachel McAdams; Keira Knightley; Penélope Cruz; Ana de Armas; Emilia Clarke
+arrested-development,Gob Bluth,Will Arnett,Jason Momoa; Chris Hemsworth; Vin Diesel; Dave Bautista; Idris Elba; Dwayne Johnson; Javier Bardem
+arrested-development,George Michael Bluth,Michael Cera,Jacob Elordi; Tom Holland; Finn Wolfhard; Jack O'Connell; Barry Keoghan; Noah Fearnley; Song Weilong
+arrested-development,Maeby Fünke,Alia Shawkat,Anya Taylor-Joy; Madelyn Cline; Jenna Ortega; Hailee Steinfeld; Margaret Qualley; Zendaya; Sydney Sweeney; Elle Fanning
+arrested-development,"Byron ""Buster"" Bluth",Tony Hale,
+arrested-development,Tobias Fünke,David Cross,Will Ferrell; Jack Black; Paul Rudd; Woody Harrelson; Will Arnett; Adam Sandler; Jim Carrey
+deadwood,Seth Bullock,Timothy Olyphant,Jake Gyllenhaal; Jon Bernthal; Edward Norton; Jesse Plemons; Walton Goggins; Jeffrey Dean Morgan; Jack O'Connell; Aidan Gillen
+deadwood,Al Swearengen,Ian McShane,Johnny Depp; Javier Bardem; Mark Strong; Mads Mikkelsen; Ralph Fiennes; Matthew McConaughey; Al Pacino
+deadwood,Alma Garret,Molly Parker,Rosamund Pike; Rebecca Ferguson; Rachel McAdams; Kate Winslet; Rachel Weisz; Amy Adams; Charlize Theron; Margot Robbie
+deadwood,Whitney Ellsworth,Jim Beaver,Devon Bostick; Barry Keoghan; Jack O'Connell; Joe Keery; Nicholas Hoult; Andrew Garfield; Josh Brolin
+deadwood,Dan Dority,W. Earl Brown,Walton Goggins; Shia LaBeouf; Scott Adkins; Paul Anderson; Mel Gibson; Kevin Bacon; Joe Keery; Ben Affleck
+deadwood,Charlie Utter,Dayton Callie,Sam Elliott; Clint Eastwood; Kurt Russell; Liam Neeson; Ed Harris; Terence Hill; Mel Gibson; Kevin Bacon
+deadwood,Amos Cochran,Brad Dourif,Willem Dafoe; Brad Dourif; Jeffrey Dean Morgan; Mark Strong; Jude Law; Tony Leung Chiu-wai; Ralph Fiennes; Tim Roth
+oz,Tobias Beecher,Lee Tergesen,Jacob Elordi; Jack O'Connell; Andrew Garfield; Jesse Plemons; Joe Keery; Barry Keoghan; Hayden Christensen; Theo James
+oz,Augustus Hill,Harold Perrineau,Idris Elba; Denzel Washington; Woody Harrelson; Walton Goggins; Stephen Graham; Irrfan Khan; Mark Strong; Javier Bardem
+oz,Ryan O'Reily,Dean Winters,Tom Hardy; Jon Bernthal; Edward Norton; Jake Gyllenhaal; Josh Brolin; Adrien Brody; Paul Anderson; Scott Adkins
+oz,Kareem Saïd,Eamonn Walker,Denzel Washington; Idris Elba; Javier Bardem; Ralph Fiennes; Mads Mikkelsen; Mark Strong; Jeffrey Dean Morgan
+oz,Leo Glynn,Ernie Hudson,Morgan Freeman; Liam Neeson; Harrison Ford; Sam Elliott; Ed Harris; Clint Eastwood; Kevin Bacon; Kurt Russell
+oz,Tim McManus,Terry Kinney,Simon Baker; Aidan Gillen; Jude Law; Jim Carrey; James Marsden; Nathan Fillion; Benedict Cumberbatch; Matthew McConaughey
+oz,Sister Peter Marie Reimondo,Rita Moreno,Penélope Cruz; Emma Thompson; Frances McDormand; Amy Madigan; Michelle Pfeiffer; Julianne Moore; Jennifer Jason Leigh; Rebecca Ferguson

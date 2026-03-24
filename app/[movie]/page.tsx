@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import CastingBoard from '../components/CastingBoard'
 import { getEnrichedActors } from '../data/enrichedActors'
-import { getTitle, getRolesForTitle } from '../data/titles'
+import { getTitle, getRolesForTitle, getSuggestionsForTitle } from '../data/titles'
 
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
@@ -12,6 +12,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   const roles = getRolesForTitle(slug)
   if (roles.length === 0) notFound()
 
+  const suggestions = getSuggestionsForTitle(slug)
   const enriched = getEnrichedActors()
   const actors = enriched.map(a => ({
     id: a.tmdb_id || a.name,
@@ -32,6 +33,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       }))}
       title={title.title}
       budget={title.budget}
+      preloadedSuggestions={suggestions}
     />
   )
 }

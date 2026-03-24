@@ -27,9 +27,10 @@ type Props = {
   roles: CastRole[]
   title: string
   budget: number
+  preloadedSuggestions?: Record<string, string[]>
 }
 
-export default function CastingBoard({ actors, roles, title, budget }: Props) {
+export default function CastingBoard({ actors, roles, title, budget, preloadedSuggestions = {} }: Props) {
   const [selections, setSelections] = useState<Record<string, string>>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverRole, setDragOverRole] = useState<string | null>(null)
@@ -55,8 +56,20 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
   useEffect(() => {
     setQuery('')
     setIsFiltered(false)
-    setVisibleActors([])
     setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
+
+    // Show pre-loaded suggestions immediately
+    const preloaded = preloadedSuggestions[activeRole] ?? []
+    if (preloaded.length > 0) {
+      const picks = preloaded
+        .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
+        .filter((a): a is CastActor => Boolean(a))
+      setVisibleActors(picks)
+      setIsFiltered(true)
+      setSuggestedPerRole(prev => ({ ...prev, [activeRole]: picks }))
+    } else {
+      setVisibleActors([])
+    }
 
     const role = roles.find(r => r.role_name === activeRole)
     if (!role) return

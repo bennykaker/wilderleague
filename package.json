@@ -10,7 +10,8 @@
     "enrich-actors": "TMDB_API_KEY=$(grep TMDB_API_KEY .env.local | cut -d= -f2) npx tsx scripts/enrich-actors.ts",
     "deep-dive": "ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY .env.local | cut -d= -f2) npx tsx scripts/deep-dive.ts",
     "setup-cron": "bash scripts/setup-cron.sh",
-    "seed-titles": "TMDB_API_KEY=$(grep TMDB_API_KEY .env.local | cut -d= -f2) npx tsx scripts/seed-titles.ts"
+    "seed-titles": "TMDB_API_KEY=$(grep TMDB_API_KEY .env.local | cut -d= -f2) npx tsx scripts/seed-titles.ts",
+    "precompute-suggestions": "ANTHROPIC_API_KEY=$(grep ANTHROPIC_API_KEY .env.local | cut -d= -f2) npx tsx scripts/precompute-suggestions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
