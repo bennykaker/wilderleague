@@ -13,7 +13,7 @@ import fs from 'fs'
 import path from 'path'
 import Papa from 'papaparse'
 
-const BATCH_SIZE = 10
+const BATCH_SIZE = 50
 const CSV_PATH = path.join(process.cwd(), 'data', 'enriched-actors.csv')
 
 function getKey(name: string): string {
