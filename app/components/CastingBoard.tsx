@@ -122,7 +122,6 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           movie: title,
           originalActor: role?.original_actor ?? '',
           query,
-          actors: actors.map(a => a.name),
         }),
       })
       const data = await res.json()
@@ -556,7 +555,6 @@ export default function CastingBoard({ actors, roles, title, budget }: Props) {
           movie: title,
           originalActor: role?.original_actor ?? '',
           query: q,
-          actors: actors.map(a => a.name),
         }),
       })
       const data = await res.json()

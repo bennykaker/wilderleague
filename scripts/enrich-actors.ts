@@ -1,8 +1,12 @@
 /**
- * Enriches actors.csv with TMDB data: gender, birth year, biography, known_for, keywords.
- * Run with: npx tsx scripts/enrich-actors.ts
+ * Builds a rich actor pool from TMDB.
+ * Run with: npm run enrich-actors
  *
- * Reads:  data/actors.csv
+ * Phase 1: Fetch top 2,000 actors from TMDB popular list (bulk, fast)
+ *          → gets name, photo, gender, known_for, popularity
+ * Phase 2: Fetch detailed bio + birth year for top 500
+ *          → individual calls, rate-limited
+ *
  * Writes: data/enriched-actors.csv
  */
 
@@ -10,11 +14,23 @@ import fs from 'fs'
 import path from 'path'
 import Papa from 'papaparse'
 
-const TMDB_TOKEN = process.env.TMDB_API_KEY ?? ''
-const DELAY_MS = 300 // stay well within TMDB rate limits
+// Read token from env or .env.local directly
+function getToken(): string {
+  if (process.env.TMDB_API_KEY) return process.env.TMDB_API_KEY
+  try {
+    const file = fs.readFileSync(path.join(process.cwd(), '.env.local'), 'utf8')
+    const match = file.match(/^TMDB_API_KEY=(.+)$/m)
+    return match?.[1]?.trim() ?? ''
+  } catch { return '' }
+}
 
-if (!TMDB_TOKEN) {
-  console.error('TMDB_API_KEY not set. Add it to .env.local and pass it via env.')
+const TOKEN = getToken()
+const DELAY_MS = 260  // ~3.8 req/s, well under TMDB's 40/10s limit
+const TOTAL_ACTORS = 2000
+const DETAIL_THRESHOLD = 500  // fetch full bio for top N by popularity
+
+if (!TOKEN) {
+  console.error('TMDB_API_KEY not found in env or .env.local')
   process.exit(1)
 }
 
@@ -22,14 +38,11 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-async function tmdbGet(path: string) {
-  const res = await fetch(`https://api.themoviedb.org/3${path}`, {
-    headers: {
-      Authorization: `Bearer ${TMDB_TOKEN}`,
-      accept: 'application/json',
-    },
+async function tmdbGet(endpoint: string): Promise<Record<string, unknown>> {
+  const res = await fetch(`https://api.themoviedb.org/3${endpoint}`, {
+    headers: { Authorization: `Bearer ${TOKEN}`, accept: 'application/json' },
   })
-  if (!res.ok) throw new Error(`TMDB ${path} → ${res.status}`)
+  if (!res.ok) throw new Error(`TMDB ${endpoint} → ${res.status}`)
   return res.json() as Promise<Record<string, unknown>>
 }
 
@@ -40,105 +53,170 @@ function genderLabel(g: number): string {
   return ''
 }
 
-function extractKeywords(person: Record<string, unknown>, credits: Record<string, unknown>): string {
-  const tags: string[] = []
+function popularityToCost(pop: number): number {
+  if (pop >= 200) return 12
+  if (pop >= 100) return 10
+  if (pop >= 50) return 8
+  if (pop >= 20) return 6
+  if (pop >= 8) return 4
+  return 3
+}
 
-  const dept = person.known_for_department as string | undefined
-  if (dept === 'Acting') tags.push('actor')
-  else if (dept) tags.push(dept.toLowerCase())
+const GENRE_MAP: Record<number, string> = {
+  28: 'action', 12: 'adventure', 16: 'animation', 35: 'comedy',
+  80: 'crime', 99: 'documentary', 18: 'drama', 10751: 'family',
+  14: 'fantasy', 36: 'history', 27: 'horror', 10402: 'music',
+  9648: 'mystery', 10749: 'romance', 878: 'sci-fi', 53: 'thriller',
+  10752: 'war', 37: 'western',
+}
 
-  // Genre-based keywords from top credits
-  const cast = (credits.cast as Array<Record<string, unknown>>) ?? []
-  const genreIds = cast.flatMap(c => (c.genre_ids as number[]) ?? [])
-  const genreMap: Record<number, string> = {
-    28: 'action', 12: 'adventure', 16: 'animation', 35: 'comedy',
-    80: 'crime', 99: 'documentary', 18: 'drama', 10751: 'family',
-    14: 'fantasy', 36: 'history', 27: 'horror', 10402: 'music',
-    9648: 'mystery', 10749: 'romance', 878: 'sci-fi', 53: 'thriller',
-    10752: 'war', 37: 'western',
+interface BulkActor {
+  id: number
+  name: string
+  profile_path: string | null
+  popularity: number
+  gender: number
+  known_for_department: string
+  known_for: Array<{ title?: string; name?: string; genre_ids?: number[] }>
+}
+
+// ── Phase 1: bulk popular list ──────────────────────────────────────────────
+
+async function fetchPopularActors(total: number): Promise<BulkActor[]> {
+  const pages = Math.ceil(total / 20)
+  const actors: BulkActor[] = []
+
+  for (let page = 1; page <= pages; page++) {
+    try {
+      const data = await tmdbGet(`/person/popular?page=${page}`)
+      const results = (data.results as BulkActor[]) ?? []
+      // Only keep actors (not directors, crew, etc.)
+      actors.push(...results.filter(p => p.known_for_department === 'Acting'))
+      process.stdout.write(`\rPhase 1: fetched page ${page}/${pages} (${actors.length} actors so far)`)
+    } catch (err) {
+      console.error(`\nPage ${page} failed: ${err}`)
+    }
+    await sleep(DELAY_MS)
   }
+
+  console.log()
+  return actors.slice(0, total)
+}
+
+// ── Phase 2: individual detail fetch ────────────────────────────────────────
+
+interface DetailResult {
+  biography: string
+  birth_year: string
+  keywords: string
+  known_for_credits: string
+}
+
+async function fetchDetail(tmdbId: number, bulkKnownFor: BulkActor['known_for']): Promise<DetailResult> {
+  const [person, credits] = await Promise.all([
+    tmdbGet(`/person/${tmdbId}`),
+    tmdbGet(`/person/${tmdbId}/movie_credits`),
+  ])
+
+  const biography = ((person.biography as string) ?? '').replace(/\n/g, ' ').trim().slice(0, 500)
+  const birthday = person.birthday as string | null
+  const birth_year = birthday ? birthday.split('-')[0] : ''
+
+  // Genre keywords from movie credits
+  const cast = (credits.cast as Array<{ genre_ids?: number[]; popularity?: number; title?: string; name?: string }>) ?? []
   const genreCounts: Record<string, number> = {}
-  for (const id of genreIds) {
-    const label = genreMap[id]
-    if (label) genreCounts[label] = (genreCounts[label] ?? 0) + 1
+  for (const movie of cast) {
+    for (const id of movie.genre_ids ?? []) {
+      const label = GENRE_MAP[id]
+      if (label) genreCounts[label] = (genreCounts[label] ?? 0) + 1
+    }
   }
   const topGenres = Object.entries(genreCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 4)
     .map(([g]) => g)
-  tags.push(...topGenres)
 
-  return tags.join('; ')
-}
+  const keywords = ['actor', ...topGenres].join('; ')
 
-function extractKnownFor(credits: Record<string, unknown>): string {
-  const cast = (credits.cast as Array<Record<string, unknown>>) ?? []
-  return cast
-    .filter(c => c.popularity && (c.popularity as number) > 5)
-    .sort((a, b) => (b.popularity as number) - (a.popularity as number))
+  const known_for_credits = cast
+    .filter(c => (c.popularity ?? 0) > 5)
+    .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
     .slice(0, 5)
-    .map(c => (c.title ?? c.name ?? '') as string)
+    .map(c => c.title ?? c.name ?? '')
     .filter(Boolean)
     .join('; ')
+
+  return { biography, birth_year, keywords, known_for_credits }
 }
 
+// ── Main ─────────────────────────────────────────────────────────────────────
+
 async function main() {
-  const csvPath = path.join(process.cwd(), 'data', 'actors.csv')
   const outPath = path.join(process.cwd(), 'data', 'enriched-actors.csv')
 
-  const raw = fs.readFileSync(csvPath, 'utf8')
-  const parsed = Papa.parse<Record<string, string>>(raw, { header: true, skipEmptyLines: true })
-  const actors = parsed.data
+  // Phase 1
+  console.log(`\nPhase 1: fetching top ${TOTAL_ACTORS} actors from TMDB popular list…`)
+  const bulkActors = await fetchPopularActors(TOTAL_ACTORS)
+  console.log(`Got ${bulkActors.length} actors from popular list.\n`)
 
-  console.log(`Enriching ${actors.length} actors…\n`)
+  // Phase 2
+  console.log(`Phase 2: fetching bios for top ${DETAIL_THRESHOLD} actors…`)
+  const detailActors = bulkActors.slice(0, DETAIL_THRESHOLD)
+  const details = new Map<number, DetailResult>()
 
-  const enriched: Record<string, string>[] = []
-
-  for (let i = 0; i < actors.length; i++) {
-    const actor = actors[i]
-    const tmdbId = actor.tmdb_id?.trim()
-    const name = actor.name?.trim()
-
-    if (!tmdbId) {
-      console.log(`[${i + 1}/${actors.length}] ${name} — no tmdb_id, skipping`)
-      enriched.push({ ...actor, gender: '', birth_year: '', biography: '', known_for: '', keywords: '' })
-      continue
-    }
-
+  for (let i = 0; i < detailActors.length; i++) {
+    const actor = detailActors[i]
     try {
-      const [person, credits] = await Promise.all([
-        tmdbGet(`/person/${tmdbId}`),
-        tmdbGet(`/person/${tmdbId}/movie_credits`),
-      ])
-
-      const gender = genderLabel(person.gender as number)
-      const birthday = person.birthday as string | null
-      const birth_year = birthday ? birthday.split('-')[0] : ''
-      const biography = ((person.biography as string) ?? '').replace(/\n/g, ' ').trim()
-      const known_for = extractKnownFor(credits)
-      const keywords = extractKeywords(person, credits)
-
-      console.log(`[${i + 1}/${actors.length}] ${name} — ${gender}, b.${birth_year}, ${keywords}`)
-
-      enriched.push({
-        ...actor,
-        gender,
-        birth_year,
-        biography: biography.slice(0, 500), // cap length
-        known_for,
-        keywords,
-      })
+      const detail = await fetchDetail(actor.id, actor.known_for)
+      details.set(actor.id, detail)
+      process.stdout.write(`\rPhase 2: ${i + 1}/${DETAIL_THRESHOLD} — ${actor.name}`.padEnd(80))
     } catch (err) {
-      console.error(`[${i + 1}/${actors.length}] ${name} — ERROR: ${err}`)
-      enriched.push({ ...actor, gender: '', birth_year: '', biography: '', known_for: '', keywords: '' })
+      console.error(`\n${actor.name} detail failed: ${err}`)
     }
-
     await sleep(DELAY_MS)
   }
+  console.log('\n')
 
-  const out = Papa.unparse(enriched)
-  fs.writeFileSync(outPath, out, 'utf8')
-  console.log(`\nDone. Written to ${outPath}`)
+  // Build output rows
+  const rows = bulkActors.map(actor => {
+    const detail = details.get(actor.id)
+    const pop = actor.popularity
+
+    // Fallback known_for from bulk data
+    const bulkKnownFor = actor.known_for
+      .map(k => k.title ?? k.name ?? '')
+      .filter(Boolean)
+      .slice(0, 3)
+      .join('; ')
+
+    // Fallback keywords from bulk known_for genres
+    const bulkGenreIds = actor.known_for.flatMap(k => k.genre_ids ?? [])
+    const bulkGenreCounts: Record<string, number> = {}
+    for (const id of bulkGenreIds) {
+      const label = GENRE_MAP[id]
+      if (label) bulkGenreCounts[label] = (bulkGenreCounts[label] ?? 0) + 1
+    }
+    const bulkKeywords = ['actor', ...Object.entries(bulkGenreCounts).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([g]) => g)].join('; ')
+
+    return {
+      name: actor.name,
+      tmdb_id: String(actor.id),
+      headshot_url: actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : '',
+      popularity: pop.toFixed(4),
+      cost: String(popularityToCost(pop)),
+      gender: genderLabel(actor.gender),
+      birth_year: detail?.birth_year ?? '',
+      biography: detail?.biography ?? '',
+      known_for: detail?.known_for_credits ?? bulkKnownFor,
+      keywords: detail?.keywords ?? bulkKeywords,
+      notes: '',
+      ui_status: '',
+    }
+  })
+
+  const csv = Papa.unparse(rows)
+  fs.writeFileSync(outPath, csv, 'utf8')
+  console.log(`Done. ${rows.length} actors written to ${outPath}`)
 }
 
 main().catch(err => {
