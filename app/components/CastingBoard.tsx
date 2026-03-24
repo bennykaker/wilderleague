@@ -337,7 +337,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       </div>
 
       {/* Body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 420px', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0 }}>
 
         {/* ── Left: Cast board ── */}
         <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto' }}>
@@ -361,7 +361,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                   background: '#22222e',
                 }}
               >
-                <div style={{ fontSize: '12px', color: '#a1a1aa', marginBottom: '14px', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700 }}>
+                <div style={{ fontSize: '16px', color: '#e2e8f0', marginBottom: '14px', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 800 }}>
                   {role.role_name}
                 </div>
 
@@ -376,8 +376,8 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                       )}
                     </div>
                     <div>
-                      <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '3px' }}>Original</div>
-                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#94a3b8', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '4px' }}>Original</div>
+                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#94a3b8', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {role.original_actor}
                       </div>
                     </div>
@@ -518,18 +518,18 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
           </div>
         </div>
 
-        {/* ── Right: Actor finder ── */}
-        <div style={{ padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* ── Centre: Marlowe chat ── */}
+        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
           {/* Role selector */}
           <div>
-            <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>
+            <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', marginBottom: '8px', fontWeight: 600 }}>
               Working on
             </div>
             <select
               value={activeRole}
               onChange={e => setActiveRole(e.target.value)}
-              style={{ width: '100%', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '9px 13px', color: '#f8fafc', fontSize: '14px', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
+              style={{ width: '100%', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '15px', fontWeight: 600, outline: 'none', cursor: 'pointer' }}
             >
               {roles.map(r => (
                 <option key={r.role_name} value={r.role_name}>{r.role_name}</option>
@@ -538,22 +538,22 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
           </div>
 
           {/* AI chat */}
-          <div style={{ background: '#111115', border: '1px solid #27272a', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px', minHeight: '80px' }}>
+          <div style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
             {aiLoading && currentMessages.length === 0 && (
-              <div style={{ fontSize: '13px', color: '#52525b', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ fontSize: '14px', color: '#71717a', fontStyle: 'italic' }}>Thinking…</div>
             )}
             {currentMessages.map((msg, i) => (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
-                    AI
+                  <span style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
+                    Marlowe
                   </span>
-                  <div style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.55 }}>{msg.text}</div>
+                  <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>{msg.text}</div>
                 </div>
                 {msg.suggestion && (
                   <button
                     onClick={() => { setQuery(msg.suggestion!); handleSearchWithQuery(msg.suggestion!) }}
-                    style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
+                    style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '7px 13px', fontSize: '13px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
                   >
                     💬 {msg.suggestion}
                   </button>
@@ -561,7 +561,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               </div>
             ))}
             {aiLoading && currentMessages.length > 0 && (
-              <div style={{ fontSize: '12px', color: '#52525b', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ fontSize: '13px', color: '#71717a', fontStyle: 'italic' }}>Thinking…</div>
             )}
             <div ref={chatEndRef} />
           </div>
@@ -572,33 +572,70 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-              placeholder='e.g. "young, intense, physical presence"'
-              style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '9px 13px', color: '#f8fafc', fontSize: '13px', outline: 'none' }}
+              placeholder='e.g. "young, intense, physical"'
+              style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
             />
             <button
               onClick={handleSearch}
               disabled={aiLoading || !query.trim()}
-              style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '9px 16px', fontSize: '13px', fontWeight: 600, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
+              style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
             >
-              Search
+              Ask
             </button>
             {isFiltered && (
               <button
                 onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
-                style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '13px', cursor: 'pointer', flexShrink: 0 }}
+                style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
               >
                 Clear
               </button>
             )}
           </div>
 
-          {/* Count */}
-          <div style={{ fontSize: '11px', color: '#3f3f46' }}>
-            {aiLoading ? '' : isFiltered ? `${displayActors.length} suggestions — drag to cast` : displayActors.length === 0 ? 'Search or ask Marlowe for suggestions' : `${displayActors.length} actors`}
+          {/* Passed on */}
+          {(() => {
+            const primaryName = getSlots(activeRole)[0]
+            const passed = (suggestedPerRole[activeRole] ?? []).filter(a =>
+              a.name !== primaryName &&
+              !blockedActors.has(a.name) &&
+              !displayActors.find(v => v.name === a.name)
+            )
+            if (passed.length === 0) return null
+            return (
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
+                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', marginBottom: '10px', fontWeight: 600 }}>
+                  Passed on · Second look?
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {passed.map(actor => (
+                    <button
+                      key={actor.name}
+                      onClick={() => assignToSlot(activeRole, actor.name, 0)}
+                      title={`Cast ${actor.name} as ${activeRole}`}
+                      style={{ display: 'flex', alignItems: 'center', gap: '7px', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '5px 10px 5px 6px', cursor: 'pointer' }}
+                    >
+                      <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
+                        {actor.image
+                          ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', fontSize: '9px' }}>?</div>
+                        }
+                      </div>
+                      <span style={{ fontSize: '13px', color: '#94a3b8', whiteSpace: 'nowrap' }}>{actor.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+
+        {/* ── Right: Actor headshots ── */}
+        <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', fontWeight: 600 }}>
+            {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Suggestions appear here' : `${displayActors.length} suggestions`}
           </div>
 
-          {/* Actor grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px' }}>
             {displayActors.map((actor, i) => {
               const isAssigned = assignedNames.has(actor.name)
               const isDragging = draggingActor === actor.name
@@ -618,15 +655,14 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                   }}
                   onDragEnd={() => setDraggingActor(null)}
                   style={{
-                    border: `1px solid ${isAiPick ? 'rgba(59,130,246,0.45)' : '#27272a'}`,
-                    borderRadius: '10px',
+                    border: `1px solid ${isAiPick ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                    borderRadius: '8px',
                     overflow: 'hidden',
-                    background: isAssigned ? '#0d0d0f' : isAiPick ? 'rgba(15,26,48,1)' : '#18181b',
-                    opacity: isAssigned ? 0.3 : isDragging ? 0.35 : 1,
+                    background: isAssigned ? '#0f0f14' : isAiPick ? 'rgba(15,26,48,1)' : '#18181b',
+                    opacity: isAssigned ? 0.25 : isDragging ? 0.3 : 1,
                     cursor: isAssigned ? 'default' : 'grab',
                     transition: 'opacity 0.15s',
                     userSelect: 'none',
-                    position: 'relative',
                   }}
                 >
                   <div style={{ aspectRatio: '2/3', background: '#111115', overflow: 'hidden' }}>
@@ -638,24 +674,22 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                         draggable={false}
                       />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '11px' }}>
-                        No photo
-                      </div>
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '10px' }}>?</div>
                     )}
                   </div>
-                  <div style={{ padding: '7px 8px 8px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#f1f5f9', lineHeight: 1.3, marginBottom: '2px' }}>
+                  <div style={{ padding: '5px 6px 6px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#e2e8f0', lineHeight: 1.25, marginBottom: '2px' }}>
                       {actor.name}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ fontSize: '10px', color: '#52525b', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontSize: '10px', color: '#71717a', fontVariantNumeric: 'tabular-nums' }}>
                         ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '9px' }}> est</span>}
                       </div>
                       {!isAssigned && (
                         <button
                           onClick={e => { e.stopPropagation(); setConfirmBan(actor.name) }}
-                          title={`Ban ${actor.name} from your talent pool`}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '11px', lineHeight: 1, color: '#3f3f46', opacity: 0.6 }}
+                          title={`Ban ${actor.name}`}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '10px', lineHeight: 1, opacity: 0.5 }}
                         >
                           🚫
                         </button>
@@ -666,42 +700,6 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               )
             })}
           </div>
-
-          {/* Passed on */}
-          {(() => {
-            const primaryName = getSlots(activeRole)[0]
-            const passed = (suggestedPerRole[activeRole] ?? []).filter(a =>
-              a.name !== primaryName &&
-              !blockedActors.has(a.name) &&
-              !displayActors.find(v => v.name === a.name)
-            )
-            if (passed.length === 0) return null
-            return (
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '14px' }}>
-                <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3f3f46', marginBottom: '10px' }}>
-                  Passed on · Second look?
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {passed.map(actor => (
-                    <button
-                      key={actor.name}
-                      onClick={() => assignToSlot(activeRole, actor.name, 0)}
-                      title={`Cast ${actor.name} as ${activeRole}`}
-                      style={{ display: 'flex', alignItems: 'center', gap: '7px', background: '#111115', border: '1px solid #27272a', borderRadius: '8px', padding: '5px 9px 5px 5px', cursor: 'pointer' }}
-                    >
-                      <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
-                        {actor.image
-                          ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '9px' }}>?</div>
-                        }
-                      </div>
-                      <span style={{ fontSize: '11px', color: '#71717a', whiteSpace: 'nowrap' }}>{actor.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )
-          })()}
         </div>
       </div>
 
@@ -940,7 +938,7 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '13px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginBottom: '3px' }}>
+          <div style={{ fontSize: '15px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}>
             ${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#3f3f46', fontWeight: 400 }}> est</span>}
           </div>
           <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
