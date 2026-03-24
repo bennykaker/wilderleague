@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "enrich-actors": "TMDB_API_KEY=$(grep TMDB_API_KEY .env.local | cut -d= -f2) npx tsx scripts/enrich-actors.ts"
+    "enrich-actors": "TMDB_API_KEY=$(grep TMDB_API_KEY .env.local | cut -d= -f2) npx tsx scripts/enrich-actors.ts",
+    "deep-dive": "npx tsx scripts/deep-dive.ts",
+    "setup-cron": "bash scripts/setup-cron.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
