@@ -3,8 +3,12 @@ import { getTitles } from './data/titles'
 import { getActiveChallenge } from './data/challenges'
 import NewHereModal from './components/NewHereModal'
 import TitleSearch from './components/TitleSearch'
+import AuthButton from './components/AuthButton'
+import { createClient } from '../lib/supabase/server'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   const all = getTitles()
   const featured = all.slice(0, 5)
   const challenge = getActiveChallenge()
@@ -38,6 +42,7 @@ export default function HomePage() {
             <Link href="/actors" style={{ fontSize: '13px', color: '#52525b', textDecoration: 'none', borderBottom: '1px solid #27272a', paddingBottom: '2px' }}>
               Browse actor pool →
             </Link>
+            <AuthButton user={user ? { email: user.email } : null} />
           </div>
           </div>
 
