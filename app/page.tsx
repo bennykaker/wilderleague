@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getTitles } from './data/titles'
 import { getActiveChallenge } from './data/challenges'
+import NewHereModal from './components/NewHereModal'
 
 export default function HomePage() {
   const all = getTitles()
@@ -31,9 +32,12 @@ export default function HomePage() {
           <p style={{ fontSize: '16px', color: '#71717a', maxWidth: '520px', lineHeight: 1.6, margin: '0 0 20px' }}>
             Pick a film or show. Drag actors into iconic roles. Work within the budget. Share your cast.
           </p>
-          <Link href="/actors" style={{ fontSize: '13px', color: '#52525b', textDecoration: 'none', borderBottom: '1px solid #27272a', paddingBottom: '2px' }}>
-            Browse actor pool →
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '4px' }}>
+            <NewHereModal />
+            <Link href="/actors" style={{ fontSize: '13px', color: '#52525b', textDecoration: 'none', borderBottom: '1px solid #27272a', paddingBottom: '2px' }}>
+              Browse actor pool →
+            </Link>
+          </div>
           </div>
 
           {/* Weekly challenge card */}
