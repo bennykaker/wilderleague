@@ -21,6 +21,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     popularity: a.popularity,
     cost: a.cost,
     salaryConfirmed: a.salary_confirmed,
+    knownFor: a.known_for || '',
   }))
 
   return (

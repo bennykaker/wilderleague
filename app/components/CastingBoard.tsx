@@ -9,6 +9,7 @@ export type CastActor = {
   popularity: number
   cost: number
   salaryConfirmed?: boolean
+  knownFor?: string
 }
 
 export type CastRole = {
@@ -685,7 +686,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                     <button
                       key={actor.name}
                       onClick={() => assignToSlot(activeRole, actor.name, 0)}
-                      title={`Cast ${actor.name} as ${activeRole}`}
+                      title={actor.knownFor ? actor.knownFor.split(';').slice(0, 4).map((s: string) => s.trim()).filter(Boolean).join(' · ') : `Cast ${actor.name} as ${activeRole}`}
                       style={{ display: 'flex', alignItems: 'center', gap: '7px', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '5px 10px 5px 6px', cursor: 'pointer' }}
                     >
                       <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
@@ -715,10 +716,15 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               const isDragging = draggingActor === actor.name
               const isAiPick = isFiltered && i < 8
 
+              const knownForTooltip = actor.knownFor
+                ? actor.knownFor.split(';').slice(0, 4).map(s => s.trim()).filter(Boolean).join(' · ')
+                : ''
+
               return (
                 <div
                   key={actor.name}
                   draggable={!isAssigned}
+                  title={knownForTooltip || undefined}
                   onDragStart={e => {
                     if (isAssigned) { e.preventDefault(); return }
                     e.dataTransfer.setData('text/plain', actor.name)
