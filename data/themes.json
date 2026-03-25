@@ -1,0 +1,202 @@
+[
+  {
+    "id": "clcu",
+    "name": "Chuck Lorre Cinematic Universe",
+    "short_name": "CLCU",
+    "description": "Big Bang Theory, Two and a Half Men, Mom, Young Sheldon, and the rest of Chuck Lorre's TV empire.",
+    "badge": "📺",
+    "seeded": false,
+    "tmdb_show_ids": ["1418", "1695", "50708", "71728", "39412", "41556", "14139", "85234", "108870", "130392", "1395", "80986"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "seinfeld",
+    "name": "The Seinfeld Universe",
+    "short_name": "Seinfeldverse",
+    "description": "Every soup nazi, close talker, and low-talker. If they appeared in a single episode, they're in.",
+    "badge": "🥨",
+    "seeded": false,
+    "tmdb_show_ids": ["1400"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "star-trek",
+    "name": "Star Trek Universe",
+    "short_name": "Trek Universe",
+    "description": "60 years of guest stars across TOS, TNG, DS9, Voyager, Enterprise, Discovery, Picard, Strange New Worlds, and more.",
+    "badge": "🖖",
+    "seeded": false,
+    "tmdb_show_ids": ["1412", "655", "580", "1637", "1855", "67198", "85949", "103516", "130925"],
+    "tmdb_movie_ids": ["152", "154", "157", "168", "172", "200", "201", "193", "54138", "188927"]
+  },
+  {
+    "id": "star-wars",
+    "name": "Star Wars Universe",
+    "short_name": "Galaxy Far Away",
+    "description": "All films plus The Mandalorian, Andor, Obi-Wan, Ahsoka, The Book of Boba Fett, Clone Wars.",
+    "badge": "⚔️",
+    "seeded": false,
+    "tmdb_show_ids": ["82856", "92830", "115036", "114461", "105971"],
+    "tmdb_movie_ids": ["11", "1891", "1892", "1893", "1894", "1895", "140607", "181808", "181809", "348350"]
+  },
+  {
+    "id": "doctor-who",
+    "name": "Doctor Who Universe",
+    "short_name": "Whoverse",
+    "description": "Over 900 episodes, 40+ years of British television. The deepest guest star pool on Earth.",
+    "badge": "🔵",
+    "seeded": false,
+    "tmdb_show_ids": ["57243", "4604"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "david-simon",
+    "name": "The David Simon Universe",
+    "short_name": "Simonverse",
+    "description": "The Wire, Treme, The Deuce, We Own This City. The greatest character actor pool in television history.",
+    "badge": "🎰",
+    "seeded": false,
+    "tmdb_show_ids": ["1438", "40277", "68716", "122283"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "law-and-order",
+    "name": "Dick Wolf Universe",
+    "short_name": "Wolf Universe",
+    "description": "Law & Order, SVU, Criminal Intent, Organized Crime, Chicago Fire, Chicago PD, Chicago Med, FBI.",
+    "badge": "🔔",
+    "seeded": false,
+    "tmdb_show_ids": ["4616", "2734", "2396", "103131", "62822", "52607", "62650", "73118", "87925"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "nbc-comedy",
+    "name": "NBC Comedy Universe",
+    "short_name": "Peacock Comedy",
+    "description": "The Office, Parks & Rec, Brooklyn Nine-Nine, 30 Rock, Community, Superstore, Abbott Elementary.",
+    "badge": "🦚",
+    "seeded": false,
+    "tmdb_show_ids": ["2316", "8592", "48891", "21402", "18347", "67393", "90893"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "snl",
+    "name": "SNL Alumni",
+    "short_name": "Five-Timers Club",
+    "description": "Anyone who completed a full season as cast or featured player. The comedy farm team.",
+    "badge": "🎭",
+    "seeded": false,
+    "tmdb_show_ids": ["1667"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "ryan-murphy",
+    "name": "Ryan Murphy Universe",
+    "short_name": "Murphyverse",
+    "description": "AHS, Glee, Nip/Tuck, Pose, American Crime Story, Dahmer, 9-1-1. He casts the same 40 actors in everything.",
+    "badge": "🎪",
+    "seeded": false,
+    "tmdb_show_ids": ["1413", "13621", "76669", "75219", "72570", "110316", "87108", "111800"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "whedonverse",
+    "name": "The Whedonverse",
+    "short_name": "Whedonverse",
+    "description": "Buffy, Angel, Firefly, Dollhouse. Cult following that knows every recurring face by name.",
+    "badge": "🧛",
+    "seeded": false,
+    "tmdb_show_ids": ["95", "1433", "1437", "7979"],
+    "tmdb_movie_ids": ["558", "1771"]
+  },
+  {
+    "id": "shondaverse",
+    "name": "The Shondaverse",
+    "short_name": "Shondaverse",
+    "description": "Grey's Anatomy, Scandal, HTGAWM, Bridgerton, Station 19, Private Practice, Queen Charlotte.",
+    "badge": "💊",
+    "seeded": false,
+    "tmdb_show_ids": ["1416", "46952", "57243", "93405", "73586", "3786", "221283"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "gunniverse",
+    "name": "The Gunniverse",
+    "short_name": "James Gunniverse",
+    "description": "Guardians of the Galaxy, The Suicide Squad, Peacemaker, Slither, Super, Brightburn.",
+    "badge": "🦝",
+    "seeded": false,
+    "tmdb_show_ids": ["114472"],
+    "tmdb_movie_ids": ["76338", "283995", "447365", "436969", "50838", "9016", "455661"]
+  },
+  {
+    "id": "csi",
+    "name": "CSI Universe",
+    "short_name": "CSI Universe",
+    "description": "CSI, CSI: Miami, CSI: NY, CSI: Vegas, CSI: Cyber. Forensic science and guest-star gold.",
+    "badge": "🔬",
+    "seeded": false,
+    "tmdb_show_ids": ["1430", "1431", "1432", "121050", "61489"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "ncis",
+    "name": "NCIS Universe",
+    "short_name": "NCIS Universe",
+    "description": "NCIS, NCIS: LA, NCIS: New Orleans, NCIS: Hawaii, NCIS: Sydney, JAG.",
+    "badge": "⚓",
+    "seeded": false,
+    "tmdb_show_ids": ["4614", "17126", "60592", "135157", "236058", "4399"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "british-crime",
+    "name": "British Crime Drama",
+    "short_name": "UK Crime",
+    "description": "Line of Duty, Broadchurch, Happy Valley, Peaky Blinders, Luther, Sherlock. The entire UK character actor pool.",
+    "badge": "🫖",
+    "seeded": false,
+    "tmdb_show_ids": ["46263", "43048", "62285", "46227", "31641", "19885"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "uk-comedy",
+    "name": "UK Comedy Universe",
+    "short_name": "UK Comedy",
+    "description": "Peep Show, The IT Crowd, The Office UK, Black Books, Fleabag, Extras, Inside No. 9.",
+    "badge": "☕",
+    "seeded": false,
+    "tmdb_show_ids": ["4595", "13599", "2996", "63664", "77058", "19019", "62681"],
+    "tmdb_movie_ids": []
+  },
+  {
+    "id": "tarantino",
+    "name": "Tarantino Universe",
+    "short_name": "Tarantinoverse",
+    "description": "Reservoir Dogs through Once Upon a Time in Hollywood. The same ensemble reinvented across 10 films.",
+    "badge": "💼",
+    "seeded": false,
+    "tmdb_show_ids": [],
+    "tmdb_movie_ids": ["500", "680", "180", "393", "1271", "1853", "31167", "49521", "49538", "466272"]
+  },
+  {
+    "id": "sorkin",
+    "name": "Aaron Sorkin Universe",
+    "short_name": "Sorkinverse",
+    "description": "The West Wing, Sports Night, The Newsroom, Studio 60. The same brilliant ensemble, different building.",
+    "badge": "🗣️",
+    "seeded": false,
+    "tmdb_show_ids": ["1371", "2243", "62413", "10376"],
+    "tmdb_movie_ids": ["37799", "1422", "440161"]
+  },
+  {
+    "id": "mcu",
+    "name": "Marvel Cinematic Universe",
+    "short_name": "MCU",
+    "description": "Every film and Disney+ series. Main cast is in the DB — this gets the deep supporting cuts.",
+    "badge": "🦸",
+    "seeded": false,
+    "tmdb_show_ids": ["88329", "84958", "91363", "92749", "84356", "88987", "115036"],
+    "tmdb_movie_ids": ["1726", "10138", "10195", "22970", "24428", "68721", "76338", "99861", "102899", "284053", "284054", "271110", "315635", "284052", "299536", "299537", "429617", "566525", "524434", "634649", "616037"]
+  }
+]

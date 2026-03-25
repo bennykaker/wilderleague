@@ -42,6 +42,11 @@ type Props = {
 // Per role: [primary, 2nd choice, 3rd choice]
 type Selections = Record<string, string[]>
 
+function uniqueByName(arr: CastActor[]): CastActor[] {
+  const seen = new Set<string>()
+  return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
+}
+
 export default function CastingBoard({ actors, roles, title, budget, preloadedSuggestions = {}, challenge }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
@@ -186,7 +191,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       const picks = preloaded
         .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
         .filter((a): a is CastActor => Boolean(a))
-      setVisibleActors(picks)
+      setVisibleActors(uniqueByName(picks))
       setIsFiltered(true)
       setSuggestedPerRole(prev => ({ ...prev, [activeRole]: picks }))
     } else if (challenge) {
@@ -229,7 +234,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             .filter(name => !blockedActors.has(name))
             .map(name => actors.find(a => a.name === name))
             .filter((a): a is CastActor => Boolean(a))
-          setVisibleActors(picks)
+          setVisibleActors(uniqueByName(picks))
           setIsFiltered(true)
           setSuggestedPerRole(prev => {
             const existing = prev[activeRole] ?? []
@@ -284,7 +289,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
         .filter(name => !blockedActors.has(name))
         .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
         .filter((a): a is CastActor => Boolean(a))
-      setVisibleActors(picks)
+      setVisibleActors(uniqueByName(picks))
       setIsFiltered(true)
       setSuggestedPerRole(prev => {
         const existing = prev[activeRole] ?? []
@@ -1009,7 +1014,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
           .filter(name => !blockedActors.has(name))
           .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
           .filter((a): a is CastActor => Boolean(a))
-        setVisibleActors(picks)
+        setVisibleActors(uniqueByName(picks))
         setIsFiltered(true)
         setSuggestedPerRole(prev => {
           const existing = prev[activeRole] ?? []
