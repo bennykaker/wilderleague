@@ -10,6 +10,7 @@ export type CastActor = {
   cost: number
   salaryConfirmed?: boolean
   knownFor?: string
+  biography?: string
 }
 
 export type CastRole = {
@@ -67,6 +68,8 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
   const [reviewData, setReviewData] = useState<{ director: { verdict: string; notes: string }; execProducer: { verdict: string; notes: string }; marketer: { verdict: string; notes: string } } | null>(null)
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
+  const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
 
@@ -716,17 +719,22 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
               const isDragging = draggingActor === actor.name
               const isAiPick = isFiltered && i < 8
 
-              const knownForTooltip = actor.knownFor
-                ? actor.knownFor.split(';').slice(0, 4).map(s => s.trim()).filter(Boolean).join(' · ')
-                : ''
-
               return (
                 <div
                   key={actor.name}
                   draggable={!isAssigned}
-                  title={knownForTooltip || undefined}
+                  onMouseEnter={e => {
+                    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                    hoverTimeoutRef.current = setTimeout(() => setHoveredActor({ actor, rect }), 300)
+                  }}
+                  onMouseLeave={() => {
+                    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+                    hoverTimeoutRef.current = setTimeout(() => setHoveredActor(null), 150)
+                  }}
                   onDragStart={e => {
                     if (isAssigned) { e.preventDefault(); return }
+                    setHoveredActor(null)
                     e.dataTransfer.setData('text/plain', actor.name)
                     e.dataTransfer.effectAllowed = 'move'
                     setDraggingActor(actor.name)
@@ -987,6 +995,9 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
           </div>
         </div>
       )}
+
+      {/* Actor hover popup */}
+      {ActorHoverCard()}
     </div>
   )
 
@@ -1030,6 +1041,90 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       }
     } catch {}
     finally { setAiLoading(false) }
+  }
+
+  // ── Actor hover popup ──
+  function ActorHoverCard() {
+    if (!hoveredActor) return null
+    const { actor, rect } = hoveredActor
+
+    const knownForItems = (actor.knownFor ?? '')
+      .split(';').map(s => s.trim()).filter(Boolean).slice(0, 5)
+
+    const bio = (actor.biography ?? '').slice(0, 220).trim()
+    const bioSnippet = bio.length === 220 ? bio + '…' : bio
+
+    // Position: prefer left of card, fall back to right
+    const popupWidth = 240
+    const spaceRight = window.innerWidth - rect.right
+    const left = spaceRight > popupWidth + 12
+      ? rect.right + 8
+      : rect.left - popupWidth - 8
+
+    const top = Math.min(
+      rect.top,
+      window.innerHeight - 340
+    )
+
+    return (
+      <div
+        onMouseEnter={() => { if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current) }}
+        onMouseLeave={() => {
+          if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current)
+          hoverTimeoutRef.current = setTimeout(() => setHoveredActor(null), 100)
+        }}
+        style={{
+          position: 'fixed',
+          left,
+          top,
+          width: `${popupWidth}px`,
+          background: '#1a1a24',
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: '14px',
+          overflow: 'hidden',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+          zIndex: 999,
+          animation: 'actorCardPop 0.15s ease-out',
+          pointerEvents: 'auto',
+        }}
+      >
+        <style>{`
+          @keyframes actorCardPop {
+            from { opacity: 0; transform: scale(0.92) translateY(4px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+          }
+        `}</style>
+
+        {actor.image && (
+          <div style={{ width: '100%', aspectRatio: '2/3', overflow: 'hidden', maxHeight: '180px' }}>
+            <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+          </div>
+        )}
+
+        <div style={{ padding: '14px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>{actor.name}</div>
+          <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
+
+          {knownForItems.length > 0 && (
+            <div style={{ marginBottom: '10px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>Known for</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                {knownForItems.map(item => (
+                  <div key={item} style={{ fontSize: '12px', color: '#a1a1aa' }}>{item}</div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {bioSnippet && (
+            <div>
+              <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>Bio</div>
+              <div style={{ fontSize: '11px', color: '#71717a', lineHeight: 1.5 }}>{bioSnippet}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 }
 
