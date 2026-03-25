@@ -276,6 +276,7 @@ export default function ActorBrowser({ actors }: Props) {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ marginBottom: '32px' }}>
+          <a href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#71717a', fontSize: '13px', fontWeight: 600, textDecoration: 'none', marginBottom: '16px' }}>← All titles</a>
           <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '10px' }}>Wilderleague</div>
           <h1 style={{ fontSize: '36px', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.05 }}>Actor pool</h1>
           <p style={{ fontSize: '14px', color: '#52525b', margin: 0 }}>{actors.length} actors · click a card to see bio · flag corrections below</p>
