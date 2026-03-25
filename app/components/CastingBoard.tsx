@@ -373,7 +373,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             disabled={Object.keys(selections).length === 0 || reviewLoading}
             style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
-            {reviewLoading ? 'Reading the room…' : 'Get cast review'}
+            {reviewLoading ? 'Reading the room…' : 'Production Meeting'}
           </button>
           <button
             onClick={() => setShowExportCard(true)}
