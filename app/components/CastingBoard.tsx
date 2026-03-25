@@ -1096,8 +1096,8 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
         `}</style>
 
         {actor.image && (
-          <div style={{ width: '100%', aspectRatio: '2/3', overflow: 'hidden', maxHeight: '180px' }}>
-            <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }} />
+          <div style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
+            <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 15%', display: 'block' }} />
           </div>
         )}
 
