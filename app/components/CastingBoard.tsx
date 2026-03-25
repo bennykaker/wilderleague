@@ -56,6 +56,9 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
   const [showExportCard, setShowExportCard] = useState(false)
   const [showBlockedModal, setShowBlockedModal] = useState(false)
   const [confirmBan, setConfirmBan] = useState<string | null>(null)
+  const [showReview, setShowReview] = useState(false)
+  const [reviewLoading, setReviewLoading] = useState(false)
+  const [reviewData, setReviewData] = useState<{ director: { verdict: string; notes: string }; execProducer: { verdict: string; notes: string }; marketer: { verdict: string; notes: string } } | null>(null)
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -306,6 +309,31 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
     }
   }
 
+  async function handleCastReview() {
+    setReviewLoading(true)
+    setShowReview(true)
+    setReviewData(null)
+    const cast = roles
+      .map(r => {
+        const name = getSlots(r.role_name)[0]
+        if (!name) return null
+        const actor = actors.find(a => a.name === name)
+        return { role: r.role_name, originalActor: r.original_actor, newActor: name, cost: actor?.cost ?? 0, salaryConfirmed: actor?.salaryConfirmed ?? false }
+      })
+      .filter(Boolean) as { role: string; originalActor: string; newActor: string; cost: number; salaryConfirmed: boolean }[]
+    const uncastRoles = roles.filter(r => !getSlots(r.role_name)[0]).map(r => r.role_name)
+    try {
+      const res = await fetch('/api/cast-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie: title, budget, spent, cast, uncastRoles }),
+      })
+      const data = await res.json()
+      setReviewData(data)
+    } catch { setReviewData(null) }
+    finally { setReviewLoading(false) }
+  }
+
   const currentMessages = chatMessages[activeRole] ?? []
 
   // Filter blocked actors from visible grid
@@ -340,6 +368,13 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             </div>
             <div style={{ fontSize: '10px', color: '#3f3f46', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
+          <button
+            onClick={handleCastReview}
+            disabled={Object.keys(selections).length === 0 || reviewLoading}
+            style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
+          >
+            {reviewLoading ? 'Reading the room…' : 'Get cast review'}
+          </button>
           <button
             onClick={() => setShowExportCard(true)}
             style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 13px', color: '#a1a1aa', fontSize: '12px', cursor: 'pointer' }}
@@ -878,6 +913,64 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
                     </div>
                   )
                 })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Cast review modal */}
+      {showReview && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
+          onClick={() => setShowReview(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '860px', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: '#71717a', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
+                <div style={{ fontSize: '22px', fontWeight: 800 }}>{title}</div>
+              </div>
+              <button onClick={() => setShowReview(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '24px', cursor: 'pointer', lineHeight: 1 }}>×</button>
+            </div>
+
+            {reviewLoading && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {['Director', 'Executive Producer', 'Marketing'].map(label => (
+                  <div key={label} style={{ background: '#18181b', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#27272a', flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '11px', color: '#52525b', marginBottom: '8px' }}>{label}</div>
+                      <div style={{ height: '12px', background: '#27272a', borderRadius: '4px', width: '60%', marginBottom: '6px' }} />
+                      <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '90%', marginBottom: '4px' }} />
+                      <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '75%' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {reviewData && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {[
+                  { key: 'director', label: 'The Director', icon: '🎬', color: '#818cf8', bg: 'rgba(99,102,241,0.06)', border: 'rgba(99,102,241,0.2)', data: reviewData.director },
+                  { key: 'execProducer', label: 'The Executive Producer', icon: '💰', color: '#4ade80', bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.2)', data: reviewData.execProducer },
+                  { key: 'marketer', label: 'The Marketing VP', icon: '📣', color: '#fb923c', bg: 'rgba(251,146,60,0.06)', border: 'rgba(251,146,60,0.2)', data: reviewData.marketer },
+                ].map(({ label, icon, color, bg, border, data }) => (
+                  <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '14px', padding: '22px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '22px' }}>{icon}</span>
+                      <div>
+                        <div style={{ fontSize: '11px', color, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</div>
+                        <div style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>{data.verdict}</div>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.65 }}>{data.notes}</div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
