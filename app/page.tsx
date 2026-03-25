@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTitles } from './data/titles'
 import { getActiveChallenge } from './data/challenges'
 import NewHereModal from './components/NewHereModal'
+import TitleSearch from './components/TitleSearch'
 
 export default function HomePage() {
   const all = getTitles()
@@ -27,7 +28,7 @@ export default function HomePage() {
             Wilderleague
           </div>
           <h1 style={{ fontSize: '42px', fontWeight: 900, lineHeight: 1.05, margin: '0 0 14px' }}>
-            Recast movies.<br />Under constraint.
+            Recast movies.<br />Make them better.
           </h1>
           <p style={{ fontSize: '16px', color: '#71717a', maxWidth: '520px', lineHeight: 1.6, margin: '0 0 20px' }}>
             Pick a film or show. Drag actors into iconic roles. Work within the budget. Share your cast.
@@ -98,37 +99,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Full list */}
+        {/* Searchable title list */}
         <div style={{ marginBottom: '20px' }}>
-          <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#52525b', marginBottom: '16px' }}>
-            All titles — {all.length} films & shows
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '10px' }}>
-            {all.map(t => (
-              <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="title-card" style={{
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  borderRadius: '12px',
-                  padding: '16px 18px',
-                  background: '#111115',
-                  display: 'flex',
-                  gap: '14px',
-                  alignItems: 'center',
-                }}>
-                  {t.poster_path ? (
-                    <img src={t.poster_path} alt={t.title} style={{ width: '40px', height: '60px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
-                  ) : (
-                    <div style={{ width: '40px', height: '60px', background: '#18181b', borderRadius: '6px', flexShrink: 0 }} />
-                  )}
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
-                    <div style={{ fontSize: '11px', color: '#52525b', marginBottom: '5px' }}>{t.year} · {t.type === 'tv' ? 'TV' : 'Film'} · ${t.budget}M</div>
-                    <div style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 600 }}>Recast →</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <TitleSearch titles={all.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path }))} />
         </div>
 
       </div>
