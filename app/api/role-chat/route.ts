@@ -48,15 +48,45 @@ function formatActor(a: EnrichedActor): string {
 // Pre-filter actors to a relevant subset before sending to Marlowe
 function selectPool(actors: EnrichedActor[], query: string, limit = 200): EnrichedActor[] {
   const q = query.toLowerCase()
+  const currentYear = new Date().getFullYear()
 
-  // Detect gender hints in query
+  // Detect gender hints
   const wantsFemale = /\b(woman|female|girl|she|her|actress)\b/.test(q)
   const wantsMale = /\b(man|male|guy|he|him|actor)\b/.test(q)
+
+  // Detect age hints
+  const wantsYoung = /\b(young|younger|twenties|20s|teen|fresh|new face|emerging|rising)\b/.test(q)
+  const wantsOlder = /\b(old|older|veteran|seasoned|mature|fifties|50s|sixties|60s)\b/.test(q)
+  const wantsMidCareer = /\b(mid.career|thirties|30s|forties|40s)\b/.test(q)
+
+  // Detect cost hints
+  const wantsCheaper = /\b(cheap|cheaper|budget|affordable|low.cost|under \$|less expensive)\b/.test(q)
+  const wantsExpensive = /\b(expensive|big name|star|marquee|bankable)\b/.test(q)
 
   let pool = actors
 
   if (wantsFemale) pool = pool.filter(a => a.gender === 'female')
   else if (wantsMale) pool = pool.filter(a => a.gender === 'male')
+
+  if (wantsYoung) {
+    pool = pool.filter(a => {
+      const age = a.birth_year ? currentYear - parseInt(a.birth_year) : 999
+      return age < 40
+    })
+  } else if (wantsOlder) {
+    pool = pool.filter(a => {
+      const age = a.birth_year ? currentYear - parseInt(a.birth_year) : 0
+      return age > 50
+    })
+  } else if (wantsMidCareer) {
+    pool = pool.filter(a => {
+      const age = a.birth_year ? currentYear - parseInt(a.birth_year) : 999
+      return age >= 30 && age <= 50
+    })
+  }
+
+  if (wantsCheaper) pool = pool.filter(a => a.cost <= 6)
+  else if (wantsExpensive) pool = pool.filter(a => a.cost >= 10)
 
   // Detect genre hints
   const genres = ['action', 'drama', 'comedy', 'thriller', 'sci-fi', 'horror', 'romance', 'crime']
@@ -65,6 +95,9 @@ function selectPool(actors: EnrichedActor[], query: string, limit = 200): Enrich
     const genreMatches = pool.filter(a => wantedGenres.some(g => a.keywords.includes(g)))
     if (genreMatches.length >= 20) pool = genreMatches
   }
+
+  // If filters made the pool tiny, relax and take top by popularity
+  if (pool.length < 20) pool = actors.slice(0, limit)
 
   return pool.slice(0, limit)
 }
@@ -84,7 +117,9 @@ export async function POST(request: NextRequest) {
   const poolText = filteredPool.map(formatActor).join('\n')
   const allNames = new Set(allActors.map(a => a.name))
 
-  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.`
+  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.
+
+Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.`
 
   let prompt = ''
 
