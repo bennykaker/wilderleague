@@ -36,6 +36,7 @@ type Props = {
   actors: CastActor[]
   roles: CastRole[]
   title: string
+  slug: string
   budget: number
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
@@ -49,7 +50,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, budget, preloadedSuggestions = {}, challenge }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -69,6 +70,9 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
+  const [submitLoading, setSubmitLoading] = useState(false)
+  const [submitResult, setSubmitResult] = useState<{ summary: string; is_cursed: boolean; curse_reason: string } | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
@@ -111,6 +115,7 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
   }, 0)
   const remaining = budget - spent
   const overBudget = remaining < 0
+  const allRolesFilled = roles.every(r => (selections[r.role_name]?.[0] ?? '') !== '')
 
   function getSlots(roleName: string): string[] {
     return selections[roleName] ?? []
@@ -383,6 +388,14 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
             style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
             {reviewLoading ? 'Reading the room…' : 'Production Meeting'}
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!allRolesFilled || submitLoading}
+            title={allRolesFilled ? 'Submit your cast to the vote' : 'Fill all roles to submit'}
+            style={{ background: allRolesFilled ? 'rgba(34,197,94,0.12)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(34,197,94,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#4ade80' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
+          >
+            {submitLoading ? 'Submitting…' : 'Submit cast ↑'}
           </button>
           <button
             onClick={() => setShowExportCard(true)}
@@ -996,6 +1009,52 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
         </div>
       )}
 
+      {/* Submit result modal */}
+      {(submitResult || submitError) && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
+          onClick={() => { setSubmitResult(null); setSubmitError(null) }}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '480px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {submitError ? (
+              <>
+                <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '12px' }}>Couldn't submit</div>
+                <div style={{ fontSize: '14px', color: '#f87171', marginBottom: '24px' }}>{submitError}</div>
+              </>
+            ) : submitResult && (
+              <>
+                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: submitResult.is_cursed ? '#f97316' : '#4ade80', fontWeight: 700, marginBottom: '10px' }}>
+                  {submitResult.is_cursed ? '🔮 Cursed cast submitted' : '✓ Cast submitted'}
+                </div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '16px' }}>
+                  "{submitResult.summary}"
+                </div>
+                {submitResult.is_cursed && submitResult.curse_reason && (
+                  <div style={{ fontSize: '13px', color: '#fb923c', background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', lineHeight: 1.5 }}>
+                    {submitResult.curse_reason}
+                  </div>
+                )}
+                <a
+                  href={`/${slug}/casts`}
+                  style={{ display: 'inline-block', fontSize: '13px', fontWeight: 700, color: '#f1f5f9', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px 16px', textDecoration: 'none', marginTop: '4px' }}
+                >
+                  See all casts for {title} →
+                </a>
+              </>
+            )}
+            <button
+              onClick={() => { setSubmitResult(null); setSubmitError(null) }}
+              style={{ display: 'block', marginTop: '20px', background: 'none', border: 'none', color: '#52525b', fontSize: '13px', cursor: 'pointer', padding: 0 }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Actor hover popup */}
       {ActorHoverCard()}
     </div>
@@ -1041,6 +1100,38 @@ export default function CastingBoard({ actors, roles, title, budget, preloadedSu
       }
     } catch {}
     finally { setAiLoading(false) }
+  }
+
+  // ── Submit cast ──
+  async function handleSubmit() {
+    if (!allRolesFilled || submitLoading) return
+    setSubmitLoading(true)
+    setSubmitError(null)
+    setSubmitResult(null)
+    try {
+      const primarySelections: Record<string, string> = {}
+      roles.forEach(r => {
+        const primary = selections[r.role_name]?.[0]
+        if (primary) primarySelections[r.role_name] = primary
+      })
+      const res = await fetch('/api/submit-cast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          movie_slug: slug,
+          movie_title: title,
+          selections: primarySelections,
+          challenge_id: challenge?.id ?? null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setSubmitError(data.error ?? 'Submission failed'); return }
+      setSubmitResult(data)
+    } catch {
+      setSubmitError('Something went wrong. Try again.')
+    } finally {
+      setSubmitLoading(false)
+    }
   }
 
   // ── Actor hover popup ──

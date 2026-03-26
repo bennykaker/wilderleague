@@ -34,6 +34,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
         original_actor_image: r.original_actor_image,
       }))}
       title={title.title}
+      slug={slug}
       budget={title.budget}
       preloadedSuggestions={suggestions}
     />

@@ -67,6 +67,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         original_actor_image: r.original_actor_image,
       }))}
       title={title.title}
+      slug={challenge.movie_slug}
       budget={title.budget}
       preloadedSuggestions={filteredSuggestions}
       challenge={challenge}
