@@ -7,10 +7,15 @@ export default function ManageBilling() {
 
   async function handleClick() {
     setLoading(true)
-    const res = await fetch('/api/stripe/portal', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else { alert('Something went wrong.'); setLoading(false) }
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else { alert(data.error ?? 'Something went wrong.'); setLoading(false) }
+    } catch (err) {
+      alert('Something went wrong.')
+      setLoading(false)
+    }
   }
 
   return (

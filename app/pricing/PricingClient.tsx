@@ -18,18 +18,28 @@ export default function PricingClient({
       return
     }
     setLoading(true)
-    const res = await fetch('/api/stripe/checkout', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else { alert('Something went wrong. Please try again.'); setLoading(false) }
+    try {
+      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else { alert(data.error ?? 'Something went wrong. Please try again.'); setLoading(false) }
+    } catch (err) {
+      alert('Something went wrong. Please try again.')
+      setLoading(false)
+    }
   }
 
   async function handleManage() {
     setLoading(true)
-    const res = await fetch('/api/stripe/portal', { method: 'POST' })
-    const data = await res.json()
-    if (data.url) window.location.href = data.url
-    else { alert('Something went wrong. Please try again.'); setLoading(false) }
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else { alert(data.error ?? 'Something went wrong. Please try again.'); setLoading(false) }
+    } catch (err) {
+      alert('Something went wrong. Please try again.')
+      setLoading(false)
+    }
   }
 
   return (
