@@ -628,6 +628,37 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             </select>
           </div>
 
+          {/* Search — top of chat */}
+          <div>
+            <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '8px', lineHeight: 1.5 }}>
+              Search by name or describe what you need — younger, cheaper, a comedian, a wildcard.
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
+                placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
+                style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+              />
+              <button
+                onClick={handleSearch}
+                disabled={aiLoading || !query.trim()}
+                style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
+              >
+                Ask
+              </button>
+              {isFiltered && (
+                <button
+                  onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
+                  style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* AI chat */}
           <div style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
             {aiLoading && currentMessages.length === 0 && (
@@ -655,32 +686,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
             <div ref={chatEndRef} />
-          </div>
-
-          {/* Search */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-              placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
-              style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-            />
-            <button
-              onClick={handleSearch}
-              disabled={aiLoading || !query.trim()}
-              style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
-            >
-              Ask
-            </button>
-            {isFiltered && (
-              <button
-                onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
-                style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
-              >
-                Clear
-              </button>
-            )}
           </div>
 
           {/* Passed on */}
