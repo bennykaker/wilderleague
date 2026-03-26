@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import { getEnrichedActors, type EnrichedActor } from '../../data/enrichedActors'
+import { createClient } from '../../../lib/supabase/server'
 
 function getApiKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -182,8 +183,18 @@ Return ONLY this JSON (no markdown):
 }`
     }
 
+    // Members get Sonnet (better Marlowe), free users get Haiku
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    let isMember = false
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+      isMember = profile?.is_member ?? false
+    }
+    const model = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model,
       max_tokens: 600,
       messages: [{ role: 'user', content: prompt }],
     })

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '../../lib/supabase/client'
 
-type User = { email?: string | null }
+type User = { email?: string | null; isMember?: boolean }
 
 export default function AuthButton({ user }: { user: User | null }) {
   const [loading, setLoading] = useState(false)
@@ -28,7 +29,15 @@ export default function AuthButton({ user }: { user: User | null }) {
   if (user) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span style={{ fontSize: '13px', color: '#71717a' }}>{user.email}</span>
+        {user.isMember ? (
+          <Link href="/members" style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 700, textDecoration: 'none', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '8px', padding: '4px 10px' }}>
+            Member ✦
+          </Link>
+        ) : (
+          <Link href="/pricing" style={{ fontSize: '12px', color: '#a1a1aa', textDecoration: 'none', border: '1px solid #27272a', borderRadius: '8px', padding: '4px 10px' }}>
+            Upgrade
+          </Link>
+        )}
         <button
           onClick={signOut}
           disabled={loading}

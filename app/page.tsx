@@ -9,6 +9,11 @@ import { createClient } from '../lib/supabase/server'
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  let isMember = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
   const all = getTitles()
   const featured = all.slice(0, 5)
   const challenge = getActiveChallenge()
@@ -42,7 +47,10 @@ export default async function HomePage() {
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Browse actor pool →
               </Link>
-              <AuthButton user={user ? { email: user.email } : null} />
+              <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
+                Membership →
+              </Link>
+              <AuthButton user={user ? { email: user.email, isMember } : null} />
             </div>
           </div>
 

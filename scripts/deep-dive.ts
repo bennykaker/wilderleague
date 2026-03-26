@@ -13,7 +13,7 @@ import fs from 'fs'
 import path from 'path'
 import Papa from 'papaparse'
 
-const BATCH_SIZE = 50
+const BATCH_SIZE = 9999 // process all pending in one run
 const CSV_PATH = path.join(process.cwd(), 'data', 'enriched-actors.csv')
 
 function getKey(name: string): string {
@@ -98,7 +98,7 @@ Return ONLY this JSON (no markdown):
 }`
 
   const message = await client.messages.create({
-    model: 'claude-opus-4-6',
+    model: 'claude-sonnet-4-6',
     max_tokens: 600,
     messages: [{ role: 'user', content: prompt }],
   })
@@ -150,8 +150,14 @@ async function main() {
     } catch (err) {
       console.log(`FAILED: ${err}`)
     }
-    // Small delay between Opus calls
-    await new Promise(r => setTimeout(r, 500))
+    await new Promise(r => setTimeout(r, 300))
+
+    // Save progress every 100 actors
+    const completed = rows.filter(r => r.casting_profile?.trim()).length
+    if (completed % 100 === 0) {
+      fs.writeFileSync(CSV_PATH, Papa.unparse(rows), 'utf8')
+      console.log(`  💾 Progress saved (${completed}/${rows.length})`)
+    }
   }
 
   const csv = Papa.unparse(rows)
