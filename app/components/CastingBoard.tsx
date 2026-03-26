@@ -365,6 +365,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         </a>
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</div>
+        <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+        <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+          Meet Marlowe
+        </a>
         <div style={{ flex: 1 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {blockedActors.size > 0 && (
