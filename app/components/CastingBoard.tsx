@@ -380,7 +380,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             <div style={{ height: '3px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${Math.min((spent / budget) * 100, 100)}%`, background: overBudget ? '#ef4444' : '#22c55e', transition: 'width 0.2s' }} />
             </div>
-            <div style={{ fontSize: '10px', color: '#3f3f46', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
+            <div style={{ fontSize: '12px', color: '#71717a', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
           <button
             onClick={handleCastReview}
@@ -555,7 +555,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                               transition: 'border-color 0.12s, background 0.12s',
                             }}
                           >
-                            <span style={{ fontSize: '11px', color: '#71717a', flexShrink: 0, fontWeight: 700 }}>{slot + 1}</span>
+                            <span style={{ fontSize: '12px', color: '#94a3b8', flexShrink: 0, fontWeight: 700 }}>{slot + 1}</span>
                             {actor ? (
                               <>
                                 <div
@@ -593,7 +593,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                                 </button>
                               </>
                             ) : (
-                              <span style={{ fontSize: '11px', color: '#52525b', fontStyle: 'italic' }}>
+                              <span style={{ fontSize: '12px', color: '#71717a', fontStyle: 'italic' }}>
                                 {isDragOver ? 'drop here' : slot === 1 ? '2nd choice' : '3rd choice'}
                               </span>
                             )}
@@ -727,12 +727,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
             </div>
             {displayActors.length > 0 && !aiLoading && (
-              <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
                 These are suggestions — not your only options. Want someone younger? Cheaper? A wild card? Just ask Marlowe.
               </div>
             )}
             {displayActors.length === 0 && !aiLoading && (
-              <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
                 Marlowe will suggest actors when you select a role. Or describe what you're looking for — younger, cheaper, comedic, a wild card.
               </div>
             )}
@@ -845,7 +845,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '10px', color: '#52525b', marginBottom: '2px' }}>{role.role_name}</div>
+                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '2px' }}>{role.role_name}</div>
                       <div style={{ fontSize: '14px', fontWeight: 600, color: primaryName ? '#f1f5f9' : '#3f3f46', fontStyle: primaryName ? 'normal' : 'italic' }}>
                         {primaryName ?? 'Uncast'}
                       </div>
@@ -857,7 +857,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                   {possibles.length > 0 && (
                     <div style={{ marginTop: '4px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {possibles.map((a, i) => (
-                        <span key={a.name} style={{ fontSize: '10px', color: '#52525b' }}>
+                        <span key={a.name} style={{ fontSize: '12px', color: '#71717a' }}>
                           {i + 2}. {a.name}
                         </span>
                       ))}
@@ -975,7 +975,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
               <div>
-                <div style={{ fontSize: '11px', color: '#71717a', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
+                <div style={{ fontSize: '12px', color: '#94a3b8', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
                 <div style={{ fontSize: '22px', fontWeight: 800 }}>{title}</div>
               </div>
               <button onClick={() => setShowReview(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '24px', cursor: 'pointer', lineHeight: 1 }}>×</button>
@@ -987,7 +987,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                   <div key={label} style={{ background: '#18181b', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#27272a', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '11px', color: '#52525b', marginBottom: '8px' }}>{label}</div>
+                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '8px' }}>{label}</div>
                       <div style={{ height: '12px', background: '#27272a', borderRadius: '4px', width: '60%', marginBottom: '6px' }} />
                       <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '90%', marginBottom: '4px' }} />
                       <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '75%' }} />
@@ -1206,7 +1206,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
         <div style={{ padding: '14px' }}>
           <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>{actor.name}</div>
-          <div style={{ fontSize: '11px', color: '#71717a', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
+          <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
 
           {knownForItems.length > 0 && (
             <div style={{ marginBottom: '10px' }}>
@@ -1222,7 +1222,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           {bioSnippet && (
             <div>
               <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>Bio</div>
-              <div style={{ fontSize: '11px', color: '#71717a', lineHeight: 1.5 }}>{bioSnippet}</div>
+              <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.5 }}>{bioSnippet}</div>
             </div>
           )}
         </div>
@@ -1281,7 +1281,7 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
             {actor.name}
           </div>
           {isPrimary && (
-            <div style={{ fontSize: '11px', color: '#71717a', marginTop: '4px' }}>drag away to remove</div>
+            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>drag away to remove</div>
           )}
         </div>
         <button
