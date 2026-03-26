@@ -358,7 +358,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
       {/* Header */}
       <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#71717a', fontSize: '13px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#a1a1aa', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           ← All titles
         </a>
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
@@ -368,24 +368,24 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           {blockedActors.size > 0 && (
             <button
               onClick={() => setShowBlockedModal(true)}
-              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '8px', padding: '6px 10px', color: '#f87171', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '8px', padding: '6px 10px', color: '#f87171', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               🚫 {blockedActors.size} banned
             </button>
           )}
-          <div style={{ fontSize: '13px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+          <div style={{ fontSize: '14px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
             ${remaining}M left
           </div>
           <div style={{ width: '80px' }}>
             <div style={{ height: '3px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${Math.min((spent / budget) * 100, 100)}%`, background: overBudget ? '#ef4444' : '#22c55e', transition: 'width 0.2s' }} />
             </div>
-            <div style={{ fontSize: '12px', color: '#71717a', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
+            <div style={{ fontSize: '14px', color: '#a1a1aa', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
           <button
             onClick={handleCastReview}
             disabled={Object.keys(selections).length === 0 || reviewLoading}
-            style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
+            style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
             {reviewLoading ? 'Reading the room…' : 'Production Meeting'}
           </button>
@@ -393,19 +393,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             onClick={handleSubmit}
             disabled={!allRolesFilled || submitLoading}
             title={allRolesFilled ? 'Submit your cast to the vote' : 'Fill all roles to submit'}
-            style={{ background: allRolesFilled ? 'rgba(34,197,94,0.12)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(34,197,94,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#4ade80' : '#52525b', fontSize: '12px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
+            style={{ background: allRolesFilled ? 'rgba(34,197,94,0.12)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(34,197,94,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#4ade80' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
           >
             {submitLoading ? 'Submitting…' : 'Submit cast ↑'}
           </button>
           <button
             onClick={() => setShowExportCard(true)}
-            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 13px', color: '#a1a1aa', fontSize: '12px', cursor: 'pointer' }}
+            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 13px', color: '#a1a1aa', fontSize: '14px', cursor: 'pointer' }}
           >
             Export card
           </button>
           <button
             onClick={copyShareLink}
-            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
           >
             Share ↗
           </button>
@@ -417,10 +417,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         <div style={{ padding: '10px 24px', background: 'rgba(251,191,36,0.07)', borderBottom: '1px solid rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           <span style={{ fontSize: '20px' }}>{challenge.badge}</span>
           <div>
-            <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
+            <span style={{ fontSize: '14px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
             <span style={{ fontSize: '14px', color: '#fef3c7', fontWeight: 700 }}>{challenge.headline}</span>
           </div>
-          <div style={{ fontSize: '13px', color: '#d97706', marginLeft: '4px' }}>— {challenge.description}</div>
+          <div style={{ fontSize: '14px', color: '#d97706', marginLeft: '4px' }}>— {challenge.description}</div>
         </div>
       )}
 
@@ -429,7 +429,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
         {/* ── Left: Cast board ── */}
         <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto' }}>
-          <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#52525b', marginBottom: '12px' }}>
+          <div style={{ fontSize: '14px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '12px' }}>
             Cast board
           </div>
 
@@ -463,11 +463,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                       {role.original_actor_image ? (
                         <img src={role.original_actor_image} alt={role.original_actor} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#71717a', fontSize: '18px' }}>?</div>
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: '18px' }}>?</div>
                       )}
                     </div>
                     <div>
-                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '4px' }}>Original</div>
+                      <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '4px' }}>Original</div>
                       <div style={{ fontSize: '15px', fontWeight: 700, color: '#94a3b8', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {role.original_actor}
                       </div>
@@ -475,7 +475,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                   </div>
 
                   {/* Arrow */}
-                  <div style={{ color: '#52525b', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
+                  <div style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
 
                   {/* Slots column */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -555,7 +555,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                               transition: 'border-color 0.12s, background 0.12s',
                             }}
                           >
-                            <span style={{ fontSize: '12px', color: '#94a3b8', flexShrink: 0, fontWeight: 700 }}>{slot + 1}</span>
+                            <span style={{ fontSize: '14px', color: '#94a3b8', flexShrink: 0, fontWeight: 700 }}>{slot + 1}</span>
                             {actor ? (
                               <>
                                 <div
@@ -583,7 +583,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                                       : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
                                     }
                                   </div>
-                                  <span style={{ fontSize: '12px', color: '#94a3b8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.name}</span>
+                                  <span style={{ fontSize: '14px', color: '#94a3b8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actor.name}</span>
                                 </div>
                                 <button
                                   onClick={() => clearSlot(role.role_name, slot)}
@@ -593,7 +593,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                                 </button>
                               </>
                             ) : (
-                              <span style={{ fontSize: '12px', color: '#71717a', fontStyle: 'italic' }}>
+                              <span style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>
                                 {isDragOver ? 'drop here' : slot === 1 ? '2nd choice' : '3rd choice'}
                               </span>
                             )}
@@ -614,7 +614,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
           {/* Role selector */}
           <div>
-            <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', marginBottom: '8px', fontWeight: 600 }}>
+            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '8px', fontWeight: 600 }}>
               Working on
             </div>
             <select
@@ -631,12 +631,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           {/* AI chat */}
           <div style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
             {aiLoading && currentMessages.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#71717a', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
             {currentMessages.map((msg, i) => (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '11px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
+                  <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
                     Marlowe
                   </span>
                   <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>{msg.text}</div>
@@ -644,7 +644,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                 {msg.suggestion && (
                   <button
                     onClick={() => { setQuery(msg.suggestion!); handleSearchWithQuery(msg.suggestion!) }}
-                    style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '7px 13px', fontSize: '13px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
+                    style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '7px 13px', fontSize: '14px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
                   >
                     💬 {msg.suggestion}
                   </button>
@@ -652,7 +652,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               </div>
             ))}
             {aiLoading && currentMessages.length > 0 && (
-              <div style={{ fontSize: '13px', color: '#71717a', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
             <div ref={chatEndRef} />
           </div>
@@ -694,7 +694,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             if (passed.length === 0) return null
             return (
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
-                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', marginBottom: '10px', fontWeight: 600 }}>
+                <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '10px', fontWeight: 600 }}>
                   Passed on · Second look?
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -708,10 +708,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                       <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
                         {actor.image
                           ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', fontSize: '9px' }}>?</div>
+                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '9px' }}>?</div>
                         }
                       </div>
-                      <span style={{ fontSize: '13px', color: '#94a3b8', whiteSpace: 'nowrap' }}>{actor.name}</span>
+                      <span style={{ fontSize: '14px', color: '#94a3b8', whiteSpace: 'nowrap' }}>{actor.name}</span>
                     </button>
                   ))}
                 </div>
@@ -723,16 +723,16 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         {/* ── Right: Actor headshots ── */}
         <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div>
-            <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', fontWeight: 600, marginBottom: '6px' }}>
+            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px' }}>
               {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
             </div>
             {displayActors.length > 0 && !aiLoading && (
-              <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
+              <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
                 These are suggestions — not your only options. Want someone younger? Cheaper? A wild card? Just ask Marlowe.
               </div>
             )}
             {displayActors.length === 0 && !aiLoading && (
-              <div style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6 }}>
+              <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
                 Marlowe will suggest actors when you select a role. Or describe what you're looking for — younger, cheaper, comedic, a wild card.
               </div>
             )}
@@ -787,22 +787,22 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                         draggable={false}
                       />
                     ) : (
-                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '10px' }}>?</div>
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '14px' }}>?</div>
                     )}
                   </div>
                   <div style={{ padding: '5px 6px 6px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#e2e8f0', lineHeight: 1.25, marginBottom: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#e2e8f0', lineHeight: 1.25, marginBottom: '2px' }}>
                       {actor.name}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ fontSize: '10px', color: '#71717a', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontSize: '14px', color: '#a1a1aa', fontVariantNumeric: 'tabular-nums' }}>
                         ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '9px' }}> est</span>}
                       </div>
                       {!isAssigned && (
                         <button
                           onClick={e => { e.stopPropagation(); setConfirmBan(actor.name) }}
                           title={`Ban ${actor.name}`}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '10px', lineHeight: 1, opacity: 0.5 }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '14px', lineHeight: 1, opacity: 0.5 }}
                         >
                           🚫
                         </button>
@@ -826,7 +826,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             style={{ background: '#111115', border: '1px solid #27272a', borderRadius: '16px', padding: '28px', width: '380px', maxHeight: '80vh', overflowY: 'auto' }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '10px' }}>
+            <div style={{ fontSize: '14px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '10px' }}>
               Wilderleague
             </div>
             <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '20px' }}>
@@ -845,19 +845,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '2px' }}>{role.role_name}</div>
+                      <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '2px' }}>{role.role_name}</div>
                       <div style={{ fontSize: '14px', fontWeight: 600, color: primaryName ? '#f1f5f9' : '#3f3f46', fontStyle: primaryName ? 'normal' : 'italic' }}>
                         {primaryName ?? 'Uncast'}
                       </div>
                     </div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: primaryActor ? '#4ade80' : '#27272a', fontVariantNumeric: 'tabular-nums' }}>
-                      {primaryActor ? <>{`$${primaryActor.cost}M`}{!primaryActor.salaryConfirmed && <span style={{ fontSize: '10px', fontWeight: 400, color: '#3f3f46' }}> est</span>}</> : '—'}
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: primaryActor ? '#4ade80' : '#27272a', fontVariantNumeric: 'tabular-nums' }}>
+                      {primaryActor ? <>{`$${primaryActor.cost}M`}{!primaryActor.salaryConfirmed && <span style={{ fontSize: '14px', fontWeight: 400, color: '#94a3b8' }}> est</span>}</> : '—'}
                     </div>
                   </div>
                   {possibles.length > 0 && (
                     <div style={{ marginTop: '4px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {possibles.map((a, i) => (
-                        <span key={a.name} style={{ fontSize: '12px', color: '#71717a' }}>
+                        <span key={a.name} style={{ fontSize: '14px', color: '#a1a1aa' }}>
                           {i + 2}. {a.name}
                         </span>
                       ))}
@@ -868,12 +868,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             })}
 
             <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
                 ${spent}M / ${budget}M
               </div>
               <button
                 onClick={copyShareLink}
-                style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
               >
                 Copy share link ↗
               </button>
@@ -896,19 +896,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             <div style={{ fontSize: '15px', fontWeight: 700, marginBottom: '8px', lineHeight: 1.4 }}>
               Ban {confirmBan}?
             </div>
-            <div style={{ fontSize: '13px', color: '#71717a', marginBottom: '24px', lineHeight: 1.5 }}>
+            <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '24px', lineHeight: 1.5 }}>
               They won't appear in any suggestion grid. You can unban them any time from the banned actors list.
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 onClick={() => setConfirmBan(null)}
-                style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px', fontSize: '13px', color: '#a1a1aa', cursor: 'pointer', fontWeight: 600 }}
+                style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px', fontSize: '14px', color: '#a1a1aa', cursor: 'pointer', fontWeight: 600 }}
               >
                 Cancel
               </button>
               <button
                 onClick={() => { blockActor(confirmBan); setConfirmBan(null) }}
-                style={{ flex: 1, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '10px', padding: '10px', fontSize: '13px', color: '#f87171', cursor: 'pointer', fontWeight: 700 }}
+                style={{ flex: 1, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '10px', padding: '10px', fontSize: '14px', color: '#f87171', cursor: 'pointer', fontWeight: 700 }}
               >
                 Ban permanently
               </button>
@@ -929,13 +929,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 700 }}>Banned actors</div>
-              <button onClick={() => setShowBlockedModal(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '18px', cursor: 'pointer' }}>×</button>
+              <button onClick={() => setShowBlockedModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '18px', cursor: 'pointer' }}>×</button>
             </div>
-            <div style={{ fontSize: '12px', color: '#52525b', marginBottom: '14px' }}>
+            <div style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '14px' }}>
               These actors won't appear in any suggestion grid. Click to unblock.
             </div>
             {blockedActors.size === 0 ? (
-              <div style={{ fontSize: '13px', color: '#3f3f46', fontStyle: 'italic' }}>No one blocked yet.</div>
+              <div style={{ fontSize: '14px', color: '#94a3b8', fontStyle: 'italic' }}>No one blocked yet.</div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {[...blockedActors].sort().map(name => {
@@ -947,10 +947,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                           <img src={actor.image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         </div>
                       )}
-                      <span style={{ flex: 1, fontSize: '13px', color: '#94a3b8' }}>{name}</span>
+                      <span style={{ flex: 1, fontSize: '14px', color: '#94a3b8' }}>{name}</span>
                       <button
                         onClick={() => unblockActor(name)}
-                        style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', color: '#60a5fa', cursor: 'pointer' }}
+                        style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '6px', padding: '4px 10px', fontSize: '14px', color: '#60a5fa', cursor: 'pointer' }}
                       >
                         Unblock
                       </button>
@@ -975,10 +975,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
               <div>
-                <div style={{ fontSize: '12px', color: '#94a3b8', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
+                <div style={{ fontSize: '14px', color: '#94a3b8', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
                 <div style={{ fontSize: '22px', fontWeight: 800 }}>{title}</div>
               </div>
-              <button onClick={() => setShowReview(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '24px', cursor: 'pointer', lineHeight: 1 }}>×</button>
+              <button onClick={() => setShowReview(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '24px', cursor: 'pointer', lineHeight: 1 }}>×</button>
             </div>
 
             {reviewLoading && (
@@ -987,7 +987,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                   <div key={label} style={{ background: '#18181b', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#27272a', flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '12px', color: '#71717a', marginBottom: '8px' }}>{label}</div>
+                      <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '8px' }}>{label}</div>
                       <div style={{ height: '12px', background: '#27272a', borderRadius: '4px', width: '60%', marginBottom: '6px' }} />
                       <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '90%', marginBottom: '4px' }} />
                       <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '75%' }} />
@@ -1008,7 +1008,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                       <span style={{ fontSize: '22px' }}>{icon}</span>
                       <div>
-                        <div style={{ fontSize: '11px', color, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</div>
+                        <div style={{ fontSize: '14px', color, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</div>
                         <div style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>{data.verdict}</div>
                       </div>
                     </div>
@@ -1038,20 +1038,20 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               </>
             ) : submitResult && (
               <>
-                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: submitResult.is_cursed ? '#f97316' : '#4ade80', fontWeight: 700, marginBottom: '10px' }}>
+                <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: submitResult.is_cursed ? '#f97316' : '#4ade80', fontWeight: 700, marginBottom: '10px' }}>
                   {submitResult.is_cursed ? '🔮 Cursed cast submitted' : '✓ Cast submitted'}
                 </div>
                 <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '16px' }}>
                   "{submitResult.summary}"
                 </div>
                 {submitResult.is_cursed && submitResult.curse_reason && (
-                  <div style={{ fontSize: '13px', color: '#fb923c', background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', lineHeight: 1.5 }}>
+                  <div style={{ fontSize: '14px', color: '#fb923c', background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', lineHeight: 1.5 }}>
                     {submitResult.curse_reason}
                   </div>
                 )}
                 <a
                   href={`/${slug}/casts`}
-                  style={{ display: 'inline-block', fontSize: '13px', fontWeight: 700, color: '#f1f5f9', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px 16px', textDecoration: 'none', marginTop: '4px' }}
+                  style={{ display: 'inline-block', fontSize: '14px', fontWeight: 700, color: '#f1f5f9', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px 16px', textDecoration: 'none', marginTop: '4px' }}
                 >
                   See all casts for {title} →
                 </a>
@@ -1059,7 +1059,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             )}
             <button
               onClick={() => { setSubmitResult(null); setSubmitError(null) }}
-              style={{ display: 'block', marginTop: '20px', background: 'none', border: 'none', color: '#52525b', fontSize: '13px', cursor: 'pointer', padding: 0 }}
+              style={{ display: 'block', marginTop: '20px', background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', padding: 0 }}
             >
               Close
             </button>
@@ -1206,14 +1206,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
         <div style={{ padding: '14px' }}>
           <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>{actor.name}</div>
-          <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
+          <div style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
 
           {knownForItems.length > 0 && (
             <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>Known for</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px' }}>Known for</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                 {knownForItems.map(item => (
-                  <div key={item} style={{ fontSize: '12px', color: '#a1a1aa' }}>{item}</div>
+                  <div key={item} style={{ fontSize: '14px', color: '#a1a1aa' }}>{item}</div>
                 ))}
               </div>
             </div>
@@ -1221,8 +1221,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
           {bioSnippet && (
             <div>
-              <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', marginBottom: '6px' }}>Bio</div>
-              <div style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.5 }}>{bioSnippet}</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px' }}>Bio</div>
+              <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.5 }}>{bioSnippet}</div>
             </div>
           )}
         </div>
@@ -1270,18 +1270,18 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
         <div style={{ width: '64px', height: '90px', borderRadius: '7px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
           {actor.image
             ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
-            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3f3f46', fontSize: '10px' }}>?</div>
+            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '14px' }}>?</div>
           }
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: '15px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}>
-            ${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#3f3f46', fontWeight: 400 }}> est</span>}
+            ${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#94a3b8', fontWeight: 400 }}> est</span>}
           </div>
           <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {actor.name}
           </div>
           {isPrimary && (
-            <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>drag away to remove</div>
+            <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>drag away to remove</div>
           )}
         </div>
         <button
@@ -1318,7 +1318,7 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '11px',
+        fontSize: '14px',
         color: isDragOver ? '#60a5fa' : '#3f3f46',
         fontStyle: 'italic',
         background: isDragOver ? 'rgba(59,130,246,0.06)' : 'transparent',
