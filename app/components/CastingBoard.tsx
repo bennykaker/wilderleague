@@ -663,7 +663,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-              placeholder='e.g. "young, intense, physical"'
+              placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
               style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
             />
             <button
@@ -722,8 +722,20 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
         {/* ── Right: Actor headshots ── */}
         <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', fontWeight: 600 }}>
-            {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Suggestions appear here' : `${displayActors.length} suggestions`}
+          <div>
+            <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#71717a', fontWeight: 600, marginBottom: '6px' }}>
+              {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
+            </div>
+            {displayActors.length > 0 && !aiLoading && (
+              <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.5 }}>
+                These are suggestions — not your only options. Want someone younger? Cheaper? A wild card? Just ask Marlowe.
+              </div>
+            )}
+            {displayActors.length === 0 && !aiLoading && (
+              <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.5 }}>
+                Marlowe will suggest actors when you select a role. Or describe what you're looking for — younger, cheaper, comedic, a wild card.
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px' }}>
