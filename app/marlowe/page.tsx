@@ -27,7 +27,7 @@ export default async function MarlowePage() {
             Meet Marlowe.
           </h1>
           <p style={{ fontSize: '18px', color: '#a1a1aa', lineHeight: 1.7, margin: '0 0 20px' }}>
-            Marlowe is a veteran Hollywood casting director with 30 years of strong opinions and zero patience for safe choices. They know every actor in the pool — their range, their box office history, their reputation on set, and what they bring to a room.
+            Marlowe is technically an AI but we like to think of them as a veteran Hollywood casting director with 30 years of strong opinions and zero patience for safe choices. They know every actor in the pool — their range, their box office history, their reputation on set, and what they bring to a room.
           </p>
           <p style={{ fontSize: '18px', color: '#a1a1aa', lineHeight: 1.7, margin: '0 0 20px' }}>
             When you open a role, Marlowe's already done their homework. They pre-select the actors they think can carry it — based on physicality, age, screen persona, and genre credibility. Not who's popular. Who fits.
