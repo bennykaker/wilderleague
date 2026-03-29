@@ -24,7 +24,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   if (roles.length === 0) notFound()
 
   const suggestions = getSuggestionsForTitle(challenge.movie_slug)
-  const enriched = getEnrichedActors()
+  const enriched = await getEnrichedActors()
 
   // Build actor pool: prefer known_for tag filter (after seeding), fall back to explicit list
   const isClcu = challenge.actor_filter?.known_for_tag === 'CLCU'

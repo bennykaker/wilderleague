@@ -9,6 +9,7 @@ export interface CastReviewRequest {
   spent: number
   cast: Array<{
     role: string
+    tier: string
     originalActor: string
     newActor: string
     cost: number
@@ -27,9 +28,28 @@ export async function POST(req: NextRequest) {
   const body: CastReviewRequest = await req.json()
   const { movie, budget, spent, cast, uncastRoles } = body
 
+  const tierLabel = (t: string) =>
+    t === 'first_lead' ? '1st lead' : t === 'second_lead' ? '2nd lead' : t === 'third_lead' ? '3rd lead' : 'supporting'
+
   const castList = cast
-    .map(c => `- ${c.role}: ${c.newActor} (was ${c.originalActor}, $${c.cost}M${!c.salaryConfirmed ? ' est' : ''})`)
+    .map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.newActor} (was ${c.originalActor}, $${c.cost}M${!c.salaryConfirmed ? ' est' : ''})`)
     .join('\n')
+
+  // Compute expected ranges per tier
+  const tierRanges: Record<string, [number, number]> = {
+    first_lead:  [0.35, 0.40],
+    second_lead: [0.15, 0.20],
+    third_lead:  [0.08, 0.12],
+    supporting:  [0.04, 0.08],
+  }
+  const allocationNotes = cast.map(c => {
+    const [lo, hi] = tierRanges[c.tier] ?? tierRanges.supporting
+    const loM = Math.round(budget * lo)
+    const hiM = Math.round(budget * hi)
+    if (c.cost > hiM * 1.5) return `${c.newActor} at $${c.cost}M is significantly OVER the expected $${loM}–$${hiM}M range for a ${tierLabel(c.tier)}`
+    if (c.cost < loM * 0.5 && c.tier === 'first_lead') return `${c.newActor} at $${c.cost}M seems UNDER-cast for a ${tierLabel(c.tier)} (expected $${loM}–$${hiM}M)`
+    return null
+  }).filter(Boolean).join('; ')
 
   const uncastList = uncastRoles.length > 0
     ? `\nUncast roles: ${uncastRoles.join(', ')}`
@@ -37,11 +57,17 @@ export async function POST(req: NextRequest) {
 
   const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
+  const budgetAllocationNote = allocationNotes
+    ? `\nBudget allocation flags: ${allocationNotes}`
+    : ''
+
   const prompt = `You are reviewing a fan recast of "${movie}".
 
 ${budgetLine}
 
-Proposed cast:
+Industry standard allocation: first lead 35–40% of budget, second lead 15–20%, third lead 8–12%, supporting 4–8%.${budgetAllocationNote}
+
+Proposed cast (with role tier):
 ${castList}${uncastList}
 
 Write three short, punchy reviews of this casting — one from each of these industry voices. Each review should be 3–5 sentences, opinionated, and reference specific casting choices by name. No hedging. These are real people with real agendas.
@@ -54,7 +80,7 @@ Return ONLY valid JSON, no markdown:
   },
   "execProducer": {
     "verdict": "one-line financial verdict",
-    "notes": "3-5 sentences from an EP's POV — box office viability, budget allocation, proven track record, completion risk, whether the spend makes sense against the return"
+    "notes": "3-5 sentences from an EP's POV — specifically address whether the budget allocation makes sense: is the money front-loaded on leads or wasted on supporting roles? Call out any actor whose cost is out of proportion to their billing. Comment on proven box office track record and completion risk."
   },
   "marketer": {
     "verdict": "one-line marketability verdict",

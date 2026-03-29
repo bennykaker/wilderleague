@@ -19,6 +19,7 @@ export interface Role {
   role_name: string
   original_actor: string
   original_actor_image: string
+  tier: 'first_lead' | 'second_lead' | 'third_lead' | 'supporting'
 }
 
 let _titles: Title[] | null = null
@@ -78,6 +79,7 @@ export function getRolesForTitle(slug: string): Role[] {
       role_name: r.role_name,
       original_actor: r.original_actor,
       original_actor_image: r.original_actor_image,
+      tier: (r.tier as Role['tier']) || 'supporting',
     }))
   }
   return _roles.filter(r => r.movie_slug === slug)

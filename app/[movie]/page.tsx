@@ -13,7 +13,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   if (roles.length === 0) notFound()
 
   const suggestions = getSuggestionsForTitle(slug)
-  const enriched = getEnrichedActors()
+  const enriched = await getEnrichedActors()
   const actors = enriched.map(a => ({
     id: a.tmdb_id || a.name,
     name: a.name,
@@ -32,6 +32,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
         role_name: r.role_name,
         original_actor: r.original_actor,
         original_actor_image: r.original_actor_image,
+        tier: r.tier,
       }))}
       title={title.title}
       slug={slug}

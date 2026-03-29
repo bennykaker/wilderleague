@@ -1,6 +1,4 @@
-import fs from 'fs'
-import path from 'path'
-import Papa from 'papaparse'
+import { createServiceClient } from '../../lib/supabase/service'
 
 export interface EnrichedActor {
   name: string
@@ -37,47 +35,61 @@ function popularityToCost(pop: number): number {
 
 let _cache: EnrichedActor[] | null = null
 
-export function getEnrichedActors(): EnrichedActor[] {
+export async function getEnrichedActors(): Promise<EnrichedActor[]> {
   if (_cache) return _cache
 
-  // Use enriched file if available, fall back to base actors.csv
-  const enrichedPath = path.join(process.cwd(), 'data', 'enriched-actors.csv')
-  const basePath = path.join(process.cwd(), 'data', 'actors.csv')
-  const filePath = fs.existsSync(enrichedPath) ? enrichedPath : basePath
+  const supabase = createServiceClient()
 
-  const file = fs.readFileSync(filePath, 'utf8')
-  const parsed = Papa.parse<Record<string, string>>(file, { header: true, skipEmptyLines: true })
+  // Fetch all actors in pages of 1000
+  const all: EnrichedActor[] = []
+  let from = 0
+  const PAGE = 1000
 
-  _cache = parsed.data
-    .filter(row => row.name?.trim())
-    .map(row => {
-      const pop = parseFloat(row.popularity ?? '0') || 0
-      const salaryEst = row.salary_estimate ? parseFloat(row.salary_estimate) || undefined : undefined
-      return {
-        name: row.name.trim(),
-        tmdb_id: row.tmdb_id?.trim() ?? '',
-        headshot_url: row.headshot_url?.trim() ?? '',
+  while (true) {
+    const { data, error } = await supabase
+      .from('actors')
+      .select('*')
+      .order('popularity', { ascending: false })
+      .range(from, from + PAGE - 1)
+
+    if (error) throw new Error(`Failed to fetch actors: ${error.message}`)
+    if (!data || data.length === 0) break
+
+    for (const row of data) {
+      const pop = Number(row.popularity) || 0
+      all.push({
+        name: row.name,
+        tmdb_id: row.tmdb_id ?? '',
+        headshot_url: row.headshot_url ?? '',
         popularity: pop,
-        gender: row.gender?.trim() ?? '',
-        birth_year: row.birth_year?.trim() ?? '',
-        biography: row.biography?.trim() ?? '',
-        known_for: row.known_for?.trim() ?? '',
-        keywords: row.keywords?.trim() ?? '',
-        notes: row.notes?.trim() ?? '',
-        cost: salaryEst ?? popularityToCost(pop),
-        archetype: row.archetype?.trim() || undefined,
-        strengths: row.strengths?.trim() || undefined,
-        weaknesses: row.weaknesses?.trim() || undefined,
-        best_cast_as: row.best_cast_as?.trim() || undefined,
-        signature_quality: row.signature_quality?.trim() || undefined,
-        career_stage: row.career_stage?.trim() || undefined,
-        casting_profile: row.casting_profile?.trim() || undefined,
-        deep_dive_date: row.deep_dive_date?.trim() || undefined,
-        salary_estimate: row.salary_estimate ? parseFloat(row.salary_estimate) || undefined : undefined,
-        salary_confirmed: row.salary_confirmed === 'true' || row.salary_confirmed === '1',
-      }
-    })
-    .sort((a, b) => b.popularity - a.popularity)
+        gender: row.gender ?? '',
+        birth_year: row.birth_year ?? '',
+        biography: row.biography ?? '',
+        known_for: row.known_for ?? '',
+        keywords: row.keywords ?? '',
+        notes: row.notes ?? '',
+        cost: row.salary_estimate ?? row.cost ?? popularityToCost(pop),
+        archetype: row.archetype ?? undefined,
+        strengths: row.strengths ?? undefined,
+        weaknesses: row.weaknesses ?? undefined,
+        best_cast_as: row.best_cast_as ?? undefined,
+        signature_quality: row.signature_quality ?? undefined,
+        career_stage: row.career_stage ?? undefined,
+        casting_profile: row.casting_profile ?? undefined,
+        deep_dive_date: row.deep_dive_date ?? undefined,
+        salary_estimate: row.salary_estimate ?? undefined,
+        salary_confirmed: row.salary_confirmed ?? false,
+      })
+    }
 
+    if (data.length < PAGE) break
+    from += PAGE
+  }
+
+  _cache = all
   return _cache
+}
+
+export function clearActorCache() {
+  _cache = null
 }

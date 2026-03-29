@@ -21,6 +21,8 @@ interface RoleChatRequest {
   role: string
   movie: string
   originalActor: string
+  roleTier?: string
+  budget?: number
   query?: string
   pickedActor?: string
   pickedActorCost?: number
@@ -47,13 +49,15 @@ function formatActor(a: EnrichedActor): string {
 }
 
 // Pre-filter actors to a relevant subset before sending to Marlowe
-function selectPool(actors: EnrichedActor[], query: string, limit = 200): EnrichedActor[] {
+function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, limit = 200): EnrichedActor[] {
   const q = query.toLowerCase()
   const currentYear = new Date().getFullYear()
 
-  // Detect gender hints
+  // Detect explicit gender requests
   const wantsFemale = /\b(woman|female|girl|she|her|actress)\b/.test(q)
   const wantsMale = /\b(man|male|guy|he|him|actor)\b/.test(q)
+  // Detect explicit gender swap request
+  const wantsSwap = /\b(gender.?swap|opposite gender|swap gender|as a woman|as a man|female version|male version)\b/.test(q)
 
   // Detect age hints
   const wantsYoung = /\b(young|younger|twenties|20s|teen|fresh|new face|emerging|rising)\b/.test(q)
@@ -66,8 +70,14 @@ function selectPool(actors: EnrichedActor[], query: string, limit = 200): Enrich
 
   let pool = actors
 
-  if (wantsFemale) pool = pool.filter(a => a.gender === 'female')
-  else if (wantsMale) pool = pool.filter(a => a.gender === 'male')
+  // Gender filter: explicit request overrides default; otherwise lock to original actor's gender
+  if (wantsFemale && !wantsSwap) {
+    pool = pool.filter(a => a.gender?.toLowerCase() === 'female')
+  } else if (wantsMale && !wantsSwap) {
+    pool = pool.filter(a => a.gender?.toLowerCase() === 'male')
+  } else if (!wantsSwap && originalGender) {
+    pool = pool.filter(a => a.gender?.toLowerCase() === originalGender.toLowerCase())
+  }
 
   if (wantsYoung) {
     pool = pool.filter(a => {
@@ -105,22 +115,45 @@ function selectPool(actors: EnrichedActor[], query: string, limit = 200): Enrich
 
 export async function POST(request: NextRequest) {
   const body = await request.json() as RoleChatRequest
-  const { action, role, movie, originalActor, query = '', pickedActor, pickedActorCost, excludeActors = [] } = body
+  const { action, role, movie, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [] } = body
 
   if (!action || !role) {
     return Response.json({ reply: '', actors: [] })
   }
 
-  const allActors = getEnrichedActors()
-  const pool = selectPool(allActors, query || role)
+  const allActors = await getEnrichedActors()
+  const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
+  const originalGender = originalActorData?.gender ?? undefined
+  const pool = selectPool(allActors, query || role, originalGender)
   const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
   const filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
   const poolText = filteredPool.map(formatActor).join('\n')
   const allNames = new Set(allActors.map(a => a.name))
 
+  // Budget allocation guidance based on role tier
+  const tierLabel = roleTier === 'first_lead' ? 'FIRST LEAD'
+    : roleTier === 'second_lead' ? 'SECOND LEAD'
+    : roleTier === 'third_lead' ? 'THIRD LEAD'
+    : 'SUPPORTING'
+
+  const tierBudgetGuide = budget ? (() => {
+    const pcts: Record<string, [number, number]> = {
+      first_lead:   [0.35, 0.40],
+      second_lead:  [0.15, 0.20],
+      third_lead:   [0.08, 0.12],
+      supporting:   [0.04, 0.08],
+    }
+    const [lo, hi] = pcts[roleTier ?? 'supporting'] ?? pcts.supporting
+    const loM = Math.round(budget * lo)
+    const hiM = Math.round(budget * hi)
+    return `This is a ${tierLabel} role. Industry standard budget allocation for this tier: $${loM}–$${hiM}M (${Math.round(lo*100)}–${Math.round(hi*100)}% of total $${budget}M casting budget). Call out actors who are dramatically over or under this range.`
+  })() : `This is a ${tierLabel} role.`
+
   const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You use they/them pronouns. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.
 
-Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.`
+Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
+
+${tierBudgetGuide}`
 
   let prompt = ''
 
@@ -172,7 +205,7 @@ Return ONLY this JSON (no markdown):
 
 You are working on a reboot of "${movie}". The director just cast ${pickedActor} as ${role} (originally ${originalActor}).${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
 
-Give a 1–2 sentence reaction — smart move, bold risk, or mistake? Be specific about why this actor works or doesn't for this exact role.
+Give a 1–2 sentence reaction — smart move, bold risk, or mistake? Be specific about why this actor works or doesn't for this exact role. If their cost is significantly outside the expected range for a ${tierLabel}, call that out.
 
 Then write a sharp follow-up suggestion (10–15 words).
 
