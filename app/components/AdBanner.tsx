@@ -13,7 +13,7 @@ const SLOT_IDS: Record<AdSlot, string> = {
   'casting-footer':  '0987654321', // replace after AdSense approval
 }
 
-const PUBLISHER_ID = 'ca-pub-0000000000000000' // replace after AdSense approval
+const PUBLISHER_ID = 'ca-pub-9605271238285023'
 
 export default function AdBanner({ slot }: { slot: AdSlot }) {
   useEffect(() => {

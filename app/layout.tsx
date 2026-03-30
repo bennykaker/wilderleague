@@ -3,7 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 
 // Replace ca-pub-0000000000000000 with your actual AdSense publisher ID
-const ADSENSE_PUBLISHER_ID = 'ca-pub-0000000000000000'
+const ADSENSE_PUBLISHER_ID = 'ca-pub-9605271238285023'
 
 export const metadata: Metadata = {
   title: "WilderLeague",
