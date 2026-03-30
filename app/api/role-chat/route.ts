@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { getEnrichedActors, type EnrichedActor } from '../../data/enrichedActors'
 import { createClient } from '../../../lib/supabase/server'
+import { extractJson } from '../../../lib/extractJson'
 
 function getApiKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -258,13 +259,14 @@ Return ONLY this JSON (no markdown):
 
     const text = message.content[0].type === 'text' ? message.content[0].text : ''
     const cleaned = text.replace(/```json|```/g, '').trim()
-    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
+
+    const jsonStr = extractJson(cleaned)
+    if (!jsonStr) {
       console.error('No JSON in role-chat response:', text)
-      return Response.json({ error: `Unexpected AI response: ${text.slice(0, 120)}`, reply: '', actors: [] })
+      return Response.json({ reply: 'Marlowe is thinking — try again in a moment.', actors: [], suggestion: null })
     }
 
-    const parsed = JSON.parse(jsonMatch[0]) as RoleChatResponse
+    const parsed = JSON.parse(jsonStr) as RoleChatResponse
 
     // Validate returned names against full actor list
     const validActors = (parsed.actors ?? []).filter(n =>

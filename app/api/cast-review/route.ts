@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { extractJson } from '../../../lib/extractJson'
 
 const client = new Anthropic()
 
@@ -136,10 +137,10 @@ Return ONLY valid JSON, no markdown:
     })
 
     const text = msg.content[0].type === 'text' ? msg.content[0].text : ''
-    const match = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
-    if (!match) return NextResponse.json({ error: 'No JSON in response' }, { status: 500 })
+    const jsonStr = extractJson(text.replace(/```json|```/g, '').trim())
+    if (!jsonStr) return NextResponse.json({ error: 'No JSON in response' }, { status: 500 })
 
-    const data: CastReviewResponse = JSON.parse(match[0])
+    const data: CastReviewResponse = JSON.parse(jsonStr)
     return NextResponse.json(data)
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 })

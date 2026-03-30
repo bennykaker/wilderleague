@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { getTitle, getRolesForTitle } from '../../data/titles'
+import { extractJson } from '../../../lib/extractJson'
 
 function getKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -71,10 +72,10 @@ Return ONLY this JSON (no markdown):
   })
 
   const text = msg.content[0].type === 'text' ? msg.content[0].text : '{}'
-  const match = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No JSON in response')
+  const jsonStr = extractJson(text.replace(/```json|```/g, '').trim())
+  if (!jsonStr) throw new Error('No JSON in response')
 
-  const parsed = JSON.parse(match[0])
+  const parsed = JSON.parse(jsonStr)
   return {
     summary: parsed.summary ?? 'An interesting cast.',
     green_light_score: Math.min(100, Math.max(0, Math.round(parsed.green_light_score ?? 50))),
