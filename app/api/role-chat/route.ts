@@ -121,6 +121,36 @@ export async function POST(request: NextRequest) {
     return Response.json({ reply: '', actors: [] })
   }
 
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let isMember = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
+
+  // Rate limit: 10 Marlowe chats/day for guests
+  if (!user) {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+    const today = new Date().toISOString().split('T')[0]
+    const { data: usage } = await supabase
+      .from('review_usage')
+      .select('count')
+      .eq('ip', ip)
+      .eq('date', today)
+      .eq('type', 'chat')
+      .single()
+    const count = usage?.count ?? 0
+    if (count >= 10) {
+      return Response.json({ error: 'Guest limit reached (10 Marlowe chats/day). Sign in for more.', reply: '', actors: [] }, { status: 429 })
+    }
+    await supabase.from('review_usage').upsert(
+      { ip, date: today, type: 'chat', count: count + 1 },
+      { onConflict: 'ip,date,type' }
+    )
+  }
+
   const allActors = await getEnrichedActors()
   const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
   const originalGender = originalActorData?.gender ?? undefined
@@ -216,14 +246,6 @@ Return ONLY this JSON (no markdown):
 }`
     }
 
-    // Members get Sonnet (better Marlowe), free users get Haiku
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    let isMember = false
-    if (user) {
-      const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
-      isMember = profile?.is_member ?? false
-    }
     const model = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
     const message = await client.messages.create({

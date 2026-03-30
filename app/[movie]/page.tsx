@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import CastingBoard from '../components/CastingBoard'
 import { getEnrichedActors } from '../data/enrichedActors'
 import { getTitle, getRolesForTitle, getSuggestionsForTitle } from '../data/titles'
+import { createClient } from '../../lib/supabase/server'
 
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
@@ -25,6 +26,14 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     biography: a.biography || '',
   }))
 
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  let isMember = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
+
   return (
     <CastingBoard
       actors={actors}
@@ -38,6 +47,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       slug={slug}
       budget={title.budget}
       preloadedSuggestions={suggestions}
+      isMember={isMember}
     />
   )
 }

@@ -30,6 +30,7 @@ async function generateScores(
   budget: number,
   spent: number,
   cast: CastItem[],
+  model: string,
 ): Promise<{ summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number }> {
   const tierLabel = (t: string) =>
     t === 'first_lead' ? '1st lead' : t === 'second_lead' ? '2nd lead' : t === 'third_lead' ? '3rd lead' : 'supporting'
@@ -74,7 +75,7 @@ Return ONLY this JSON (no markdown):
 
   const client = new Anthropic({ apiKey: getKey() })
   const msg = await client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model,
     max_tokens: 300,
     messages: [{ role: 'user', content: prompt }],
   })
@@ -137,11 +138,19 @@ export async function POST(req: NextRequest) {
 
     await supabase.from('review_usage').upsert(
       { ip, date: today, type: 'submit', count: count + 1 },
-      { onConflict: 'ip,date' }
+      { onConflict: 'ip,date,type' }
     )
   }
 
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
+
+  // Members get Sonnet (richer scoring), guests get Haiku
+  let isMember = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
+  const scoringModel = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
   // Generate scores
   let summary = 'An interesting cast.'
@@ -151,7 +160,7 @@ export async function POST(req: NextRequest) {
   let award: string | null = null
 
   try {
-    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast)
+    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast, scoringModel)
     summary = result.summary
     green_light_score = result.green_light_score
     quality_score = result.quality_score

@@ -41,6 +41,7 @@ type Props = {
   budget: number
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
+  isMember?: boolean
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -51,7 +52,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge, isMember = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -76,6 +77,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [showAllPassed, setShowAllPassed] = useState(false)
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
   const [showMarloweFirst, setShowMarloweFirst] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
@@ -399,11 +401,15 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             <div style={{ fontSize: '14px', color: '#a1a1aa', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
           <button
-            onClick={() => Object.keys(selections).length > 0 && setShowMarloweFirst(true)}
+            onClick={() => {
+              if (Object.keys(selections).length === 0) return
+              if (!isMember) { setShowUpgradeModal(true); return }
+              setShowMarloweFirst(true)
+            }}
             disabled={Object.keys(selections).length === 0 || reviewLoading}
             style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
-            {reviewLoading ? 'Reading the room…' : 'Production Meeting'}
+            {reviewLoading ? 'Reading the room…' : isMember ? 'Production Meeting' : '🔒 Production Meeting'}
           </button>
           <button
             onClick={handleSubmit}
@@ -1131,6 +1137,37 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               style={{ display: 'block', background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', padding: 0 }}
             >
               Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade modal */}
+      {showUpgradeModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
+          onClick={() => setShowUpgradeModal(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '420px', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎬</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Members only</div>
+            <div style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '24px' }}>
+              The Production Meeting — Director, Executive Producer, and Marketing VP in the same room — is a member feature. Sign up to run the full review.
+            </div>
+            <a
+              href="/auth"
+              style={{ display: 'block', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.4)', borderRadius: '10px', padding: '12px 20px', color: '#a78bfa', fontSize: '15px', fontWeight: 700, textDecoration: 'none', marginBottom: '10px' }}
+            >
+              Sign up for full access →
+            </a>
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '14px', cursor: 'pointer', padding: 0 }}
+            >
+              Maybe later
             </button>
           </div>
         </div>
