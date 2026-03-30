@@ -23,23 +23,40 @@ const supabase = createClient(
 const TMDB_KEY = process.env.TMDB_API_KEY!
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500'
 
-async function searchTMDB(title: string, type: string, year: number | null): Promise<{ poster_path: string | null; tmdb_id: string | null }> {
-  const isTV = type === 'tv'
-  const endpoint = isTV ? 'search/tv' : 'search/movie'
-  const yearParam = year && !isTV ? `&primary_release_year=${year}` : year && isTV ? `&first_air_date_year=${year}` : ''
-  const url = `https://api.themoviedb.org/3/${endpoint}?query=${encodeURIComponent(title)}${yearParam}`
-
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${TMDB_KEY}`, 'Content-Type': 'application/json' },
-  })
-  const data = await res.json() as { results?: Array<{ poster_path?: string; id?: number }> }
-  const result = data.results?.[0]
+async function tmdbSearch(endpoint: string, query: string, yearParam = ''): Promise<{ poster_path: string | null; tmdb_id: string | null }> {
+  const url = `https://api.themoviedb.org/3/${endpoint}?query=${encodeURIComponent(query)}${yearParam}`
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${TMDB_KEY}` } })
+  const data = await res.json() as { results?: Array<{ poster_path?: string; id?: number; popularity?: number }> }
+  // Pick most popular result that has a poster
+  const result = data.results?.filter(r => r.poster_path).sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))[0]
   if (!result) return { poster_path: null, tmdb_id: null }
-
   return {
-    poster_path: result.poster_path ? `${TMDB_IMG}${result.poster_path}` : null,
+    poster_path: `${TMDB_IMG}${result.poster_path}`,
     tmdb_id: result.id ? String(result.id) : null,
   }
+}
+
+async function searchTMDB(title: string, type: string, year: number | null): Promise<{ poster_path: string | null; tmdb_id: string | null }> {
+  const isStage = type === 'play' || type === 'musical'
+  const isTV = type === 'tv'
+
+  if (isTV) {
+    return tmdbSearch('search/tv', title, year ? `&first_air_date_year=${year}` : '')
+  }
+
+  if (isStage) {
+    // Search for the most prominent film adaptation — try with year first, then without
+    const withYear = year && year > 1900 ? await tmdbSearch('search/movie', title, `&primary_release_year=${year}`) : { poster_path: null, tmdb_id: null }
+    if (withYear.poster_path) return withYear
+    // Try movie search without year (catches adaptations made in different years)
+    const withoutYear = await tmdbSearch('search/movie', title)
+    if (withoutYear.poster_path) return withoutYear
+    // Last resort: try TV (e.g. filmed stage productions on streaming)
+    return tmdbSearch('search/tv', title)
+  }
+
+  // Regular movie
+  return tmdbSearch('search/movie', title, year ? `&primary_release_year=${year}` : '')
 }
 
 async function main() {
