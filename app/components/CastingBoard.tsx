@@ -80,6 +80,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
   const [showMarloweFirst, setShowMarloweFirst] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [showDeepDive, setShowDeepDive] = useState(false)
+  const [deepDiveQuery, setDeepDiveQuery] = useState('')
+  const [deepDiveLoading, setDeepDiveLoading] = useState(false)
+  const [deepDiveRemaining, setDeepDiveRemaining] = useState<number | null>(null)
+  const [deepDiveActors, setDeepDiveActors] = useState<CastActor[]>([])
+  const [extraActors, setExtraActors] = useState<CastActor[]>([])
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
@@ -110,6 +116,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     })
   }
 
+  // Merge server actors with any deep-dive additions for this session
+  const allActors = extraActors.length > 0
+    ? [...actors, ...extraActors.filter(e => !actors.find(a => a.name === e.name))]
+    : actors
+
   // All actor names assigned to any slot across all roles
   const assignedNames = new Set(
     Object.values(selections).flatMap(arr => arr).filter(Boolean)
@@ -118,7 +129,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   // Budget only counts primary (slot 0) choices
   const spent = Object.values(selections).reduce((sum, arr) => {
     const name = arr[0]
-    return sum + (name ? (actors.find(a => a.name === name)?.cost ?? 0) : 0)
+    return sum + (name ? (allActors.find(a => a.name === name)?.cost ?? 0) : 0)
   }, 0)
   const remaining = budget - spent
   const overBudget = remaining < 0
@@ -153,7 +164,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     // Only fire reaction message when assigning primary slot
     if (slot === 0) {
       const role = roles.find(r => r.role_name === roleName)
-      const actor = actors.find(a => a.name === actorName)
+      const actor = allActors.find(a => a.name === actorName)
       fetch('/api/role-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -347,7 +358,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       .map(r => {
         const name = getSlots(r.role_name)[0]
         if (!name) return null
-        const actor = actors.find(a => a.name === name)
+        const actor = allActors.find(a => a.name === name)
         return { role: r.role_name, tier: r.tier ?? 'supporting', originalActor: r.original_actor, newActor: name, cost: actor?.cost ?? 0, salaryConfirmed: actor?.salaryConfirmed ?? false }
       })
       .filter(Boolean) as { role: string; tier: string; originalActor: string; newActor: string; cost: number; salaryConfirmed: boolean }[]
@@ -365,6 +376,24 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   }
 
   const currentMessages = chatMessages[activeRole] ?? []
+
+  async function handleDeepDive() {
+    if (!deepDiveQuery.trim()) return
+    setDeepDiveLoading(true)
+    const excludeNames = actors.map(a => a.name)
+    try {
+      const res = await fetch('/api/deep-dive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: deepDiveQuery, excludeNames }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(data.error ?? 'Deep dive failed'); return }
+      setDeepDiveActors(data.actors ?? [])
+      if (data.remaining != null) setDeepDiveRemaining(data.remaining)
+    } catch { alert('Deep dive failed. Try again.') }
+    finally { setDeepDiveLoading(false) }
+  }
 
   // Filter blocked actors from visible grid
   const displayActors = visibleActors.filter(a => !blockedActors.has(a.name))
@@ -882,6 +911,108 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             )
           })()}
 
+          {/* Deep Dive */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
+            {!showDeepDive ? (
+              <div
+                title={isMember ? undefined : 'Expand your search past the top 2,000 working actors.'}
+                style={{ position: 'relative', display: 'inline-block', width: '100%' }}
+              >
+                <button
+                  onClick={() => {
+                    if (!isMember) { setShowUpgradeModal(true); return }
+                    setShowDeepDive(true)
+                  }}
+                  style={{
+                    width: '100%',
+                    background: isMember ? 'rgba(59,130,246,0.08)' : '#18181b',
+                    border: `1px solid ${isMember ? 'rgba(59,130,246,0.3)' : '#27272a'}`,
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    color: isMember ? '#60a5fa' : '#52525b',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  {isMember ? null : <span style={{ fontSize: '14px' }}>🔒</span>}
+                  Deep Dive
+                  <span style={{ fontSize: '11px', color: isMember ? '#3b82f6' : '#3f3f46', fontWeight: 400, marginLeft: '2px' }}>
+                    beyond top 2,000
+                  </span>
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700 }}>
+                    Deep Dive
+                  </div>
+                  {deepDiveRemaining != null && (
+                    <div style={{ fontSize: '12px', color: '#52525b' }}>{deepDiveRemaining} left today</div>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input
+                    value={deepDiveQuery}
+                    onChange={e => setDeepDiveQuery(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleDeepDive() }}
+                    placeholder='Search by name, role, genre…'
+                    style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '8px 10px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+                  />
+                  <button
+                    onClick={handleDeepDive}
+                    disabled={deepDiveLoading || !deepDiveQuery.trim()}
+                    style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', fontWeight: 700, cursor: deepDiveLoading || !deepDiveQuery.trim() ? 'not-allowed' : 'pointer', opacity: deepDiveLoading || !deepDiveQuery.trim() ? 0.5 : 1, flexShrink: 0 }}
+                  >
+                    {deepDiveLoading ? '…' : 'Go'}
+                  </button>
+                </div>
+                {deepDiveActors.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '2px' }}>{deepDiveActors.length} found — drag to cast or click to add to pool</div>
+                    {deepDiveActors.map(a => (
+                      <button
+                        key={a.name}
+                        onClick={() => {
+                          // Add to extra actors pool so cost lookups work
+                          setExtraActors(prev => prev.find(p => p.name === a.name) ? prev : [a, ...prev])
+                          setVisibleActors(prev => {
+                            if (prev.find(p => p.name === a.name)) return prev
+                            return [a, ...prev]
+                          })
+                          setSuggestedPerRole(prev => {
+                            const existing = prev[activeRole] ?? []
+                            if (existing.find(p => p.name === a.name)) return prev
+                            return { ...prev, [activeRole]: [a, ...existing] }
+                          })
+                          setIsFiltered(true)
+                          setDeepDiveActors(prev => prev.filter(d => d.name !== a.name))
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', textAlign: 'left' }}
+                      >
+                        <div style={{ width: '32px', height: '44px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
+                          {a.image
+                            ? <img src={a.image} alt={a.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            : <div style={{ width: '100%', height: '100%', background: '#2a2a38' }} />
+                          }
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</div>
+                          <div style={{ fontSize: '12px', color: '#94a3b8' }}>${a.cost}M</div>
+                        </div>
+                        <span style={{ fontSize: '12px', color: '#3b82f6', flexShrink: 0 }}>+ add</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {!isMember && (
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', marginTop: '4px' }}>
               <AdBanner slot="casting-footer" />
@@ -1245,7 +1376,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         .filter(r => primarySelections[r.role_name])
         .map(r => {
           const actorName = primarySelections[r.role_name]
-          const actor = actors.find(a => a.name === actorName)
+          const actor = allActors.find(a => a.name === actorName)
           return { role: r.role_name, tier: r.tier ?? 'supporting', actor: actorName, cost: actor?.cost ?? 0 }
         })
       const res = await fetch('/api/submit-cast', {

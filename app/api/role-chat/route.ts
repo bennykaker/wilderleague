@@ -130,26 +130,25 @@ export async function POST(request: NextRequest) {
     isMember = profile?.is_member ?? false
   }
 
-  // Rate limit: 10 Marlowe chats/day for guests
-  if (!user) {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-    const today = new Date().toISOString().split('T')[0]
-    const { data: usage } = await supabase
-      .from('review_usage')
-      .select('count')
-      .eq('ip', ip)
-      .eq('date', today)
-      .eq('type', 'chat')
-      .single()
-    const count = usage?.count ?? 0
-    if (count >= 10) {
-      return Response.json({ error: 'Guest limit reached (10 Marlowe chats/day). Sign in for more.', reply: '', actors: [] }, { status: 429 })
-    }
-    await supabase.from('review_usage').upsert(
-      { ip, date: today, type: 'chat', count: count + 1 },
-      { onConflict: 'ip,date,type' }
-    )
+  // Rate limit: 10/day guests, 100/day members
+  const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
+  const chatLimit = user ? 100 : 10
+  const today = new Date().toISOString().split('T')[0]
+  const { data: chatUsage } = await supabase
+    .from('review_usage')
+    .select('count')
+    .eq('ip', trackingKey)
+    .eq('date', today)
+    .eq('type', 'chat')
+    .single()
+  const chatCount = chatUsage?.count ?? 0
+  if (chatCount >= chatLimit) {
+    return Response.json({ error: `${user ? 'Member' : 'Guest'} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
   }
+  await supabase.from('review_usage').upsert(
+    { ip: trackingKey, date: today, type: 'chat', count: chatCount + 1 },
+    { onConflict: 'ip,date,type' }
+  )
 
   const allActors = await getEnrichedActors()
   const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())

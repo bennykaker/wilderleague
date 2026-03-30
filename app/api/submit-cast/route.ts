@@ -120,37 +120,37 @@ export async function POST(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Rate limit: 3 submissions/day for guests
-  if (!user) {
-    const today = new Date().toISOString().split('T')[0]
-    const { data: usage } = await supabase
-      .from('review_usage')
-      .select('count')
-      .eq('ip', ip)
-      .eq('date', today)
-      .eq('type', 'submit')
-      .single()
+  // Rate limit: 3/day guests, 20/day members
+  const today = new Date().toISOString().split('T')[0]
 
-    const count = usage?.count ?? 0
-    if (count >= 3) {
-      return NextResponse.json({ error: 'Guest limit reached (3 submissions/day). Sign in for more.' }, { status: 429 })
-    }
-
-    await supabase.from('review_usage').upsert(
-      { ip, date: today, type: 'submit', count: count + 1 },
-      { onConflict: 'ip,date,type' }
-    )
+  let isMemberForLimit = false
+  if (user) {
+    const { data: profileCheck } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMemberForLimit = profileCheck?.is_member ?? false
   }
+
+  const submitLimit = user ? (isMemberForLimit ? 20 : 5) : 3
+  const submitKey = user ? user.id : ip
+  const { data: submitUsage } = await supabase
+    .from('review_usage')
+    .select('count')
+    .eq('ip', submitKey)
+    .eq('date', today)
+    .eq('type', 'submit')
+    .single()
+  const submitCount = submitUsage?.count ?? 0
+  if (submitCount >= submitLimit) {
+    return NextResponse.json({ error: `${user ? (isMemberForLimit ? 'Member' : 'Free account') : 'Guest'} limit reached (${submitLimit} submissions/day).${!user ? ' Sign in for more.' : ''}`, status: 429 }, { status: 429 })
+  }
+  await supabase.from('review_usage').upsert(
+    { ip: submitKey, date: today, type: 'submit', count: submitCount + 1 },
+    { onConflict: 'ip,date,type' }
+  )
 
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
   // Members get Sonnet (richer scoring), guests get Haiku
-  let isMember = false
-  if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
-    isMember = profile?.is_member ?? false
-  }
-  const scoringModel = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+  const scoringModel = isMemberForLimit ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
   // Generate scores
   let summary = 'An interesting cast.'

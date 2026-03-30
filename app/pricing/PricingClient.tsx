@@ -93,14 +93,15 @@ export default function PricingClient({
               Best
             </div>
             <div style={{ fontSize: '13px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700, marginBottom: '8px' }}>Member</div>
-            <div style={{ fontSize: '36px', fontWeight: 900, marginBottom: '4px' }}>$3</div>
+            <div style={{ fontSize: '36px', fontWeight: 900, marginBottom: '4px' }}>$7</div>
             <div style={{ fontSize: '14px', color: '#71717a', marginBottom: '28px' }}>per month</div>
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 'Everything in Free',
                 'Sharper Marlowe (upgraded AI)',
+                'Full Production Meeting — Director, EP & Marketing VP',
+                'Deep Dive — search beyond the top 2,000 actors',
                 'Unlimited cast submissions',
-                'Monthly cast digest by email',
                 'Early access to new features',
                 'Supports independent development',
               ].map(f => (
@@ -123,7 +124,7 @@ export default function PricingClient({
                 disabled={loading}
                 style={{ width: '100%', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '13px', fontSize: '15px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
               >
-                {loading ? 'Loading…' : user ? 'Upgrade — $3/month' : 'Sign in to upgrade'}
+                {loading ? 'Loading…' : user ? 'Upgrade — $7/month' : 'Sign in to upgrade'}
               </button>
             )}
           </div>
