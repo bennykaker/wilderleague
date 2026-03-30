@@ -27,7 +27,7 @@ const UNIVERSES: Record<string, string[]> = {
   CLCU: [
     'The Big Bang Theory', 'Two and a Half Men', 'Mom', 'Young Sheldon',
     'Mike & Molly', 'Two Broke Girls', 'Dharma & Greg', 'Bob Hearts Abishola',
-    'United States of Al', 'The Kominsky Method', 'Roseanne', 'Ghosts',
+    'United States of Al', 'The Kominsky Method', 'Roseanne', 'Ghosts (US)',
     'Grace Under Fire', 'Cybill',
   ],
   Schurverse: [
@@ -98,11 +98,19 @@ const UNIVERSES: Record<string, string[]> = {
 }
 
 function assignTags(knownFor: string, keywords: string): string[] {
-  const haystack = (knownFor + ' ' + keywords).toLowerCase()
+  // Split known_for into individual titles and do exact matches
+  const titles = new Set(
+    knownFor.split(/[;,]/).map(t => t.trim().toLowerCase()).filter(Boolean)
+  )
+  // Keywords can still use substring matching since they're already individual terms
+  const keywordBlob = keywords.toLowerCase()
   const tags: string[] = []
 
   for (const [tag, shows] of Object.entries(UNIVERSES)) {
-    const matched = shows.some(show => haystack.includes(show.toLowerCase()))
+    const matched = shows.some(show => {
+      const s = show.toLowerCase()
+      return titles.has(s) || keywordBlob.includes(s)
+    })
     if (matched) tags.push(tag)
   }
 
