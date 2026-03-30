@@ -135,23 +135,15 @@ async function main() {
     if (error) throw new Error(error.message)
     if (!actors || actors.length === 0) break
 
-    const updates: Array<{ id: string; tags: string[] }> = []
-
+    // Update ALL actors — clear stale tags from previous runs
     for (const actor of actors) {
       const tags = assignTags(actor.known_for ?? '', actor.keywords ?? '')
-      if (tags.length > 0) {
-        updates.push({ id: actor.id, tags })
-        totalTagged++
-      }
-    }
-
-    // Batch update
-    for (const { id, tags } of updates) {
+      if (tags.length > 0) totalTagged++
       const { error: updateError } = await supabase
         .from('actors')
-        .update({ universe_tags: tags.join(',') })
-        .eq('id', id)
-      if (updateError) console.error(`Failed to update ${id}:`, updateError.message)
+        .update({ universe_tags: tags.length > 0 ? tags.join(',') : null })
+        .eq('id', actor.id)
+      if (updateError) console.error(`Failed to update ${actor.id}:`, updateError.message)
     }
 
     totalUpdated += actors.length
