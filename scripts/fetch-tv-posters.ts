@@ -27,9 +27,11 @@ async function searchTMDB(title: string, type: string, year: number | null): Pro
   const isTV = type === 'tv'
   const endpoint = isTV ? 'search/tv' : 'search/movie'
   const yearParam = year && !isTV ? `&primary_release_year=${year}` : year && isTV ? `&first_air_date_year=${year}` : ''
-  const url = `https://api.themoviedb.org/3/${endpoint}?api_key=${TMDB_KEY}&query=${encodeURIComponent(title)}${yearParam}`
+  const url = `https://api.themoviedb.org/3/${endpoint}?query=${encodeURIComponent(title)}${yearParam}`
 
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${TMDB_KEY}`, 'Content-Type': 'application/json' },
+  })
   const data = await res.json() as { results?: Array<{ poster_path?: string; id?: number }> }
   const result = data.results?.[0]
   if (!result) return { poster_path: null, tmdb_id: null }
