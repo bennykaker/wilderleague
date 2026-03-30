@@ -27,10 +27,18 @@ const force = process.argv.includes('--force')
 
 async function enrichTitle(slug: string, title: string, type: string, year: number | null) {
   const isTV = type === 'tv'
+  const isStage = type === 'play' || type === 'musical'
+
+  const typeLabel = isTV ? 'TV series' : isStage ? `${type} — provide metadata for the definitive stage production and/or best-known film adaptation` : 'movie'
+  const yearNote = isStage && year && year < 1900
+    ? `originally written ${year}, treat as a classic stage work`
+    : year ? `, ${year}` : ''
 
   const prompt = `You are a film and television industry database editor with encyclopedic knowledge.
 
-Provide detailed metadata for: "${title}" (${isTV ? 'TV series' : 'movie'}${year ? `, ${year}` : ''})
+Provide detailed metadata for: "${title}" (${typeLabel}${yearNote})
+
+${isStage ? `IMPORTANT: This is a stage work. For rt_score use the score of the best-known film or TV adaptation if one exists, otherwise estimate critical consensus. For location_filmed use the most notable production location. For studio use the most prominent producing theater/company.` : ''}
 
 Return ONLY this JSON (no markdown):
 {
@@ -43,7 +51,7 @@ Return ONLY this JSON (no markdown):
   "franchise": "franchise or universe name if applicable, or null",
   "rt_score": Rotten Tomatoes critics score as integer 0-100,
   "awards": "notable awards won, e.g. 'Oscar: Best Picture, Best Director' or 'Emmy: Outstanding Drama (3)' — null if none notable",
-  ${isTV ? `
+  ${isTV || isStage ? `
   "year_end": last air year as integer, or null if still ongoing,
   "seasons": total number of seasons as integer,
   "episodes": total episode count as integer,
