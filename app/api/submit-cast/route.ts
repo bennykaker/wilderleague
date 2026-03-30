@@ -3,8 +3,6 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
 function getKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
   try {
@@ -16,48 +14,87 @@ function getKey(): string {
   } catch { return '' }
 }
 
-async function generateSummary(
+type CastItem = { role: string; tier: string; actor: string; cost: number }
+
+function computeAward(gl: number, q: number, hmu: number): string | null {
+  const avg = (gl + q + hmu) / 3
+  if (avg >= 78) return 'best_in_show'
+  if (q >= 75 && gl < 45) return 'genius_unmakable'
+  if (gl >= 70 && q < 45) return 'makable_unwatchable'
+  if (hmu >= 80) return 'hear_me_out'
+  return null
+}
+
+async function generateScores(
   movie: string,
-  selections: Record<string, string>
-): Promise<{ summary: string; is_cursed: boolean; curse_reason: string }> {
-  const castLines = Object.entries(selections)
-    .map(([role, actor]) => `${role}: ${actor}`)
+  budget: number,
+  spent: number,
+  cast: CastItem[],
+): Promise<{ summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number }> {
+  const tierLabel = (t: string) =>
+    t === 'first_lead' ? '1st lead' : t === 'second_lead' ? '2nd lead' : t === 'third_lead' ? '3rd lead' : 'supporting'
+
+  const castLines = cast
+    .map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor} ($${c.cost}M)`)
     .join('\n')
 
-  const prompt = `You are Marlowe, veteran Hollywood casting director.
+  const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
-Movie: ${movie}
-Proposed cast:
+  const prompt = `You are a Hollywood industry analyst reviewing a proposed cast for a reboot of "${movie}".
+
+${budgetLine}
+Industry standard allocation: 1st lead 35–40% of budget, 2nd lead 15–20%, 3rd lead 8–12%, supporting 4–8%.
+
+Cast:
 ${castLines}
 
-Give a one-line casting verdict (max 20 words). Sharp, specific, no filler.
+Score this cast on three dimensions (0–100 each):
 
-Also decide: is this cast "cursed"? Cursed means the choices are baffling, against-type, or chaotic in a way that somehow intrigues — not just bad, but deliciously wrong. High bar.
+GREEN LIGHT SCORE — How likely is this to get made?
+High score: bankable leads, budget-appropriate spend, proven box office track records, studio-friendly package.
+Low score: risky unknowns in lead roles, budget misallocation, completion risk, unmarketable choices.
 
-Return ONLY this JSON:
+QUALITY SCORE — How good is this film likely to be?
+High score: actors with strong dramatic range for these roles, creative/inspired choices, real chemistry potential, correct tier casting.
+Low score: wrong-genre casting, actors out of their depth, mismatched tone, money wasted on wrong tiers.
+
+HEAR ME OUT SCORE — How deliciously unexpected is this cast?
+High score: genuinely surprising against-type choices that somehow make sense, combinations nobody saw coming.
+Low score: safe obvious replacements, straight swaps, no imagination.
+
+Also give a one-line Marlowe verdict (sharp, specific, max 20 words — no hedging).
+
+Return ONLY this JSON (no markdown):
 {
-  "summary": "one-line verdict",
-  "is_cursed": true or false,
-  "curse_reason": "one sentence explaining the curse, or empty string if not cursed"
+  "green_light_score": 0-100,
+  "quality_score": 0-100,
+  "hear_me_out_score": 0-100,
+  "summary": "one-line Marlowe verdict"
 }`
 
   const client = new Anthropic({ apiKey: getKey() })
   const msg = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 200,
+    model: 'claude-sonnet-4-6',
+    max_tokens: 300,
     messages: [{ role: 'user', content: prompt }],
   })
 
   const text = msg.content[0].type === 'text' ? msg.content[0].text : '{}'
-  const json = text.replace(/```json|```/g, '').trim()
-  const match = json.match(/\{[\s\S]*\}/)
-  if (!match) return { summary: 'An interesting cast.', is_cursed: false, curse_reason: '' }
-  return JSON.parse(match[0])
+  const match = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
+  if (!match) return { summary: 'An interesting cast.', green_light_score: 50, quality_score: 50, hear_me_out_score: 50 }
+
+  const parsed = JSON.parse(match[0])
+  return {
+    summary: parsed.summary ?? 'An interesting cast.',
+    green_light_score: Math.min(100, Math.max(0, Math.round(parsed.green_light_score ?? 50))),
+    quality_score: Math.min(100, Math.max(0, Math.round(parsed.quality_score ?? 50))),
+    hear_me_out_score: Math.min(100, Math.max(0, Math.round(parsed.hear_me_out_score ?? 50))),
+  }
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { movie_slug, movie_title, selections, challenge_id } = body
+  const { movie_slug, movie_title, selections, challenge_id, budget = 100, cast = [] } = body
 
   if (!movie_slug || !selections || Object.keys(selections).length === 0) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -98,24 +135,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Guest limit reached (3 submissions/day). Sign in for more.' }, { status: 429 })
     }
 
-    // Upsert usage
     await supabase.from('review_usage').upsert(
       { ip, date: today, type: 'submit', count: count + 1 },
       { onConflict: 'ip,date' }
     )
   }
 
-  // Generate AI summary
+  const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
+
+  // Generate scores
   let summary = 'An interesting cast.'
-  let is_cursed = false
-  let curse_reason = ''
+  let green_light_score = 50
+  let quality_score = 50
+  let hear_me_out_score = 50
+  let award: string | null = null
+
   try {
-    const result = await generateSummary(movie_title ?? movie_slug, selections)
+    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast)
     summary = result.summary
-    is_cursed = result.is_cursed
-    curse_reason = result.curse_reason
+    green_light_score = result.green_light_score
+    quality_score = result.quality_score
+    hear_me_out_score = result.hear_me_out_score
+    award = computeAward(green_light_score, quality_score, hear_me_out_score)
   } catch (e) {
-    console.error('AI summary failed:', e)
+    console.error('AI scoring failed:', e)
   }
 
   // Insert submission
@@ -125,8 +168,12 @@ export async function POST(req: NextRequest) {
     challenge_id: challenge_id ?? null,
     selections,
     ai_summary: summary,
-    is_cursed,
-    curse_reason,
+    is_cursed: hear_me_out_score >= 70,
+    curse_reason: hear_me_out_score >= 70 ? 'High Hear Me Out score.' : '',
+    green_light_score,
+    quality_score,
+    hear_me_out_score,
+    award,
     ip,
   }).select('id').single()
 
@@ -135,5 +182,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 })
   }
 
-  return NextResponse.json({ id: data.id, summary, is_cursed, curse_reason })
+  return NextResponse.json({ id: data.id })
 }

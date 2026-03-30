@@ -22,6 +22,7 @@ create table if not exists actors (
   career_stage text,
   casting_profile text,
   deep_dive_date text,
+  nationality text,
   salary_estimate numeric,
   salary_confirmed boolean not null default false,
   created_at timestamptz not null default now(),

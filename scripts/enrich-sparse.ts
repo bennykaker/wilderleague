@@ -57,7 +57,8 @@ Return ONLY this JSON (no markdown, no extra text):
   "best_cast_as": "ideal role types, comma separated",
   "signature_quality": "one sentence — their single most distinctive quality",
   "career_stage": "one of: rising, established, peak, legacy, current",
-  "casting_profile": "2-3 sentences: who they are as an actor, what they bring to a role, when to cast them"
+  "casting_profile": "2-3 sentences: who they are as an actor, what they bring to a role, when to cast them",
+  "nationality": "primary nationality as a single country name (e.g. 'American', 'British', 'Australian', 'Canadian', 'Irish', 'French', 'German', 'South African', 'New Zealander', etc.) — use the country they are most associated with professionally, not dual citizenship"
 }`
 
   const message = await anthropic.messages.create({
@@ -106,6 +107,7 @@ async function main() {
           signature_quality: enrichment.signature_quality,
           career_stage: enrichment.career_stage,
           casting_profile: enrichment.casting_profile,
+          nationality: enrichment.nationality ?? null,
           deep_dive_date: new Date().toISOString().slice(0, 10),
         })
         .eq('id', actor.id)

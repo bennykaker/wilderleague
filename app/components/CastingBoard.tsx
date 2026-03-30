@@ -72,7 +72,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
   const [submitLoading, setSubmitLoading] = useState(false)
-  const [submitResult, setSubmitResult] = useState<{ summary: string; is_cursed: boolean; curse_reason: string } | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showAllPassed, setShowAllPassed] = useState(false)
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
@@ -1115,45 +1114,21 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         </div>
       )}
 
-      {/* Submit result modal */}
-      {(submitResult || submitError) && (
+      {/* Submit error modal */}
+      {submitError && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
-          onClick={() => { setSubmitResult(null); setSubmitError(null) }}
+          onClick={() => setSubmitError(null)}
         >
           <div
             style={{ background: '#111115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '480px' }}
             onClick={e => e.stopPropagation()}
           >
-            {submitError ? (
-              <>
-                <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '12px' }}>Couldn't submit</div>
-                <div style={{ fontSize: '14px', color: '#f87171', marginBottom: '24px' }}>{submitError}</div>
-              </>
-            ) : submitResult && (
-              <>
-                <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: submitResult.is_cursed ? '#f97316' : '#4ade80', fontWeight: 700, marginBottom: '10px' }}>
-                  {submitResult.is_cursed ? '🔮 Cursed cast submitted' : '✓ Cast submitted'}
-                </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '16px' }}>
-                  "{submitResult.summary}"
-                </div>
-                {submitResult.is_cursed && submitResult.curse_reason && (
-                  <div style={{ fontSize: '14px', color: '#fb923c', background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', lineHeight: 1.5 }}>
-                    {submitResult.curse_reason}
-                  </div>
-                )}
-                <a
-                  href={`/${slug}/casts`}
-                  style={{ display: 'inline-block', fontSize: '14px', fontWeight: 700, color: '#f1f5f9', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '10px 16px', textDecoration: 'none', marginTop: '4px' }}
-                >
-                  See all casts for {title} →
-                </a>
-              </>
-            )}
+            <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '12px' }}>Couldn't submit</div>
+            <div style={{ fontSize: '14px', color: '#f87171', marginBottom: '24px' }}>{submitError}</div>
             <button
-              onClick={() => { setSubmitResult(null); setSubmitError(null) }}
-              style={{ display: 'block', marginTop: '20px', background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', padding: 0 }}
+              onClick={() => setSubmitError(null)}
+              style={{ display: 'block', background: 'none', border: 'none', color: '#94a3b8', fontSize: '14px', cursor: 'pointer', padding: 0 }}
             >
               Close
             </button>
@@ -1215,13 +1190,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     if (!allRolesFilled || submitLoading) return
     setSubmitLoading(true)
     setSubmitError(null)
-    setSubmitResult(null)
     try {
       const primarySelections: Record<string, string> = {}
       roles.forEach(r => {
         const primary = selections[r.role_name]?.[0]
         if (primary) primarySelections[r.role_name] = primary
       })
+      const castWithDetails = roles
+        .filter(r => primarySelections[r.role_name])
+        .map(r => {
+          const actorName = primarySelections[r.role_name]
+          const actor = actors.find(a => a.name === actorName)
+          return { role: r.role_name, tier: r.tier ?? 'supporting', actor: actorName, cost: actor?.cost ?? 0 }
+        })
       const res = await fetch('/api/submit-cast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1230,11 +1211,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           movie_title: title,
           selections: primarySelections,
           challenge_id: challenge?.id ?? null,
+          budget,
+          cast: castWithDetails,
         }),
       })
       const data = await res.json()
       if (!res.ok) { setSubmitError(data.error ?? 'Submission failed'); return }
-      setSubmitResult(data)
+      window.location.href = `/results/${data.id}`
     } catch {
       setSubmitError('Something went wrong. Try again.')
     } finally {
