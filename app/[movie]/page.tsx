@@ -7,10 +7,10 @@ import { createClient } from '../../lib/supabase/server'
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
 
-  const title = getTitle(slug)
+  const title = await getTitle(slug)
   if (!title) notFound()
 
-  const roles = getRolesForTitle(slug)
+  const roles = await getRolesForTitle(slug)
   if (roles.length === 0) notFound()
 
   const suggestions = getSuggestionsForTitle(slug)

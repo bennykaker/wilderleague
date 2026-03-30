@@ -20,10 +20,10 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
 
   if (error || !submission) notFound()
 
-  const title = getTitle(submission.movie_slug)
+  const title = await getTitle(submission.movie_slug)
   if (!title) notFound()
 
-  const roles = getRolesForTitle(submission.movie_slug)
+  const roles = await getRolesForTitle(submission.movie_slug)
   const selections: Record<string, string> = submission.selections ?? {}
 
   // Fetch actor costs from DB

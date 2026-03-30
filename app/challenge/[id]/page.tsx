@@ -17,10 +17,10 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const challenge = getChallenge(id)
   if (!challenge) notFound()
 
-  const title = getTitle(challenge.movie_slug)
+  const title = await getTitle(challenge.movie_slug)
   if (!title) notFound()
 
-  const roles = getRolesForTitle(challenge.movie_slug)
+  const roles = await getRolesForTitle(challenge.movie_slug)
   if (roles.length === 0) notFound()
 
   const suggestions = getSuggestionsForTitle(challenge.movie_slug)

@@ -14,7 +14,7 @@ export default async function HomePage() {
     const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
   }
-  const all = getTitles()
+  const all = await getTitles()
   const featured = all.slice(0, 5)
   const challenge = getActiveChallenge()
 
