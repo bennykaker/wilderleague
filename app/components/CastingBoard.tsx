@@ -12,6 +12,7 @@ export type CastActor = {
   salaryConfirmed?: boolean
   knownFor?: string
   biography?: string
+  universeTags?: string[]
 }
 
 export type CastRole = {
@@ -1339,6 +1340,26 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                   <div key={item} style={{ fontSize: '14px', color: '#a1a1aa' }}>{item}</div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {(actor.universeTags ?? []).length > 0 && (
+            <div style={{ marginBottom: '10px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+              {(actor.universeTags ?? []).map(tag => (
+                <span key={tag} style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  background: 'rgba(139,92,246,0.15)',
+                  border: '1px solid rgba(139,92,246,0.3)',
+                  color: '#a78bfa',
+                  borderRadius: '5px',
+                  padding: '2px 6px',
+                }}>
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
 

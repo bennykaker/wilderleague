@@ -24,6 +24,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     salaryConfirmed: a.salary_confirmed,
     knownFor: a.known_for || '',
     biography: a.biography || '',
+    universeTags: a.universe_tags ?? [],
   }))
 
   const supabase = await createClient()
