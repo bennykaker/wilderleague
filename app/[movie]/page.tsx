@@ -7,14 +7,25 @@ import { createClient } from '../../lib/supabase/server'
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
 
-  const title = await getTitle(slug)
-  if (!title) notFound()
+  const supabase = await createClient()
 
-  const roles = await getRolesForTitle(slug)
+  const [title, roles, enriched, { data: { user } }] = await Promise.all([
+    getTitle(slug),
+    getRolesForTitle(slug),
+    getEnrichedActors(),
+    supabase.auth.getUser(),
+  ])
+
+  if (!title) notFound()
   if (roles.length === 0) notFound()
 
+  let isMember = false
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
+
   const suggestions = getSuggestionsForTitle(slug)
-  const enriched = await getEnrichedActors()
   const actors = enriched.map(a => ({
     id: a.tmdb_id || a.name,
     name: a.name,
@@ -26,14 +37,6 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     biography: a.biography || '',
     universeTags: a.universe_tags ?? [],
   }))
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  let isMember = false
-  if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
-    isMember = profile?.is_member ?? false
-  }
 
   return (
     <CastingBoard

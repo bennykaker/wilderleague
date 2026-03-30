@@ -12,31 +12,41 @@ const supabase = createClient(
 export default async function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const { data: submission, error } = await supabase
-    .from('submissions')
-    .select('id, movie_slug, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award, scored')
-    .eq('id', id)
-    .single()
+  const authClient = await createServerClient()
+
+  const [{ data: submission, error }, { data: { user } }] = await Promise.all([
+    supabase
+      .from('submissions')
+      .select('id, movie_slug, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award, scored')
+      .eq('id', id)
+      .single(),
+    authClient.auth.getUser(),
+  ])
 
   if (error || !submission) notFound()
 
-  const title = await getTitle(submission.movie_slug)
+  const [title, roles] = await Promise.all([
+    getTitle(submission.movie_slug),
+    getRolesForTitle(submission.movie_slug),
+  ])
+
   if (!title) notFound()
 
-  const roles = await getRolesForTitle(submission.movie_slug)
   const selections: Record<string, string> = submission.selections ?? {}
-
-  // Fetch actor costs from DB
   const actorNames = Object.values(selections).filter(Boolean)
-  const { data: actorRows } = await supabase
-    .from('actors')
-    .select('name, cost')
-    .in('name', actorNames)
+
+  const [{ data: actorRows }, isMemberResult] = await Promise.all([
+    supabase.from('actors').select('name, cost').in('name', actorNames),
+    user
+      ? authClient.from('profiles').select('is_member').eq('id', user.id).single()
+      : Promise.resolve({ data: null }),
+  ])
+
+  const isMember = (isMemberResult as { data: { is_member?: boolean } | null })?.data?.is_member ?? false
 
   const costMap: Record<string, number> = {}
   for (const a of actorRows ?? []) costMap[a.name] = a.cost
 
-  // Build cast list in role order
   const cast = roles
     .filter(r => selections[r.role_name])
     .map(r => ({
@@ -47,14 +57,6 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
     }))
 
   const spent = cast.reduce((sum, c) => sum + c.cost, 0)
-
-  const authClient = await createServerClient()
-  const { data: { user } } = await authClient.auth.getUser()
-  let isMember = false
-  if (user) {
-    const { data: profile } = await authClient.from('profiles').select('is_member').eq('id', user.id).single()
-    isMember = profile?.is_member ?? false
-  }
 
   return (
     <ResultsClient
