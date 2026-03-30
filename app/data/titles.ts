@@ -122,7 +122,7 @@ async function fetchRoles(): Promise<Role[]> {
 
 // Cache for 1 hour — revalidate when enrichment updates data
 const getCachedTitles = unstable_cache(fetchTitles, ['titles-v2'], { revalidate: 3600 })
-const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v2'],  { revalidate: 3600 })
+const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v3'],  { revalidate: 3600 })
 
 export async function getTitles(): Promise<Title[]> {
   return getCachedTitles()
