@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
 
   // Rate limit: 5/day guests, 50/day members, 200/day directors
   const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
-  const chatLimit = isDirector ? 200 : isMember ? 50 : 5
+  const chatLimit = isDirector ? 200 : isMember ? 50 : 10
   const userTierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
   const today = new Date().toISOString().split('T')[0]
   const { data: chatUsage } = await supabase
