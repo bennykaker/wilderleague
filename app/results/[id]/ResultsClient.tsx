@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import AdBanner from '../../components/AdBanner'
 
 type CastItem = {
   role: string
@@ -21,6 +22,7 @@ type Props = {
   cast: CastItem[]
   budget: number
   spent: number
+  isMember?: boolean
 }
 
 const TIER_LABEL: Record<string, string> = {
@@ -151,7 +153,7 @@ function ScoreCard({ label, value, type, phase, myPhase, emoji }: {
 }
 
 export default function ResultsClient({
-  movieTitle, movieSlug, summary, greenLight, quality, hearMeOut, award, cast, budget, spent,
+  movieTitle, movieSlug, summary, greenLight, quality, hearMeOut, award, cast, budget, spent, isMember = false,
 }: Props) {
   const [phase, setPhase] = useState(0)
   const overBudget = spent > budget
@@ -328,6 +330,12 @@ export default function ResultsClient({
                 Recast again
               </a>
             </div>
+
+            {!isMember && (
+              <div style={{ marginTop: '8px' }}>
+                <AdBanner slot="results" />
+              </div>
+            )}
           </div>
         )}
       </div>

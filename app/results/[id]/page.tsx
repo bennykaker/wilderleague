@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import { createClient as createServerClient } from '../../../lib/supabase/server'
 import { getTitle, getRolesForTitle } from '../../data/titles'
 import ResultsClient from './ResultsClient'
 
@@ -47,6 +48,14 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
 
   const spent = cast.reduce((sum, c) => sum + c.cost, 0)
 
+  const authClient = await createServerClient()
+  const { data: { user } } = await authClient.auth.getUser()
+  let isMember = false
+  if (user) {
+    const { data: profile } = await authClient.from('profiles').select('is_member').eq('id', user.id).single()
+    isMember = profile?.is_member ?? false
+  }
+
   return (
     <ResultsClient
       submissionId={submission.id}
@@ -60,6 +69,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
       cast={cast}
       budget={title.budget}
       spent={spent}
+      isMember={isMember}
     />
   )
 }

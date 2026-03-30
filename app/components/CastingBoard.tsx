@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import AdBanner from './AdBanner'
 
 export type CastActor = {
   id: string
@@ -879,6 +880,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               </div>
             )
           })()}
+
+          {!isMember && (
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', marginTop: '4px' }}>
+              <AdBanner slot="casting-footer" />
+            </div>
+          )}
         </div>
       </div>
 
