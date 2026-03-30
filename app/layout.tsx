@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import MobileGate from "./components/MobileGate";
 import "./globals.css";
 
 // Replace ca-pub-0000000000000000 with your actual AdSense publisher ID
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
+        <MobileGate />
         {children}
         <Script
           async
