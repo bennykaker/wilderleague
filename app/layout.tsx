@@ -9,6 +9,9 @@ const ADSENSE_PUBLISHER_ID = 'ca-pub-9605271238285023'
 export const metadata: Metadata = {
   title: "WilderLeague",
   description: "Fantasy movie casting leagues",
+  other: {
+    'google-adsense-account': 'ca-pub-9605271238285023',
+  },
 };
 
 export default function RootLayout({
