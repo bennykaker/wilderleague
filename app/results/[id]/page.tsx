@@ -14,7 +14,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
 
   const { data: submission, error } = await supabase
     .from('submissions')
-    .select('id, movie_slug, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award')
+    .select('id, movie_slug, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award, scored')
     .eq('id', id)
     .single()
 
@@ -70,6 +70,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
       budget={title.budget}
       spent={spent}
       isMember={isMember}
+      scored={submission.scored ?? false}
     />
   )
 }

@@ -23,6 +23,7 @@ type Props = {
   budget: number
   spent: number
   isMember?: boolean
+  scored?: boolean
 }
 
 const TIER_LABEL: Record<string, string> = {
@@ -153,10 +154,51 @@ function ScoreCard({ label, value, type, phase, myPhase, emoji }: {
 }
 
 export default function ResultsClient({
-  movieTitle, movieSlug, summary, greenLight, quality, hearMeOut, award, cast, budget, spent, isMember = false,
+  movieTitle, movieSlug, summary, greenLight, quality, hearMeOut, award, cast, budget, spent, isMember = false, scored = true, submissionId,
 }: Props) {
   const [phase, setPhase] = useState(0)
+  const [scoredState, setScoredState] = useState(scored)
+  const [retrying, setRetrying] = useState(false)
+  const [retryError, setRetryError] = useState<string | null>(null)
+  const [liveScores, setLiveScores] = useState<{ greenLight: number; quality: number; hearMeOut: number; summary: string; award: string | null } | null>(null)
   const overBudget = spent > budget
+
+  async function handleRetry() {
+    setRetrying(true)
+    setRetryError(null)
+    try {
+      const res = await fetch('/api/score-submission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: submissionId }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setRetryError(data.error ?? 'Scoring failed. Try again.'); return }
+      setLiveScores({
+        greenLight: data.green_light_score,
+        quality: data.quality_score,
+        hearMeOut: data.hear_me_out_score,
+        summary: data.summary,
+        award: data.award,
+      })
+      setScoredState(true)
+      setPhase(0)
+      setTimeout(() => setPhase(1), 400)
+      setTimeout(() => setPhase(2), 2400)
+      setTimeout(() => setPhase(3), 4400)
+      setTimeout(() => setPhase(4), 6200)
+    } catch {
+      setRetryError('Something went wrong. Try again in a moment.')
+    } finally {
+      setRetrying(false)
+    }
+  }
+
+  const gl = liveScores?.greenLight ?? greenLight
+  const q = liveScores?.quality ?? quality
+  const hmu = liveScores?.hearMeOut ?? hearMeOut
+  const verdict = liveScores?.summary ?? summary
+  const activeAward = liveScores?.award ?? award
 
   useEffect(() => {
     const timers = [
@@ -168,7 +210,7 @@ export default function ResultsClient({
     return () => timers.forEach(clearTimeout)
   }, [])
 
-  const awardMeta = award ? AWARD_META[award] : null
+  const awardMeta = activeAward ? AWARD_META[activeAward] : null
 
   return (
     <div style={{
@@ -257,15 +299,38 @@ export default function ResultsClient({
           Cast Review — {movieTitle}
         </div>
 
+        {/* Unscored state */}
+        {!scoredState && (
+          <div style={{ width: '100%', background: '#111115', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: '16px' }}>📞</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Marlowe is tied up on another call</div>
+            <div style={{ fontSize: '14px', color: '#71717a', lineHeight: 1.6, marginBottom: '24px' }}>
+              Your cast has been saved. Scores couldn't be generated right now — try again in a moment.
+            </div>
+            {retryError && (
+              <div style={{ fontSize: '13px', color: '#f87171', marginBottom: '16px' }}>{retryError}</div>
+            )}
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '10px', padding: '12px 24px', color: retrying ? '#52525b' : '#60a5fa', fontSize: '14px', fontWeight: 700, cursor: retrying ? 'not-allowed' : 'pointer' }}
+            >
+              {retrying ? 'Calling Marlowe…' : 'Try scoring again'}
+            </button>
+          </div>
+        )}
+
         {/* Three scores */}
+        {scoredState && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-          <ScoreCard label="Green Light Score" value={greenLight} type="green"  emoji="🟢" phase={phase} myPhase={1} />
-          <ScoreCard label="Quality Score"      value={quality}    type="quality" emoji="⭐" phase={phase} myPhase={2} />
-          <ScoreCard label="Hear Me Out Score"  value={hearMeOut}  type="hmu"    emoji="🔮" phase={phase} myPhase={3} />
+          <ScoreCard label="Green Light Score" value={gl}  type="green"   emoji="🟢" phase={phase} myPhase={1} />
+          <ScoreCard label="Quality Score"      value={q}   type="quality" emoji="⭐" phase={phase} myPhase={2} />
+          <ScoreCard label="Hear Me Out Score"  value={hmu} type="hmu"     emoji="🔮" phase={phase} myPhase={3} />
         </div>
+        )}
 
         {/* Award */}
-        {awardMeta && phase >= 4 && (
+        {scoredState && awardMeta && phase >= 4 && (
           <div style={{
             animation: 'awardDrop 0.5s cubic-bezier(0.34,1.56,0.64,1) both',
             background: `${awardMeta.color}14`,
@@ -286,7 +351,7 @@ export default function ResultsClient({
         )}
 
         {/* Marlowe verdict + links */}
-        {phase >= 4 && (
+        {scoredState && phase >= 4 && (
           <div style={{ animation: 'fadeUp 0.5s ease both', width: '100%', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
             <div style={{
               background: '#111115',
@@ -295,7 +360,7 @@ export default function ResultsClient({
               padding: '20px 24px',
             }}>
               <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', fontWeight: 700, marginBottom: '8px' }}>Marlowe's verdict</div>
-              <div style={{ fontSize: '16px', fontStyle: 'italic', color: '#cbd5e1', lineHeight: 1.6 }}>"{summary}"</div>
+              <div style={{ fontSize: '16px', fontStyle: 'italic', color: '#cbd5e1', lineHeight: 1.6 }}>"{verdict}"</div>
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
+import { getTitle, getRolesForTitle } from '../../data/titles'
 
 function getKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -35,10 +36,7 @@ async function generateScores(
   const tierLabel = (t: string) =>
     t === 'first_lead' ? '1st lead' : t === 'second_lead' ? '2nd lead' : t === 'third_lead' ? '3rd lead' : 'supporting'
 
-  const castLines = cast
-    .map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor} ($${c.cost}M)`)
-    .join('\n')
-
+  const castLines = cast.map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor} ($${c.cost}M)`).join('\n')
   const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
   const prompt = `You are a Hollywood industry analyst reviewing a proposed cast for a reboot of "${movie}".
@@ -52,16 +50,8 @@ ${castLines}
 Score this cast on three dimensions (0–100 each):
 
 GREEN LIGHT SCORE — How likely is this to get made?
-High score: bankable leads, budget-appropriate spend, proven box office track records, studio-friendly package.
-Low score: risky unknowns in lead roles, budget misallocation, completion risk, unmarketable choices.
-
 QUALITY SCORE — How good is this film likely to be?
-High score: actors with strong dramatic range for these roles, creative/inspired choices, real chemistry potential, correct tier casting.
-Low score: wrong-genre casting, actors out of their depth, mismatched tone, money wasted on wrong tiers.
-
 HEAR ME OUT SCORE — How deliciously unexpected is this cast?
-High score: genuinely surprising against-type choices that somehow make sense, combinations nobody saw coming.
-Low score: safe obvious replacements, straight swaps, no imagination.
 
 Also give a one-line Marlowe verdict (sharp, specific, max 20 words — no hedging).
 
@@ -82,7 +72,7 @@ Return ONLY this JSON (no markdown):
 
   const text = msg.content[0].type === 'text' ? msg.content[0].text : '{}'
   const match = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
-  if (!match) return { summary: 'An interesting cast.', green_light_score: 50, quality_score: 50, hear_me_out_score: 50 }
+  if (!match) throw new Error('No JSON in response')
 
   const parsed = JSON.parse(match[0])
   return {
@@ -94,12 +84,8 @@ Return ONLY this JSON (no markdown):
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const { movie_slug, movie_title, selections, challenge_id, budget = 100, cast = [] } = body
-
-  if (!movie_slug || !selections || Object.keys(selections).length === 0) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-  }
+  const { id } = await req.json()
+  if (!id) return NextResponse.json({ error: 'Missing submission id' }, { status: 400 })
 
   const cookieStore = await cookies()
   const headersList = await headers()
@@ -118,33 +104,23 @@ export async function POST(req: NextRequest) {
     }
   )
 
+  // Fetch the submission
+  const { data: submission, error: fetchError } = await supabase
+    .from('submissions')
+    .select('id, movie_slug, selections, scored, ip')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !submission) return NextResponse.json({ error: 'Submission not found' }, { status: 404 })
+  if (submission.scored) return NextResponse.json({ error: 'Already scored' }, { status: 409 })
+
+  // Only the submitter (by IP) or authenticated user can retry
   const { data: { user } } = await supabase.auth.getUser()
-
-  // Rate limit: 3 submissions/day for guests
-  if (!user) {
-    const today = new Date().toISOString().split('T')[0]
-    const { data: usage } = await supabase
-      .from('review_usage')
-      .select('count')
-      .eq('ip', ip)
-      .eq('date', today)
-      .eq('type', 'submit')
-      .single()
-
-    const count = usage?.count ?? 0
-    if (count >= 3) {
-      return NextResponse.json({ error: 'Guest limit reached (3 submissions/day). Sign in for more.' }, { status: 429 })
-    }
-
-    await supabase.from('review_usage').upsert(
-      { ip, date: today, type: 'submit', count: count + 1 },
-      { onConflict: 'ip,date,type' }
-    )
+  if (!user && submission.ip !== ip) {
+    return NextResponse.json({ error: 'Not authorised to score this submission' }, { status: 403 })
   }
 
-  const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
-
-  // Members get Sonnet (richer scoring), guests get Haiku
+  // Determine model
   let isMember = false
   if (user) {
     const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
@@ -152,47 +128,56 @@ export async function POST(req: NextRequest) {
   }
   const scoringModel = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
-  // Generate scores
-  let summary = 'An interesting cast.'
-  let green_light_score = 50
-  let quality_score = 50
-  let hear_me_out_score = 50
-  let award: string | null = null
-  let scored = false
+  // Rebuild cast with costs from DB
+  const title = await getTitle(submission.movie_slug)
+  const roles = await getRolesForTitle(submission.movie_slug)
+  const selections: Record<string, string> = submission.selections ?? {}
+
+  const actorNames = Object.values(selections).filter(Boolean)
+  const { data: actorRows } = await supabase
+    .from('actors')
+    .select('name, cost')
+    .in('name', actorNames)
+
+  const costMap: Record<string, number> = {}
+  for (const a of actorRows ?? []) costMap[a.name] = a.cost
+
+  const cast: CastItem[] = roles
+    .filter(r => selections[r.role_name])
+    .map(r => ({
+      role: r.role_name,
+      tier: r.tier ?? 'supporting',
+      actor: selections[r.role_name],
+      cost: costMap[selections[r.role_name]] ?? 0,
+    }))
+
+  const budget = title?.budget ?? 100
+  const spent = cast.reduce((sum, c) => sum + c.cost, 0)
 
   try {
-    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast, scoringModel)
-    summary = result.summary
-    green_light_score = result.green_light_score
-    quality_score = result.quality_score
-    hear_me_out_score = result.hear_me_out_score
-    award = computeAward(green_light_score, quality_score, hear_me_out_score)
-    scored = true
+    const result = await generateScores(title?.title ?? submission.movie_slug, budget, spent, cast, scoringModel)
+    const award = computeAward(result.green_light_score, result.quality_score, result.hear_me_out_score)
+
+    await supabase.from('submissions').update({
+      ai_summary: result.summary,
+      green_light_score: result.green_light_score,
+      quality_score: result.quality_score,
+      hear_me_out_score: result.hear_me_out_score,
+      award,
+      is_cursed: result.hear_me_out_score >= 70,
+      curse_reason: result.hear_me_out_score >= 70 ? 'High Hear Me Out score.' : '',
+      scored: true,
+    }).eq('id', id)
+
+    return NextResponse.json({
+      summary: result.summary,
+      green_light_score: result.green_light_score,
+      quality_score: result.quality_score,
+      hear_me_out_score: result.hear_me_out_score,
+      award,
+    })
   } catch (e) {
-    console.error('AI scoring failed:', e)
+    console.error('Retry scoring failed:', e)
+    return NextResponse.json({ error: 'Scoring failed. Try again in a moment.' }, { status: 503 })
   }
-
-  // Insert submission
-  const { data, error } = await supabase.from('submissions').insert({
-    user_id: user?.id ?? null,
-    movie_slug,
-    challenge_id: challenge_id ?? null,
-    selections,
-    ai_summary: summary,
-    is_cursed: hear_me_out_score >= 70,
-    curse_reason: hear_me_out_score >= 70 ? 'High Hear Me Out score.' : '',
-    green_light_score,
-    quality_score,
-    hear_me_out_score,
-    award,
-    scored,
-    ip,
-  }).select('id').single()
-
-  if (error) {
-    console.error('Insert error:', error)
-    return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 })
-  }
-
-  return NextResponse.json({ id: data.id })
 }
