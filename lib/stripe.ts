@@ -16,3 +16,4 @@ export const stripe = new Stripe(getEnv('STRIPE_SECRET_KEY'), {
 })
 
 export const PRICE_ID = getEnv('STRIPE_PRICE_ID')
+export const PRICE_ID_DIRECTOR = getEnv('STRIPE_PRICE_ID_DIRECTOR')

@@ -125,14 +125,17 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   let isMember = false
+  let isDirector = false
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
+    isDirector = profile?.is_director ?? false
   }
 
-  // Rate limit: 10/day guests, 100/day members
+  // Rate limit: 5/day guests, 50/day members, 200/day directors
   const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
-  const chatLimit = user ? 100 : 10
+  const chatLimit = isDirector ? 200 : isMember ? 50 : 5
+  const tierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
   const today = new Date().toISOString().split('T')[0]
   const { data: chatUsage } = await supabase
     .from('review_usage')
@@ -143,7 +146,7 @@ export async function POST(request: NextRequest) {
     .single()
   const chatCount = chatUsage?.count ?? 0
   if (chatCount >= chatLimit) {
-    return Response.json({ error: `${user ? 'Member' : 'Guest'} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
+    return Response.json({ error: `${tierLabel} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
   }
   await supabase.from('review_usage').upsert(
     { ip: trackingKey, date: today, type: 'chat', count: chatCount + 1 },
@@ -245,7 +248,7 @@ Return ONLY this JSON (no markdown):
 }`
     }
 
-    const model = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+    const model = (isMember || isDirector) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
     const message = await client.messages.create({
       model,

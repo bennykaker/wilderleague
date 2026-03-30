@@ -124,12 +124,14 @@ export async function POST(req: NextRequest) {
   const today = new Date().toISOString().split('T')[0]
 
   let isMemberForLimit = false
+  let isDirectorForLimit = false
   if (user) {
-    const { data: profileCheck } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    const { data: profileCheck } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
     isMemberForLimit = profileCheck?.is_member ?? false
+    isDirectorForLimit = profileCheck?.is_director ?? false
   }
 
-  const submitLimit = user ? (isMemberForLimit ? 20 : 5) : 3
+  const submitLimit = isDirectorForLimit ? 50 : isMemberForLimit ? 20 : user ? 3 : 3
   const submitKey = user ? user.id : ip
   const { data: submitUsage } = await supabase
     .from('review_usage')
@@ -150,7 +152,7 @@ export async function POST(req: NextRequest) {
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
   // Members get Sonnet (richer scoring), guests get Haiku
-  const scoringModel = isMemberForLimit ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+  const scoringModel = (isMemberForLimit || isDirectorForLimit) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
   // Generate scores
   let summary = 'An interesting cast.'

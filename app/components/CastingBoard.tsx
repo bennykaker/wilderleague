@@ -44,6 +44,7 @@ type Props = {
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
   isMember?: boolean
+  isDirector?: boolean
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -54,7 +55,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge, isMember = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -434,13 +435,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           <button
             onClick={() => {
               if (Object.keys(selections).length === 0) return
-              if (!isMember) { setShowUpgradeModal(true); return }
+              if (!isDirector) { setShowUpgradeModal(true); return }
               setShowMarloweFirst(true)
             }}
             disabled={Object.keys(selections).length === 0 || reviewLoading}
             style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
-            {reviewLoading ? 'Reading the room…' : isMember ? 'Production Meeting' : '🔒 Production Meeting'}
+            {reviewLoading ? 'Reading the room…' : isDirector ? 'Production Meeting' : '🔒 Production Meeting'}
           </button>
           <button
             onClick={handleSubmit}
@@ -1294,7 +1295,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎬</div>
             <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Members only</div>
             <div style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '24px' }}>
-              The Production Meeting — Director, Executive Producer, and Marketing VP in the same room — is a member feature. Sign up to run the full review.
+              The Production Meeting — Director, Executive Producer, and Marketing VP in the same room — is a Director-tier feature. Upgrade to $10/month to run the full review.
             </div>
             <a
               href="/auth"

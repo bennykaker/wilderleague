@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Members only' }, { status: 403 })
 
-  const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
-  if (!profile?.is_member) return NextResponse.json({ error: 'Members only' }, { status: 403 })
+  const { data: profile } = await supabase.from('profiles').select('is_director').eq('id', user.id).single()
+  if (!profile?.is_director) return NextResponse.json({ error: 'Director tier required' }, { status: 403 })
 
   // Rate limit: 20 production meetings/day
   const today = new Date().toISOString().split('T')[0]

@@ -20,9 +20,11 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   if (roles.length === 0) notFound()
 
   let isMember = false
+  let isDirector = false
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
+    isDirector = profile?.is_director ?? false
   }
 
   const suggestions = getSuggestionsForTitle(slug)
@@ -52,6 +54,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       budget={title.budget}
       preloadedSuggestions={suggestions}
       isMember={isMember}
+      isDirector={isDirector}
     />
   )
 }

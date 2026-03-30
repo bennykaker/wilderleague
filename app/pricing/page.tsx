@@ -6,10 +6,12 @@ export default async function PricingPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   let isMember = false
+  let isDirector = false
   if (user) {
-    const { data } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    const { data } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
     isMember = data?.is_member ?? false
+    isDirector = data?.is_director ?? false
   }
 
-  return <PricingClient user={user ? { email: user.email } : null} isMember={isMember} />
+  return <PricingClient user={user ? { email: user.email } : null} isMember={isMember} isDirector={isDirector} />
 }
