@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createServiceClient } from '../../lib/supabase/service'
 
 export interface EnrichedActor {
@@ -12,17 +13,18 @@ export interface EnrichedActor {
   keywords: string
   notes: string
   cost: number
-  archetype?: string
-  strengths?: string
-  weaknesses?: string
-  best_cast_as?: string
-  signature_quality?: string
-  career_stage?: string
   casting_profile?: string
-  deep_dive_date?: string
   salary_estimate?: number
   salary_confirmed?: boolean
+  nationality?: string
 }
+
+const ACTOR_COLUMNS = [
+  'name', 'tmdb_id', 'headshot_url', 'popularity',
+  'gender', 'birth_year', 'biography', 'known_for',
+  'keywords', 'notes', 'cost', 'salary_estimate',
+  'salary_confirmed', 'casting_profile', 'nationality',
+].join(', ')
 
 function popularityToCost(pop: number): number {
   if (pop >= 20) return 12
@@ -33,22 +35,18 @@ function popularityToCost(pop: number): number {
   return 3
 }
 
-let _cache: EnrichedActor[] | null = null
-
-export async function getEnrichedActors(): Promise<EnrichedActor[]> {
-  if (_cache) return _cache
-
+async function fetchActors(): Promise<EnrichedActor[]> {
   const supabase = createServiceClient()
 
-  // Fetch all actors in pages of 1000
   const all: EnrichedActor[] = []
   let from = 0
   const PAGE = 1000
+  const LIMIT = 2000
 
-  while (true) {
+  while (all.length < LIMIT) {
     const { data, error } = await supabase
       .from('actors')
-      .select('*')
+      .select(ACTOR_COLUMNS)
       .order('popularity', { ascending: false })
       .range(from, from + PAGE - 1)
 
@@ -69,16 +67,10 @@ export async function getEnrichedActors(): Promise<EnrichedActor[]> {
         keywords: row.keywords ?? '',
         notes: row.notes ?? '',
         cost: row.salary_estimate ?? row.cost ?? popularityToCost(pop),
-        archetype: row.archetype ?? undefined,
-        strengths: row.strengths ?? undefined,
-        weaknesses: row.weaknesses ?? undefined,
-        best_cast_as: row.best_cast_as ?? undefined,
-        signature_quality: row.signature_quality ?? undefined,
-        career_stage: row.career_stage ?? undefined,
         casting_profile: row.casting_profile ?? undefined,
-        deep_dive_date: row.deep_dive_date ?? undefined,
         salary_estimate: row.salary_estimate ?? undefined,
         salary_confirmed: row.salary_confirmed ?? false,
+        nationality: row.nationality ?? undefined,
       })
     }
 
@@ -86,10 +78,16 @@ export async function getEnrichedActors(): Promise<EnrichedActor[]> {
     from += PAGE
   }
 
-  _cache = all
-  return _cache
+  return all
+}
+
+// Cache for 1 hour across serverless invocations
+const getCachedActors = unstable_cache(fetchActors, ['enriched-actors'], { revalidate: 3600 })
+
+export async function getEnrichedActors(): Promise<EnrichedActor[]> {
+  return getCachedActors()
 }
 
 export function clearActorCache() {
-  _cache = null
+  // Cache is managed by Next.js — revalidates on next request after TTL
 }
