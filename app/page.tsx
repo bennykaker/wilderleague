@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getTitles } from './data/titles'
+import { getEnrichedActors } from './data/enrichedActors'
 import { getActiveChallenge } from './data/challenges'
 import NewHereModal from './components/NewHereModal'
 import TitleSearch from './components/TitleSearch'
@@ -14,7 +15,10 @@ export default async function HomePage() {
     const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
   }
-  const all = await getTitles()
+  const [all] = await Promise.all([
+    getTitles(),
+    getEnrichedActors(), // warm the cache for movie pages
+  ])
   const featured = all.slice(0, 5)
   const challenge = getActiveChallenge()
 
