@@ -89,6 +89,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [extraActors, setExtraActors] = useState<CastActor[]>([])
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
 
   // Load blocklist from localStorage
@@ -290,7 +291,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   }, [activeRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const container = chatContainerRef.current
+    if (container) container.scrollTop = container.scrollHeight
   }, [chatMessages])
 
   async function handleSearch() {
@@ -727,7 +729,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           </div>
 
           {/* AI chat */}
-          <div style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+          <div ref={chatContainerRef} style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, overflowY: 'auto' }}>
             {aiLoading && currentMessages.length === 0 && (
               <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
@@ -768,7 +770,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             {aiLoading && currentMessages.length > 0 && (
               <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
-            <div ref={chatEndRef} />
           </div>
 
         </div>
