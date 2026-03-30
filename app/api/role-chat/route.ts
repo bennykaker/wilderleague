@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
   // Rate limit: 5/day guests, 50/day members, 200/day directors
   const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
   const chatLimit = isDirector ? 200 : isMember ? 50 : 5
-  const tierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
+  const userTierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
   const today = new Date().toISOString().split('T')[0]
   const { data: chatUsage } = await supabase
     .from('review_usage')
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     .single()
   const chatCount = chatUsage?.count ?? 0
   if (chatCount >= chatLimit) {
-    return Response.json({ error: `${tierLabel} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
+    return Response.json({ error: `${userTierLabel} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
   }
   await supabase.from('review_usage').upsert(
     { ip: trackingKey, date: today, type: 'chat', count: chatCount + 1 },

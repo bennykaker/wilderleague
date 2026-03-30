@@ -54,7 +54,7 @@ async function fetchActors(): Promise<EnrichedActor[]> {
     if (error) throw new Error(`Failed to fetch actors: ${error.message}`)
     if (!data || data.length === 0) break
 
-    for (const row of data) {
+    for (const row of data as any[]) {
       const pop = Number(row.popularity) || 0
       all.push({
         name: row.name,

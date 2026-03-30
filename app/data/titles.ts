@@ -66,7 +66,7 @@ async function fetchTitles(): Promise<Title[]> {
 
   if (error) throw new Error(`Failed to fetch titles: ${error.message}`)
 
-  return (data ?? []).map(r => ({
+  return ((data ?? []) as any[]).map(r => ({
     slug: r.slug,
     title: r.title,
     year: r.year ?? 0,
@@ -109,7 +109,7 @@ async function fetchRoles(): Promise<Role[]> {
 
   if (error) throw new Error(`Failed to fetch roles: ${error.message}`)
 
-  return (data ?? []).map(r => ({
+  return ((data ?? []) as any[]).map(r => ({
     movie_slug: r.title_slug,
     role_name: r.role_name,
     original_actor: r.original_actor ?? '',

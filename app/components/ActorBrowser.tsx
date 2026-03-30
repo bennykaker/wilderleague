@@ -180,33 +180,9 @@ function ActorCard({ actor }: { actor: EnrichedActor }) {
                 <div style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
                   Marlowe's assessment
                 </div>
-                {actor.archetype && (
-                  <div style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 600, marginBottom: '6px' }}>{actor.archetype}</div>
-                )}
-                <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6, margin: '0 0 8px' }}>
+                <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
                   {actor.casting_profile}
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', fontSize: '11px' }}>
-                  {actor.strengths && (
-                    <div>
-                      <span style={{ color: '#52525b' }}>Strengths: </span>
-                      <span style={{ color: '#a1a1aa' }}>{actor.strengths}</span>
-                    </div>
-                  )}
-                  {actor.best_cast_as && (
-                    <div>
-                      <span style={{ color: '#52525b' }}>Best as: </span>
-                      <span style={{ color: '#a1a1aa' }}>{actor.best_cast_as}</span>
-                    </div>
-                  )}
-                  {actor.career_stage && (
-                    <div style={{ marginLeft: 'auto' }}>
-                      <span style={{ fontSize: '10px', background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '2px 7px', color: '#52525b', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        {actor.career_stage}
-                      </span>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
 
