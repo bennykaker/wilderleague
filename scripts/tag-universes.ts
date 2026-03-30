@@ -89,6 +89,12 @@ const UNIVERSES: Record<string, string[]> = {
     'Ready to Wear', 'Cookie\'s Fortune', 'Dr. T and the Women',
     'A Prairie Home Companion', 'Kansas City', 'Pret-a-Porter',
   ],
+  Whedonverse: [
+    'Buffy the Vampire Slayer', 'Angel', 'Firefly', 'Serenity',
+    'Dollhouse', 'Agents of S.H.I.E.L.D.', 'The Avengers',
+    'Avengers: Age of Ultron', 'Much Ado About Nothing', 'Cabin in the Woods',
+    'Dr. Horrible\'s Sing-Along Blog',
+  ],
 }
 
 function assignTags(knownFor: string, keywords: string): string[] {
