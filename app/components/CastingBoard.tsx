@@ -96,6 +96,9 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
+  // Pre-fetched describe results keyed by role name
+  const prefetchedRef = useRef<Record<string, { reply: string; actors: string[]; suggestion: string | null; remaining?: number } | 'loading' | 'error'>>({})
+  const prefetchFiredRef = useRef(false)
 
   // Load blocklist from localStorage
   useEffect(() => {
@@ -215,6 +218,65 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     })
   }
 
+  // Helper: apply a prefetched describe result to state
+  function applyDescribeResult(roleName: string, data: { reply: string; actors: string[]; suggestion: string | null; remaining?: number }) {
+    if (data.remaining != null) setChatRemaining(data.remaining)
+    setChatMessages(prev => ({
+      ...prev,
+      [roleName]: [{ text: data.reply || 'No response from AI.', suggestion: data.suggestion ?? null }],
+    }))
+    if (data.actors?.length) {
+      const picks = data.actors
+        .filter((name: string) => !blockedActors.has(name))
+        .map((name: string) => actors.find(a => a.name === name))
+        .filter((a): a is CastActor => Boolean(a))
+      setVisibleActors(uniqueByName(picks))
+      setIsFiltered(true)
+      setSuggestedPerRole(prev => {
+        const existing = prev[roleName] ?? []
+        const existingNames = new Set(existing.map(a => a.name))
+        return { ...prev, [roleName]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
+      })
+    }
+  }
+
+  // Pre-fetch all role descriptions in parallel on mount
+  useEffect(() => {
+    if (prefetchFiredRef.current || challenge) return
+    prefetchFiredRef.current = true
+
+    const rolesToFetch = roles.filter(r => !(preloadedSuggestions[r.role_name]?.length))
+    for (const role of rolesToFetch) {
+      prefetchedRef.current[role.role_name] = 'loading'
+      fetch('/api/role-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'describe',
+          role: role.role_name,
+          movie: title,
+          movieSlug: slug,
+          originalActor: role.original_actor,
+          roleTier: role.tier,
+          budget,
+          useSonnet: false,
+        }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.limitReached) { setChatLimitReached(true); prefetchedRef.current[role.role_name] = 'error'; return }
+          if (data.remaining != null) setChatRemaining(data.remaining)
+          prefetchedRef.current[role.role_name] = { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: data.suggestion ?? null, remaining: data.remaining }
+          // If this is the active role and chat is still empty, apply immediately
+          if (role.role_name === activeRole) {
+            applyDescribeResult(role.role_name, prefetchedRef.current[role.role_name] as any)
+            setAiLoading(false)
+          }
+        })
+        .catch(() => { prefetchedRef.current[role.role_name] = 'error' })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Fetch role description when active role changes
   useEffect(() => {
     setQuery('')
@@ -233,7 +295,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       setAiLoading(false)
       return
     } else if (challenge) {
-      // For challenges the actor pool IS the suggestion list — show everyone
       const available = actors.filter(a => !blockedActors.has(a.name))
       setVisibleActors(available)
       setIsFiltered(true)
@@ -245,6 +306,21 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     const role = roles.find(r => r.role_name === activeRole)
     if (!role) return
 
+    // Check if already prefetched
+    const cached = prefetchedRef.current[activeRole]
+    if (cached && cached !== 'loading' && cached !== 'error') {
+      applyDescribeResult(activeRole, cached)
+      setAiLoading(false)
+      return
+    }
+
+    // Still loading from prefetch — wait for it (show spinner, prefetch will apply when done)
+    if (cached === 'loading') {
+      setAiLoading(true)
+      return
+    }
+
+    // Not prefetched (e.g. challenge mode or error) — fetch now
     setAiLoading(true)
     let cancelled = false
 
@@ -269,24 +345,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         if (data.limitReached) { setChatLimitReached(true); setAiLoading(false); return }
         if (data.sonnetLimitReached) { setSonnetLimitReached(true) }
         if (data.remaining != null) setChatRemaining(data.remaining)
-        const reply = data.reply || data.error || 'No response from AI.'
-        setChatMessages(prev => ({
-          ...prev,
-          [activeRole]: [{ text: reply, suggestion: data.suggestion ?? null }],
-        }))
-        if (data.actors?.length) {
-          const picks = (data.actors as string[])
-            .filter(name => !blockedActors.has(name))
-            .map(name => actors.find(a => a.name === name))
-            .filter((a): a is CastActor => Boolean(a))
-          setVisibleActors(uniqueByName(picks))
-          setIsFiltered(true)
-          setSuggestedPerRole(prev => {
-            const existing = prev[activeRole] ?? []
-            const existingNames = new Set(existing.map(a => a.name))
-            return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
-          })
-        }
+        applyDescribeResult(activeRole, { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: data.suggestion ?? null, remaining: data.remaining })
       })
       .catch(err => {
         if (cancelled) return
