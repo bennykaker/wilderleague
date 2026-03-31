@@ -35,6 +35,9 @@ export interface Title {
   franchise: string | null
   rt_score: number | null
   awards: string | null
+  casting_brief: string | null
+  reboot_potential: number | null
+  reboot_notes: string | null
 }
 
 export interface Role {
@@ -55,6 +58,7 @@ const TITLE_COLUMNS = [
   'seasons', 'episodes', 'budget_per_episode', 'status', 'showrunner', 'network',
   'genre_tags', 'location_set', 'location_filmed', 'studio',
   'source_material', 'franchise', 'rt_score', 'awards',
+  'casting_brief', 'reboot_potential', 'reboot_notes',
 ].join(', ')
 
 async function fetchTitles(): Promise<Title[]> {
@@ -97,6 +101,9 @@ async function fetchTitles(): Promise<Title[]> {
     franchise: r.franchise ?? null,
     rt_score: r.rt_score ?? null,
     awards: r.awards ?? null,
+    casting_brief: r.casting_brief ?? null,
+    reboot_potential: r.reboot_potential ?? null,
+    reboot_notes: r.reboot_notes ?? null,
   }))
 }
 
@@ -121,7 +128,7 @@ async function fetchRoles(): Promise<Role[]> {
 }
 
 // Cache for 1 hour — revalidate when enrichment updates data
-const getCachedTitles = unstable_cache(fetchTitles, ['titles-v2'], { revalidate: 3600 })
+const getCachedTitles = unstable_cache(fetchTitles, ['titles-v3'], { revalidate: 3600 })
 const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v3'],  { revalidate: 3600 })
 
 export async function getTitles(): Promise<Title[]> {

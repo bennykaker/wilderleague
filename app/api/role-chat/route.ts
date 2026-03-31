@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import fs from 'fs'
 import path from 'path'
 import { getEnrichedActors, type EnrichedActor } from '../../data/enrichedActors'
+import { getTitle } from '../../data/titles'
 import { createClient } from '../../../lib/supabase/server'
 import { extractJson } from '../../../lib/extractJson'
 
@@ -21,6 +22,7 @@ interface RoleChatRequest {
   action: 'describe' | 'search' | 'react'
   role: string
   movie: string
+  movieSlug?: string
   originalActor: string
   roleTier?: string
   budget?: number
@@ -117,7 +119,7 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
 
 export async function POST(request: NextRequest) {
   const body = await request.json() as RoleChatRequest
-  const { action, role, movie, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [], useSonnet = false } = body
+  const { action, role, movie, movieSlug, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [], useSonnet = false } = body
 
   if (!action || !role) {
     return Response.json({ reply: '', actors: [] })
@@ -198,7 +200,10 @@ export async function POST(request: NextRequest) {
     { onConflict: 'ip,date,type' }
   )
 
-  const allActors = await getEnrichedActors()
+  const [allActors, titleData] = await Promise.all([
+    getEnrichedActors(),
+    movieSlug ? getTitle(movieSlug) : Promise.resolve(null),
+  ])
   const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
   const originalGender = originalActorData?.gender ?? undefined
   const pool = selectPool(allActors, query || role, originalGender)
@@ -226,10 +231,14 @@ export async function POST(request: NextRequest) {
     return `This is a ${tierLabel} role. Industry standard budget allocation for this tier: $${loM}–$${hiM}M (${Math.round(lo*100)}–${Math.round(hi*100)}% of total $${budget}M casting budget). Call out actors who are dramatically over or under this range.`
   })() : `This is a ${tierLabel} role.`
 
+  const castingBriefSection = (titleData as any)?.casting_brief
+    ? `\nCasting brief for this property: ${(titleData as any).casting_brief}`
+    : ''
+
   const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You use they/them pronouns. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
-
+${castingBriefSection}
 ${tierBudgetGuide}`
 
   let prompt = ''
