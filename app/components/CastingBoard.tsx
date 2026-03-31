@@ -87,6 +87,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [deepDiveRemaining, setDeepDiveRemaining] = useState<number | null>(null)
   const [deepDiveActors, setDeepDiveActors] = useState<CastActor[]>([])
   const [extraActors, setExtraActors] = useState<CastActor[]>([])
+  const [chatRemaining, setChatRemaining] = useState<number | null>(null)
+  const [chatLimitReached, setChatLimitReached] = useState(false)
+  const [useSonnet, setUseSonnet] = useState(false)
+  const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
+  const [manualSearch, setManualSearch] = useState('')
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -254,11 +259,15 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         roleTier: role.tier,
         budget,
         actors: actors.map(a => a.name),
+        useSonnet,
       }),
     })
       .then(r => r.json())
       .then(data => {
         if (cancelled) return
+        if (data.limitReached) { setChatLimitReached(true); setAiLoading(false); return }
+        if (data.sonnetLimitReached) { setSonnetLimitReached(true) }
+        if (data.remaining != null) setChatRemaining(data.remaining)
         const reply = data.reply || data.error || 'No response from AI.'
         setChatMessages(prev => ({
           ...prev,
@@ -313,9 +322,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           budget,
           query,
           excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
+          useSonnet,
         }),
       })
       const data = await res.json()
+      if (data.limitReached) { setChatLimitReached(true); return }
+      if (data.sonnetLimitReached) setSonnetLimitReached(true)
+      if (data.remaining != null) setChatRemaining(data.remaining)
       if (data.reply) {
         setChatMessages(prev => ({
           ...prev,
@@ -699,36 +712,103 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
           {/* Search — top of chat */}
           <div>
-            <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '8px', lineHeight: 1.5 }}>
-              Search by name or describe what you need — younger, cheaper, a comedian, a wildcard.
-            </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <input
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-                placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
-                style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-              />
-              <button
-                onClick={handleSearch}
-                disabled={aiLoading || !query.trim()}
-                style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
-              >
-                Ask
-              </button>
-              {isFiltered && (
-                <button
-                  onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
-                  style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
-                >
-                  Clear
-                </button>
+            {/* Counter + Sonnet toggle row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
+                {chatLimitReached
+                  ? 'Marlowe is resting — search by name below.'
+                  : 'Search by name or describe what you need — younger, cheaper, a comedian, a wildcard.'}
+              </div>
+              {chatRemaining != null && !chatLimitReached && (
+                <div style={{ fontSize: '12px', color: chatRemaining <= 10 ? '#f59e0b' : '#52525b', flexShrink: 0, marginLeft: '8px' }}>
+                  {chatRemaining} left
+                </div>
               )}
             </div>
+
+            {/* Sonnet toggle — directors only */}
+            {isDirector && !chatLimitReached && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <button
+                  onClick={() => { setUseSonnet(v => !v); setSonnetLimitReached(false) }}
+                  style={{
+                    background: useSonnet ? 'rgba(139,92,246,0.15)' : '#1a1a22',
+                    border: `1px solid ${useSonnet ? '#7c3aed' : '#3f3f46'}`,
+                    borderRadius: '8px', padding: '5px 10px', fontSize: '12px', fontWeight: 600,
+                    color: useSonnet ? '#a78bfa' : '#71717a', cursor: 'pointer',
+                  }}
+                >
+                  {useSonnet ? 'Sonnet ON' : 'Sonnet'}
+                </button>
+                {sonnetLimitReached && (
+                  <span style={{ fontSize: '12px', color: '#f59e0b' }}>Sonnet limit hit — switched to Haiku</span>
+                )}
+              </div>
+            )}
+
+            {/* Normal Marlowe search (hidden when limit reached) */}
+            {!chatLimitReached && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
+                  placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
+                  style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+                />
+                <button
+                  onClick={handleSearch}
+                  disabled={aiLoading || !query.trim()}
+                  style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
+                >
+                  Ask
+                </button>
+                {isFiltered && (
+                  <button
+                    onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
+                    style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Fail state: manual name search when limit reached */}
+            {chatLimitReached && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  value={manualSearch}
+                  onChange={e => {
+                    const val = e.target.value
+                    setManualSearch(val)
+                    if (val.trim().length >= 2) {
+                      const q = val.toLowerCase()
+                      const matches = actors.filter(a => a.name.toLowerCase().includes(q) && !blockedActors.has(a.name))
+                      setVisibleActors(matches.slice(0, 20))
+                      setIsFiltered(true)
+                    } else if (!val.trim()) {
+                      setVisibleActors([])
+                      setIsFiltered(false)
+                    }
+                  }}
+                  placeholder='Search actor by name…'
+                  style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+                />
+                {isFiltered && (
+                  <button
+                    onClick={() => { setVisibleActors([]); setIsFiltered(false); setManualSearch('') }}
+                    style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* AI chat */}
+          {/* AI chat — hidden when limit reached */}
+          {!chatLimitReached && (
           <div ref={chatContainerRef} style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, overflowY: 'auto' }}>
             {aiLoading && currentMessages.length === 0 && (
               <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
@@ -771,6 +851,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
             )}
           </div>
+          )}
 
         </div>
 
@@ -1337,9 +1418,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           budget,
           query: q,
           excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
+          useSonnet,
         }),
       })
       const data = await res.json()
+      if (data.limitReached) { setChatLimitReached(true); return }
+      if (data.sonnetLimitReached) setSonnetLimitReached(true)
+      if (data.remaining != null) setChatRemaining(data.remaining)
       if (data.reply) {
         setChatMessages(prev => ({
           ...prev,

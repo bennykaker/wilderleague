@@ -28,6 +28,7 @@ interface RoleChatRequest {
   pickedActor?: string
   pickedActorCost?: number
   excludeActors?: string[]
+  useSonnet?: boolean
 }
 
 interface RoleChatResponse {
@@ -116,7 +117,7 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
 
 export async function POST(request: NextRequest) {
   const body = await request.json() as RoleChatRequest
-  const { action, role, movie, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [] } = body
+  const { action, role, movie, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [], useSonnet = false } = body
 
   if (!action || !role) {
     return Response.json({ reply: '', actors: [] })
@@ -133,24 +134,67 @@ export async function POST(request: NextRequest) {
     isDirector = profile?.is_director ?? false
   }
 
-  // Rate limit: 5/day guests, 50/day members, 200/day directors
+  // Rolling 3-day limits: guests 50, members 300, directors 500
+  // Directors also get a Sonnet toggle with a separate 50/day hard cap
   const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
-  const chatLimit = isDirector ? 200 : isMember ? 50 : 10
   const userTierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
+
+  // Rolling 3-day window: sum counts for today and the past 2 days
   const today = new Date().toISOString().split('T')[0]
-  const { data: chatUsage } = await supabase
+  const twoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]
+  const { data: recentUsage } = await supabase
+    .from('review_usage')
+    .select('count')
+    .eq('ip', trackingKey)
+    .eq('type', 'chat')
+    .gte('date', twoDaysAgo)
+  const rollingCount = (recentUsage ?? []).reduce((sum: number, r: { count: number }) => sum + (r.count ?? 0), 0)
+  const rollingLimit = isDirector ? 500 : isMember ? 300 : 50
+
+  if (rollingCount >= rollingLimit) {
+    return Response.json({
+      error: `${userTierLabel} limit reached (${rollingLimit} Marlowe chats per 3 days).${!user ? ' Sign in for more.' : ''}`,
+      reply: '', actors: [], limitReached: true,
+      remaining: 0,
+    }, { status: 429 })
+  }
+
+  // Sonnet cap: directors only, 50/day hard cap
+  const wantsSonnet = useSonnet && isDirector
+  const SONNET_DAILY_LIMIT = 50
+  if (wantsSonnet) {
+    const { data: sonnetUsage } = await supabase
+      .from('review_usage')
+      .select('count')
+      .eq('ip', trackingKey)
+      .eq('date', today)
+      .eq('type', 'chat_sonnet')
+      .single()
+    const sonnetCount = sonnetUsage?.count ?? 0
+    if (sonnetCount >= SONNET_DAILY_LIMIT) {
+      return Response.json({
+        error: `Sonnet limit reached (${SONNET_DAILY_LIMIT}/day). Switching to Haiku.`,
+        reply: '', actors: [], sonnetLimitReached: true,
+        remaining: rollingLimit - rollingCount,
+      }, { status: 429 })
+    }
+    await supabase.from('review_usage').upsert(
+      { ip: trackingKey, date: today, type: 'chat_sonnet', count: sonnetCount + 1 },
+      { onConflict: 'ip,date,type' }
+    )
+  }
+
+  // Record haiku chat usage
+  const { data: todayUsage } = await supabase
     .from('review_usage')
     .select('count')
     .eq('ip', trackingKey)
     .eq('date', today)
     .eq('type', 'chat')
     .single()
-  const chatCount = chatUsage?.count ?? 0
-  if (chatCount >= chatLimit) {
-    return Response.json({ error: `${userTierLabel} limit reached (${chatLimit} Marlowe chats/day).${!user ? ' Sign in for more.' : ''}`, reply: '', actors: [] }, { status: 429 })
-  }
+  const todayCount = todayUsage?.count ?? 0
   await supabase.from('review_usage').upsert(
-    { ip: trackingKey, date: today, type: 'chat', count: chatCount + 1 },
+    { ip: trackingKey, date: today, type: 'chat', count: todayCount + 1 },
     { onConflict: 'ip,date,type' }
   )
 
@@ -249,7 +293,8 @@ Return ONLY this JSON (no markdown):
 }`
     }
 
-    const model = (isMember || isDirector) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+    // Haiku for everyone by default; directors can opt into Sonnet
+    const model = wantsSonnet ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
     const message = await client.messages.create({
       model,
@@ -277,6 +322,8 @@ Return ONLY this JSON (no markdown):
       reply: parsed.reply ?? '',
       actors: validActors,
       suggestion: parsed.suggestion ?? null,
+      remaining: rollingLimit - rollingCount - 1,
+      usedSonnet: wantsSonnet,
     })
   } catch (err) {
     console.error('Role chat error:', err)
