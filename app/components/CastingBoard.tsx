@@ -15,11 +15,15 @@ export type CastActor = {
   universeTags?: string[]
 }
 
+type MarloweCache = { reply: string; actors: string[]; suggestion: string | null }
+
 export type CastRole = {
   role_name: string
   original_actor: string
   original_actor_image?: string
   tier?: string
+  marlowe_cache?: MarloweCache | null
+  marlowe_quick?: Record<string, MarloweCache> | null
 }
 
 type ChatMsg = {
@@ -92,6 +96,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
+  const [isCached, setIsCached] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -245,7 +250,23 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     if (prefetchFiredRef.current || challenge) return
     prefetchFiredRef.current = true
 
-    const rolesToFetch = roles.filter(r => !(preloadedSuggestions[r.role_name]?.length))
+    // Seed the prefetch cache from DB-stored marlowe_cache first (instant, no API call)
+    for (const role of roles) {
+      if (role.marlowe_cache) {
+        prefetchedRef.current[role.role_name] = { ...role.marlowe_cache, remaining: undefined }
+      }
+    }
+
+    // Apply DB cache to the initial active role immediately
+    const firstRole = roles.find(r => r.role_name === activeRole)
+    if (firstRole?.marlowe_cache) {
+      applyDescribeResult(activeRole, { ...firstRole.marlowe_cache, remaining: undefined })
+      setIsCached(true)
+      setAiLoading(false)
+    }
+
+    // Only fetch from API for roles that have no DB cache
+    const rolesToFetch = roles.filter(r => !r.marlowe_cache && !(preloadedSuggestions[r.role_name]?.length))
     for (const role of rolesToFetch) {
       prefetchedRef.current[role.role_name] = 'loading'
       fetch('/api/role-chat', {
@@ -267,7 +288,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           if (data.limitReached) { setChatLimitReached(true); prefetchedRef.current[role.role_name] = 'error'; return }
           if (data.remaining != null) setChatRemaining(data.remaining)
           prefetchedRef.current[role.role_name] = { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: data.suggestion ?? null, remaining: data.remaining }
-          // If this is the active role and chat is still empty, apply immediately
           if (role.role_name === activeRole) {
             applyDescribeResult(role.role_name, prefetchedRef.current[role.role_name] as any)
             setAiLoading(false)
@@ -809,30 +829,68 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
 
             {/* Normal Marlowe search (hidden when limit reached) */}
             {!chatLimitReached && (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-                  placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
-                  style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-                />
-                <button
-                  onClick={handleSearch}
-                  disabled={aiLoading || !query.trim()}
-                  style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
-                >
-                  Ask
-                </button>
-                {isFiltered && (
+              <>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
+                    placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
+                    style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+                  />
                   <button
-                    onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
-                    style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                    onClick={handleSearch}
+                    disabled={aiLoading || !query.trim()}
+                    style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
                   >
-                    Clear
+                    Ask
                   </button>
-                )}
-              </div>
+                  {isFiltered && (
+                    <button
+                      onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
+                      style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* Quick search buttons — use DB cache if available, otherwise hit API */}
+                {(() => {
+                  const currentRole = roles.find(r => r.role_name === activeRole)
+                  const quickLabels = ['Younger', 'Cheaper', 'Older', 'Comedian', 'Action star']
+                  return (
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
+                      {quickLabels.map(label => {
+                        const key = label.toLowerCase()
+                        const cached = currentRole?.marlowe_quick?.[key]
+                        return (
+                          <button
+                            key={label}
+                            disabled={aiLoading}
+                            onClick={() => {
+                              if (cached) {
+                                applyDescribeResult(activeRole, cached)
+                              } else {
+                                setQuery(label)
+                                handleSearchWithQuery(label)
+                              }
+                            }}
+                            style={{ background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '5px 11px', fontSize: '13px', color: cached ? '#60a5fa' : '#a1a1aa', cursor: aiLoading ? 'not-allowed' : 'pointer', opacity: aiLoading ? 0.5 : 1 }}
+                          >
+                            {label}
+                          </button>
+                        )
+                      })}
+                      {!isCached && (
+                        <span style={{ fontSize: '12px', color: '#3f3f46', alignSelf: 'center', marginLeft: '4px' }}>
+                          Less popular titles may take a moment to load
+                        </span>
+                      )}
+                    </div>
+                  )
+                })()}
+              </>
             )}
 
             {/* Fail state: manual name search when limit reached */}

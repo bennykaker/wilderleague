@@ -48,6 +48,8 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
         original_actor: r.original_actor,
         original_actor_image: r.original_actor_image,
         tier: r.tier,
+        marlowe_cache: r.marlowe_cache ?? null,
+        marlowe_quick: r.marlowe_quick ?? null,
       }))}
       title={title.title}
       slug={slug}

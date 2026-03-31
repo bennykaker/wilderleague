@@ -40,6 +40,12 @@ export interface Title {
   reboot_notes: string | null
 }
 
+export interface MarloweCache {
+  reply: string
+  actors: string[]
+  suggestion: string | null
+}
+
 export interface Role {
   movie_slug: string
   role_name: string
@@ -48,6 +54,8 @@ export interface Role {
   tier: 'first_lead' | 'second_lead' | 'third_lead' | 'supporting'
   seasons_appeared: string | null
   display_order: number
+  marlowe_cache: MarloweCache | null
+  marlowe_quick: Record<string, MarloweCache> | null
 }
 
 const TITLE_COLUMNS = [
@@ -111,7 +119,7 @@ async function fetchRoles(): Promise<Role[]> {
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from('roles')
-    .select('title_slug, role_name, original_actor, original_actor_image, tier, seasons_appeared, display_order')
+    .select('title_slug, role_name, original_actor, original_actor_image, tier, seasons_appeared, display_order, marlowe_cache, marlowe_quick')
     .order('display_order', { ascending: true })
 
   if (error) throw new Error(`Failed to fetch roles: ${error.message}`)
@@ -124,12 +132,14 @@ async function fetchRoles(): Promise<Role[]> {
     tier: (r.tier as Role['tier']) ?? 'supporting',
     seasons_appeared: r.seasons_appeared ?? null,
     display_order: r.display_order ?? 0,
+    marlowe_cache: r.marlowe_cache ?? null,
+    marlowe_quick: r.marlowe_quick ?? null,
   }))
 }
 
 // Cache for 1 hour — revalidate when enrichment updates data
 const getCachedTitles = unstable_cache(fetchTitles, ['titles-v3'], { revalidate: 3600 })
-const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v3'],  { revalidate: 3600 })
+const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v4'],  { revalidate: 3600 })
 
 export async function getTitles(): Promise<Title[]> {
   return getCachedTitles()
