@@ -26,19 +26,20 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const suggestions = getSuggestionsForTitle(challenge.movie_slug)
   const enriched = await getEnrichedActors()
 
-  // Build actor pool: prefer known_for tag filter (after seeding), fall back to explicit list
+  // Build actor pool: filter by constraint, explicit list, or use everyone
   const isClcu = challenge.actor_filter?.known_for_tag === 'CLCU'
   const explicitNames = new Set(challenge.actor_pool.map(n => n.toLowerCase()))
+  const hasConstraint = isClcu || explicitNames.size > 0
 
-  const poolActors = enriched.filter(a => {
-    if (isClcu) {
-      // Include if known_for mentions any Chuck Lorre show
-      const knownFor = a.known_for ?? ''
-      if (CLCU_SHOWS.some(show => knownFor.includes(show))) return true
-    }
-    // Always include explicit pool names as fallback
-    return explicitNames.has(a.name.toLowerCase())
-  })
+  const poolActors = hasConstraint
+    ? enriched.filter(a => {
+        if (isClcu) {
+          const knownFor = a.known_for ?? ''
+          if (CLCU_SHOWS.some(show => knownFor.includes(show))) return true
+        }
+        return explicitNames.has(a.name.toLowerCase())
+      })
+    : enriched
 
   const actors = poolActors.map(a => ({
     id: a.tmdb_id || a.name,
@@ -65,6 +66,9 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         role_name: r.role_name,
         original_actor: r.original_actor,
         original_actor_image: r.original_actor_image,
+        tier: r.tier,
+        marlowe_cache: r.marlowe_cache ?? null,
+        marlowe_quick: r.marlowe_quick ?? null,
       }))}
       title={title.title}
       slug={challenge.movie_slug}
