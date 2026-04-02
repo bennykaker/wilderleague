@@ -42,28 +42,42 @@ interface RoleResult {
 
 async function generateRoles(title: TitleRow): Promise<RoleResult[]> {
   const isTV = title.type === 'tv'
+  const isStage = title.type === 'play' || title.type === 'musical'
+  const isBook = title.type === 'book'
 
-  const prompt = `You are a Hollywood casting database editor with encyclopedic knowledge.
+  let typeLabel: string
+  if (isTV) typeLabel = 'TV series'
+  else if (isStage) typeLabel = title.type === 'musical' ? 'stage musical' : 'stage play'
+  else if (isBook) typeLabel = 'novel'
+  else typeLabel = 'movie'
 
-List the main cast for: "${title.title}" (${isTV ? 'TV series' : 'movie'}${title.year ? `, ${title.year}` : ''}${title.seasons ? `, ${title.seasons} seasons` : ''})
+  const actorInstruction = isBook
+    ? `- original_actor: for books, use the actor from the most notable film/TV adaptation if one exists, otherwise null`
+    : isStage
+    ? `- original_actor: use the actor from the original Broadway/West End production, or the most notable film adaptation`
+    : `- original_actor should be the actor who originated the role in the ORIGINAL production`
+
+  const prompt = `You are a casting database editor with encyclopedic knowledge of film, TV, theatre, and literature.
+
+List the main characters for: "${title.title}" (${typeLabel}${title.year ? `, ${title.year}` : ''}${title.seasons ? `, ${title.seasons} seasons` : ''})
 
 Rules:
-- Include 6–12 roles for movies, 8–16 for TV shows
+- Include 6–12 roles for movies/books/stage works, 8–16 for TV shows
 - Tier definitions:
   first_lead: the undisputed protagonist(s) — max 2
-  second_lead: major supporting characters essential to the story — 2-4
+  second_lead: major characters essential to the story — 2-4
   third_lead: important recurring characters — 2-4
   supporting: notable supporting roles worth recasting
 - For TV shows, include seasons_appeared as a range e.g. "1-7" or "1-3" or "4-7"
 - role_name should be the CHARACTER name, not the actor name
-- original_actor should be the actor who originated the role in the ORIGINAL production
+${actorInstruction}
 
 Return ONLY this JSON (no markdown):
 {
   "roles": [
     {
       "role_name": "character name",
-      "original_actor": "actor full name",
+      "original_actor": "actor full name or null",
       "tier": "first_lead|second_lead|third_lead|supporting",
       "seasons_appeared": "1-3" or null
     }

@@ -114,6 +114,7 @@ async function fetchTitles(): Promise<Title[]> {
     casting_brief: r.casting_brief ?? null,
     reboot_potential: r.reboot_potential ?? null,
     reboot_notes: r.reboot_notes ?? null,
+    author: r.author ?? null,
   }))
 }
 
@@ -137,6 +138,7 @@ async function fetchRolesForSlug(slug: string): Promise<Role[]> {
     display_order: r.display_order ?? 0,
     marlowe_cache: r.marlowe_cache ?? null,
     marlowe_quick: r.marlowe_quick ?? null,
+    role_description: r.role_description ?? null,
   }))
 }
 

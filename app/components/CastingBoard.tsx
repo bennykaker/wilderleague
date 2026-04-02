@@ -19,8 +19,8 @@ type MarloweCache = { reply: string; actors: string[]; suggestion: string | null
 
 export type CastRole = {
   role_name: string
-  original_actor: string
-  original_actor_image?: string
+  original_actor: string | null
+  original_actor_image?: string | null
   tier?: string
   role_description?: string | null
   marlowe_cache?: MarloweCache | null

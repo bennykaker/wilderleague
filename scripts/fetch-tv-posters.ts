@@ -40,23 +40,26 @@ async function searchTMDB(title: string, type: string, year: number | null): Pro
   const isStage = type === 'play' || type === 'musical'
   const isTV = type === 'tv'
 
+  // Strip season qualifiers like "(Season 1)" for cleaner TMDB searches
+  const cleanTitle = title.replace(/\s*\(Season \d+\)/i, '').trim()
+
   if (isTV) {
-    return tmdbSearch('search/tv', title, year ? `&first_air_date_year=${year}` : '')
+    return tmdbSearch('search/tv', cleanTitle, year ? `&first_air_date_year=${year}` : '')
   }
 
   if (isStage) {
     // Search for the most prominent film adaptation — try with year first, then without
-    const withYear = year && year > 1900 ? await tmdbSearch('search/movie', title, `&primary_release_year=${year}`) : { poster_path: null, tmdb_id: null }
+    const withYear = year && year > 1900 ? await tmdbSearch('search/movie', cleanTitle, `&primary_release_year=${year}`) : { poster_path: null, tmdb_id: null }
     if (withYear.poster_path) return withYear
     // Try movie search without year (catches adaptations made in different years)
-    const withoutYear = await tmdbSearch('search/movie', title)
+    const withoutYear = await tmdbSearch('search/movie', cleanTitle)
     if (withoutYear.poster_path) return withoutYear
     // Last resort: try TV (e.g. filmed stage productions on streaming)
-    return tmdbSearch('search/tv', title)
+    return tmdbSearch('search/tv', cleanTitle)
   }
 
   // Regular movie
-  return tmdbSearch('search/movie', title, year ? `&primary_release_year=${year}` : '')
+  return tmdbSearch('search/movie', cleanTitle, year ? `&primary_release_year=${year}` : '')
 }
 
 async function main() {
@@ -64,6 +67,7 @@ async function main() {
     .from('titles')
     .select('slug, title, type, year, poster_path, tmdb_id')
     .or('poster_path.is.null,poster_path.eq.')
+    .neq('type', 'book')
     .order('type', { ascending: true })
 
   if (error) throw new Error(error.message)
