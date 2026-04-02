@@ -42,10 +42,17 @@ async function generateScores(
 
   const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
-  const prompt = `You are a Hollywood industry analyst reviewing a proposed cast for a reboot of "${movie}".
+  const budgetStatus = spent > budget
+    ? `$${spent - budget}M over budget`
+    : spent < budget * 0.7
+    ? `$${budget - spent}M under budget (possibly leaving money on the table)`
+    : 'budget well-managed'
+
+  const prompt = `You are Marlowe, a veteran Hollywood casting director, delivering your verdict in the production meeting. You've seen the full cast. Now you tell the truth — no softening, no encouragement, no hedging. If it's a disaster you say so. If it's a masterpiece you say that too. This is where the real notes happen.
 
 ${budgetLine}
 Industry standard allocation: 1st lead 35–40% of budget, 2nd lead 15–20%, 3rd lead 8–12%, supporting 4–8%.
+Budget status: ${budgetStatus}.
 
 Cast:
 ${castLines}
@@ -54,7 +61,8 @@ Score this cast on three dimensions (0–100 each):
 
 GREEN LIGHT SCORE — How likely is this to get made?
 High score: bankable leads, budget-appropriate spend, proven box office track records, studio-friendly package.
-Low score: risky unknowns in lead roles, budget misallocation, completion risk, unmarketable choices.
+Low score: risky unknowns in lead roles, budget misallocation, going significantly over budget tanks this score hard, unmarketable choices.
+Note: being more than 15% over budget should meaningfully hurt this score.
 
 QUALITY SCORE — How good is this film likely to be?
 High score: actors with strong dramatic range for these roles, creative/inspired choices, real chemistry potential, correct tier casting.
@@ -64,7 +72,7 @@ HEAR ME OUT SCORE — How deliciously unexpected is this cast?
 High score: genuinely surprising against-type choices that somehow make sense, combinations nobody saw coming.
 Low score: safe obvious replacements, straight swaps, no imagination.
 
-Also give a one-line Marlowe verdict (sharp, specific, max 20 words — no hedging).
+Give a one-line Marlowe verdict: sharp, specific, max 20 words. If they went significantly over budget, the verdict must mention it. No hedging.
 
 Return ONLY this JSON (no markdown):
 {
@@ -126,10 +134,12 @@ export async function POST(req: NextRequest) {
 
   let isMemberForLimit = false
   let isDirectorForLimit = false
+  let submitterUsername: string | null = null
   if (user) {
-    const { data: profileCheck } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
+    const { data: profileCheck } = await supabase.from('profiles').select('is_member, is_director, username').eq('id', user.id).single()
     isMemberForLimit = profileCheck?.is_member ?? false
     isDirectorForLimit = profileCheck?.is_director ?? false
+    submitterUsername = profileCheck?.username ?? null
   }
 
   const submitLimit = isDirectorForLimit ? 50 : isMemberForLimit ? 20 : user ? 3 : 3
@@ -178,6 +188,7 @@ export async function POST(req: NextRequest) {
   // Insert submission
   const { data, error } = await supabase.from('submissions').insert({
     user_id: user?.id ?? null,
+    username: submitterUsername,
     movie_slug,
     challenge_id: challenge_id ?? null,
     selections,

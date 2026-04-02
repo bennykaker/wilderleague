@@ -25,6 +25,36 @@ const supabase = createClient(
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 const force = process.argv.includes('--force')
 
+async function enrichBook(slug: string, title: string, author: string | null, year: number | null) {
+  const prompt = `You are a publishing and entertainment industry database editor with encyclopedic knowledge.
+
+Provide metadata for the novel: "${title}"${author ? ` by ${author}` : ''}${year ? ` (${year})` : ''}
+
+This is a BOOK, not a film. Do not invent film metadata.
+
+Return ONLY this JSON (no markdown):
+{
+  "logline": "2-sentence description of the book's premise and tone",
+  "genre_tags": "comma-separated genres, max 4 (e.g. 'romantasy,fantasy,romance')",
+  "location_set": "primary location(s) where the story takes place",
+  "awards": "notable awards won (e.g. 'Pulitzer Prize', 'Booker Prize') — null if none notable",
+  "casting_brief": "2-3 sentences on what kind of adaptation this would be and what to look for when casting — tone, physicality, chemistry needs",
+  "reboot_potential": integer 1-10 rating for how much audiences would want to see this adapted or reimagined,
+  "reboot_notes": "1 sentence on why this is or isn't a great adaptation candidate"
+}`
+
+  const msg = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 500,
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  const text = msg.content[0].type === 'text' ? msg.content[0].text : ''
+  const match = text.replace(/```json|```/g, '').trim().match(/\{[\s\S]*\}/)
+  if (!match) throw new Error(`No JSON in response: ${text.slice(0, 100)}`)
+  return JSON.parse(match[0])
+}
+
 async function enrichTitle(slug: string, title: string, type: string, year: number | null) {
   const isTV = type === 'tv'
   const isStage = type === 'play' || type === 'musical'
@@ -97,7 +127,7 @@ Return ONLY this JSON (no markdown):
 async function main() {
   let query = supabase
     .from('titles')
-    .select('slug, title, type, year')
+    .select('slug, title, type, year, author')
     .order('year', { ascending: true })
 
   if (!force) {
@@ -119,35 +149,49 @@ async function main() {
 
   for (const t of titles) {
     try {
-      const enrichment = await enrichTitle(t.slug, t.title, t.type, t.year)
+      const isBook = t.type === 'book'
+      const enrichment = isBook
+        ? await enrichBook(t.slug, t.title, (t as any).author ?? null, t.year)
+        : await enrichTitle(t.slug, t.title, t.type, t.year)
+
+      const update = isBook ? {
+        logline: enrichment.logline ?? null,
+        genre_tags: enrichment.genre_tags ?? null,
+        location_set: enrichment.location_set ?? null,
+        awards: enrichment.awards ?? null,
+        casting_brief: enrichment.casting_brief ?? null,
+        reboot_potential: enrichment.reboot_potential ?? null,
+        reboot_notes: enrichment.reboot_notes ?? null,
+        enriched_at: new Date().toISOString().slice(0, 10),
+      } : {
+        logline: enrichment.logline ?? null,
+        genre_tags: enrichment.genre_tags ?? null,
+        location_set: enrichment.location_set ?? null,
+        location_filmed: enrichment.location_filmed ?? null,
+        studio: enrichment.studio ?? null,
+        source_material: enrichment.source_material ?? null,
+        franchise: enrichment.franchise ?? null,
+        rt_score: enrichment.rt_score ?? null,
+        awards: enrichment.awards ?? null,
+        year_end: enrichment.year_end ?? null,
+        seasons: enrichment.seasons ?? null,
+        episodes: enrichment.episodes ?? null,
+        budget_per_episode: enrichment.budget_per_episode ?? null,
+        status: enrichment.status ?? null,
+        showrunner: enrichment.showrunner ?? null,
+        network: enrichment.network ?? null,
+        production_budget: enrichment.production_budget ?? null,
+        production_budget_adjusted: enrichment.production_budget_adjusted ?? null,
+        box_office_domestic: enrichment.box_office_domestic ?? null,
+        box_office_worldwide: enrichment.box_office_worldwide ?? null,
+        flop_status: enrichment.flop_status ?? null,
+        director: enrichment.director ?? null,
+        enriched_at: new Date().toISOString().slice(0, 10),
+      }
 
       const { error: updateError } = await supabase
         .from('titles')
-        .update({
-          logline: enrichment.logline ?? null,
-          genre_tags: enrichment.genre_tags ?? null,
-          location_set: enrichment.location_set ?? null,
-          location_filmed: enrichment.location_filmed ?? null,
-          studio: enrichment.studio ?? null,
-          source_material: enrichment.source_material ?? null,
-          franchise: enrichment.franchise ?? null,
-          rt_score: enrichment.rt_score ?? null,
-          awards: enrichment.awards ?? null,
-          year_end: enrichment.year_end ?? null,
-          seasons: enrichment.seasons ?? null,
-          episodes: enrichment.episodes ?? null,
-          budget_per_episode: enrichment.budget_per_episode ?? null,
-          status: enrichment.status ?? null,
-          showrunner: enrichment.showrunner ?? null,
-          network: enrichment.network ?? null,
-          production_budget: enrichment.production_budget ?? null,
-          production_budget_adjusted: enrichment.production_budget_adjusted ?? null,
-          box_office_domestic: enrichment.box_office_domestic ?? null,
-          box_office_worldwide: enrichment.box_office_worldwide ?? null,
-          flop_status: enrichment.flop_status ?? null,
-          director: enrichment.director ?? null,
-          enriched_at: new Date().toISOString().slice(0, 10),
-        })
+        .update(update)
         .eq('slug', t.slug)
 
       if (updateError) throw new Error(updateError.message)

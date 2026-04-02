@@ -18,13 +18,14 @@ export interface EnrichedActor {
   salary_confirmed?: boolean
   nationality?: string
   universe_tags?: string[]
+  race_ethnicity?: string
 }
 
 const ACTOR_COLUMNS = [
   'name', 'tmdb_id', 'headshot_url', 'popularity',
   'gender', 'birth_year', 'biography', 'known_for',
   'keywords', 'notes', 'cost', 'salary_estimate',
-  'salary_confirmed', 'casting_profile', 'nationality', 'universe_tags',
+  'salary_confirmed', 'casting_profile', 'nationality', 'universe_tags', 'race_ethnicity',
 ].join(', ')
 
 function popularityToCost(pop: number): number {
@@ -73,6 +74,7 @@ async function fetchActors(): Promise<EnrichedActor[]> {
         salary_confirmed: row.salary_confirmed ?? false,
         nationality: row.nationality ?? undefined,
         universe_tags: row.universe_tags ? row.universe_tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [],
+        race_ethnicity: row.race_ethnicity ?? undefined,
       })
     }
 

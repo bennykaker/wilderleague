@@ -243,6 +243,18 @@ const CHALLENGES: Challenge[] = [
     ends: '2026-12-31',
   },
   {
+    id: 'korean-west-wing',
+    label: 'Casting Challenge',
+    headline: 'Recast The West Wing — Korean actors only',
+    description: 'The Bartlet administration moves to the Blue House. Every role in The West Wing must be filled by a Korean actor. President Bartlet has given a speech in Seoul. CJ Cregg handles the Korean press corps. Toby has opinions about the DPRK.',
+    badge: '🇰🇷',
+    movie_slug: 'the-west-wing',
+    actor_pool: [],
+    active: true,
+    starts: '2026-04-02',
+    ends: '2026-12-31',
+  },
+  {
     id: 'breaking-westeros',
     label: 'Casting Challenge',
     headline: 'Recast Game of Thrones — Breaking Bad universe only',

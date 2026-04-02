@@ -63,6 +63,9 @@ const NEW_TITLES = [
   { slug: 'downton-abbey',            title: 'Downton Abbey',                 type: 'tv',    year: 2010, budget: 25 },
   { slug: 'sherlock',                 title: 'Sherlock',                      type: 'tv',    year: 2010, budget: 20 },
 
+  // New releases
+  { slug: 'project-hail-mary',        title: 'Project Hail Mary',             type: 'movie', year: 2025, budget: 150 },
+
   // Additional movies worth adding
   { slug: 'the-departed',             title: 'The Departed',                  type: 'movie', year: 2006, budget: 55 },
   { slug: 'fight-club',               title: 'Fight Club',                    type: 'movie', year: 1999, budget: 55 },

@@ -5,6 +5,7 @@ import Link from 'next/link'
 
 type Submission = {
   id: string
+  username: string | null
   selections: Record<string, string>
   ai_summary: string
   green_light_score: number
@@ -137,6 +138,11 @@ export default function ChallengeTop10Client({
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
+                    {sub.username && (
+                      <div style={{ fontSize: '11px', color: '#52525b', fontWeight: 600, marginBottom: '4px' }}>
+                        @{sub.username}
+                      </div>
+                    )}
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.4 }}>
                       "{sub.ai_summary}"
                     </div>

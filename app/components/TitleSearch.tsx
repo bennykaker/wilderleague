@@ -7,9 +7,10 @@ type Title = {
   slug: string
   title: string
   year: number
-  type: 'movie' | 'tv'
+  type: string
   budget: number
-  poster_path: string
+  poster_path: string | null
+  author?: string | null
 }
 
 export default function TitleSearch({ titles }: { titles: Title[] }) {
@@ -44,7 +45,7 @@ export default function TitleSearch({ titles }: { titles: Title[] }) {
       <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '16px', fontWeight: 600 }}>
         {query.trim()
           ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''}`
-          : `All titles — ${titles.length} films & shows`}
+          : `All titles — ${titles.length} films, shows & books`}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '10px' }}>
@@ -61,13 +62,32 @@ export default function TitleSearch({ titles }: { titles: Title[] }) {
             }}>
               {t.poster_path ? (
                 <img src={t.poster_path} alt={t.title} style={{ width: '44px', height: '66px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
+              ) : t.type === 'book' ? (
+                <div style={{
+                  width: '44px', height: '66px', borderRadius: '6px', flexShrink: 0,
+                  background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+                  border: '1px solid rgba(99,102,241,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4px',
+                }}>
+                  <span style={{ fontSize: '8px', color: '#a5b4fc', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                    {t.title.split(' ').slice(0, 3).join(' ')}
+                  </span>
+                </div>
               ) : (
                 <div style={{ width: '44px', height: '66px', background: '#18181b', borderRadius: '6px', flexShrink: 0 }} />
               )}
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: '15px', fontWeight: 700, color: '#f1f5f9', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
-                <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '6px' }}>{t.year} · {t.type === 'tv' ? 'TV' : 'Film'} · ${t.budget}M</div>
-                <div style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 600 }}>Recast →</div>
+                <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '6px' }}>
+                  {t.type === 'book' ? (
+                    <>{t.year} · <span style={{ color: '#818cf8' }}>Novel</span>{t.author ? ` · ${t.author}` : ''}</>
+                  ) : (
+                    <>{t.year} · {t.type === 'tv' ? 'TV' : 'Film'} · ${t.budget}M</>
+                  )}
+                </div>
+                <div style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 600 }}>
+                  {t.type === 'book' ? 'Cast it →' : 'Recast →'}
+                </div>
               </div>
             </div>
           </Link>

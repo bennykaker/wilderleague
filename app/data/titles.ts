@@ -6,7 +6,8 @@ export interface Title {
   title: string
   year: number
   year_end: number | null
-  type: 'movie' | 'tv'
+  type: 'movie' | 'tv' | 'play' | 'musical' | 'book'
+  author: string | null
   tmdb_id: string
   poster_path: string
   backdrop_path: string
@@ -49,11 +50,12 @@ export interface MarloweCache {
 export interface Role {
   movie_slug: string
   role_name: string
-  original_actor: string
-  original_actor_image: string
+  original_actor: string | null
+  original_actor_image: string | null
   tier: 'first_lead' | 'second_lead' | 'third_lead' | 'supporting'
   seasons_appeared: string | null
   display_order: number
+  role_description: string | null
   marlowe_cache: MarloweCache | null
   marlowe_quick: Record<string, MarloweCache> | null
 }
@@ -66,7 +68,7 @@ const TITLE_COLUMNS = [
   'seasons', 'episodes', 'budget_per_episode', 'status', 'showrunner', 'network',
   'genre_tags', 'location_set', 'location_filmed', 'studio',
   'source_material', 'franchise', 'rt_score', 'awards',
-  'casting_brief', 'reboot_potential', 'reboot_notes',
+  'casting_brief', 'reboot_potential', 'reboot_notes', 'author',
 ].join(', ')
 
 async function fetchTitles(): Promise<Title[]> {
@@ -119,7 +121,7 @@ async function fetchRolesForSlug(slug: string): Promise<Role[]> {
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from('roles')
-    .select('title_slug, role_name, original_actor, original_actor_image, tier, seasons_appeared, display_order, marlowe_cache, marlowe_quick')
+    .select('title_slug, role_name, original_actor, original_actor_image, tier, seasons_appeared, display_order, role_description, marlowe_cache, marlowe_quick')
     .eq('title_slug', slug)
     .order('display_order', { ascending: true })
 

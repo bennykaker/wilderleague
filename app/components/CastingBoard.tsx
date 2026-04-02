@@ -631,25 +631,28 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-                  {/* Original actor */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                    <div style={{ width: '64px', height: '90px', borderRadius: '8px', background: '#2a2a38', overflow: 'hidden', flexShrink: 0 }}>
-                      {role.original_actor_image ? (
-                        <img src={role.original_actor_image} alt={role.original_actor} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: '18px' }}>?</div>
-                      )}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '4px' }}>Original</div>
-                      <div style={{ fontSize: '15px', fontWeight: 700, color: '#94a3b8', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {role.original_actor}
+                  {/* Original actor — hidden for books (no original actor) */}
+                  {role.original_actor && (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                        <div style={{ width: '64px', height: '90px', borderRadius: '8px', background: '#2a2a38', overflow: 'hidden', flexShrink: 0 }}>
+                          {role.original_actor_image ? (
+                            <img src={role.original_actor_image} alt={role.original_actor} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: '18px' }}>?</div>
+                          )}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '4px' }}>Original</div>
+                          <div style={{ fontSize: '15px', fontWeight: 700, color: '#94a3b8', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {role.original_actor}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Arrow */}
-                  <div style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
+                      {/* Arrow */}
+                      <div style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
+                    </>
+                  )}
 
                   {/* Slots column */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>

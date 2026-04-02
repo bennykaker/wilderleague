@@ -10,9 +10,11 @@ export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   let isMember = false
+  let username: string | null = null
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_member, username').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
+    username = profile?.username ?? null
   }
   const [all] = await Promise.all([
     getTitles(),
@@ -68,7 +70,7 @@ export default async function HomePage() {
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
               </Link>
-              <AuthButton user={user ? { email: user.email, isMember } : null} />
+              <AuthButton user={user ? { email: user.email, username, isMember } : null} />
             </div>
           </div>
 
@@ -89,6 +91,17 @@ export default async function HomePage() {
                       alt={t.title}
                       style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
                     />
+                  ) : t.type === 'book' ? (
+                    <div style={{
+                      width: '100%', aspectRatio: '2/3',
+                      background: 'linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%)',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      padding: '16px 12px', textAlign: 'center', gap: '8px',
+                    }}>
+                      <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#818cf8', fontWeight: 700 }}>Novel</div>
+                      <div style={{ fontSize: '15px', fontWeight: 800, color: '#e0e7ff', lineHeight: 1.3 }}>{t.title}</div>
+                      {(t as any).author && <div style={{ fontSize: '11px', color: '#a5b4fc', lineHeight: 1.4 }}>{(t as any).author}</div>}
+                    </div>
                   ) : (
                     <div style={{ width: '100%', aspectRatio: '2/3', background: '#111115', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: '14px', padding: '12px', textAlign: 'center' }}>
                       {t.title}
@@ -96,7 +109,9 @@ export default async function HomePage() {
                   )}
                   <div style={{ padding: '10px 12px', background: '#111115' }}>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '4px' }}>{t.title}</div>
-                    <div style={{ fontSize: '13px', color: '#a1a1aa' }}>{t.year} · ${t.budget}M</div>
+                    <div style={{ fontSize: '13px', color: '#a1a1aa' }}>
+                      {t.type === 'book' ? `${t.year} · Novel` : `${t.year} · $${t.budget}M`}
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -106,7 +121,7 @@ export default async function HomePage() {
 
         {/* Searchable title list */}
         <div style={{ marginBottom: '20px' }}>
-          <TitleSearch titles={all.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path }))} />
+          <TitleSearch titles={all.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: (t as any).author ?? null }))} />
         </div>
 
       </div>

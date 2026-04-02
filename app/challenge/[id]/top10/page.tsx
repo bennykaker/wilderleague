@@ -20,7 +20,7 @@ export default async function ChallengeTop10Page({ params }: { params: Promise<{
 
   const { data: submissions } = await supabase
     .from('submissions')
-    .select('id, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award')
+    .select('id, username, selections, ai_summary, green_light_score, quality_score, hear_me_out_score, award')
     .eq('challenge_id', id)
     .eq('scored', true)
     .order('green_light_score', { ascending: false })

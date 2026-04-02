@@ -53,7 +53,7 @@ function formatActor(a: EnrichedActor): string {
 }
 
 // Pre-filter actors to a relevant subset before sending to Marlowe
-function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, limit = 200): EnrichedActor[] {
+function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = 200): EnrichedActor[] {
   const q = query.toLowerCase()
   const currentYear = new Date().getFullYear()
 
@@ -102,6 +102,17 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
 
   if (wantsCheaper) pool = pool.filter(a => a.cost <= 6)
   else if (wantsExpensive) pool = pool.filter(a => a.cost >= 10)
+  else if (roleTier && !wantsExpensive) {
+    // Cap cost for non-lead roles — no point sending $12M actors when the budget says $4–8M
+    const b = budget ?? 100
+    const tierCaps: Record<string, number> = {
+      second_lead: Math.round(b * 0.25),  // generous ceiling above the 20% guideline
+      third_lead:  Math.round(b * 0.16),
+      supporting:  Math.round(b * 0.12),
+    }
+    const cap = tierCaps[roleTier]
+    if (cap) pool = pool.filter(a => a.cost <= cap)
+  }
 
   // Detect genre hints
   const genres = ['action', 'drama', 'comedy', 'thriller', 'sci-fi', 'horror', 'romance', 'crime']
@@ -113,6 +124,18 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
 
   // If filters made the pool tiny, relax and take top by popularity
   if (pool.length < 20) pool = actors.slice(0, limit)
+
+  // Race boost: if we know the original actor's race, surface matching actors first.
+  // Keep the full pool so Marlowe has fallbacks, but matching actors occupy the top slots.
+  const wantsEthnicitySwap = /\b(any race|any ethnicity|different race|white version|black version|asian version|latino version)\b/.test(query.toLowerCase())
+  if (originalRace && originalRace !== 'white' && originalRace !== 'unknown' && !wantsEthnicitySwap) {
+    const matching = pool.filter(a => a.race_ethnicity === originalRace)
+    const rest = pool.filter(a => a.race_ethnicity !== originalRace)
+    // Fill first 2/3 of pool with matching actors, rest with everyone else
+    const matchSlice = matching.slice(0, Math.ceil(limit * 0.67))
+    const restSlice = rest.slice(0, limit - matchSlice.length)
+    return [...matchSlice, ...restSlice]
+  }
 
   return pool.slice(0, limit)
 }
@@ -206,7 +229,8 @@ export async function POST(request: NextRequest) {
   ])
   const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
   const originalGender = originalActorData?.gender ?? undefined
-  const pool = selectPool(allActors, query || role, originalGender)
+  const originalRace = originalActorData?.race_ethnicity ?? undefined
+  const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace)
   const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
   const filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
   const poolText = filteredPool.map(formatActor).join('\n')
@@ -235,11 +259,18 @@ export async function POST(request: NextRequest) {
     ? `\nCasting brief for this property: ${(titleData as any).casting_brief}`
     : ''
 
-  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You are male. You have encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are direct, confident, and occasionally withering. You do not hedge. When something is a bad idea you say so. When something is inspired you say that too.
+  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You love this work — finding the right actor for a role is one of life's genuine pleasures and you bring real enthusiasm to the hunt. You have strong opinions and encyclopedic knowledge of actors — their range, box office history, screen presence, and reputation on set. You are collaborative and fun to work with. You get excited about inspired choices. You push back on bad instincts but you do it with wit, not contempt. This is a creative conversation, not a performance review.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
+
+Race and ethnicity: You know who ${originalActor} is. Use that knowledge. When suggesting replacements, the overwhelming majority of your picks — ideally all of them — must share the same racial and ethnic background as the original actor. Do not whitewash roles. If the actor pool doesn't give you enough matching options, return fewer names and say so rather than suggesting mismatched actors. Only deviate if the director explicitly asks for a different ethnicity.
 ${castingBriefSection}
 ${tierBudgetGuide}`
+
+  const isBook = !originalActor
+  const roleContext = isBook
+    ? `an adaptation of "${movie}". The role is ${role} — a character from the book.`
+    : `a reboot of "${movie}". The role is ${role}, originally played by ${originalActor}.`
 
   let prompt = ''
 
@@ -247,13 +278,13 @@ ${tierBudgetGuide}`
     if (action === 'describe') {
       prompt = `${persona}
 
-You are working on a reboot of "${movie}". The role is ${role}, originally played by ${originalActor}.
+You are working on ${roleContext}
 
 Actor pool (suggest ONLY names that appear exactly in this list):
 ${poolText}
 
 Your tasks:
-1. Write 2 sharp sentences describing this character — their essence, what they demand from an actor, what the original performance got right or wrong.
+1. Write 2 sharp sentences describing this character — their essence, what they demand from an actor.${isBook ? ' Draw on your knowledge of the book.' : ' Note what the original performance got right or wrong.'}
 2. Pick 6–10 actors from the pool who genuinely fit — think physicality, age, screen persona, genre credibility.
 3. Write a punchy follow-up question (10–15 words) offering to go deeper.
 
@@ -267,7 +298,7 @@ Return ONLY this JSON (no markdown):
     } else if (action === 'search') {
       prompt = `${persona}
 
-You are working on a reboot of "${movie}". The role is ${role}, originally played by ${originalActor}.
+You are working on ${roleContext}
 
 The director just said: "${query}"
 
@@ -289,7 +320,7 @@ Return ONLY this JSON (no markdown):
     } else if (action === 'react') {
       prompt = `${persona}
 
-You are working on a reboot of "${movie}". The director just cast ${pickedActor} as ${role} (originally ${originalActor}).${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
+You are working on ${isBook ? `an adaptation of "${movie}"` : `a reboot of "${movie}"`}. The director just cast ${pickedActor} as ${role}${!isBook ? ` (originally ${originalActor})` : ''}.${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
 
 Give a 1–2 sentence reaction — smart move, bold risk, or mistake? Be specific about why this actor works or doesn't for this exact role. If their cost is significantly outside the expected range for a ${tierLabel}, call that out.
 

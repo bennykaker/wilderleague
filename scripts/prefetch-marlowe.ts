@@ -218,13 +218,23 @@ async function main() {
   const allActors = await fetchAllActors()
   console.log(`Loaded ${allActors.length} actors.\n`)
 
-  // Fetch all roles, joining title data for casting_brief and budget
-  const { data: roles, error } = await supabase
-    .from('roles')
-    .select('title_slug, role_name, original_actor, tier, marlowe_cache')
-    .order('title_slug', { ascending: true })
-
-  if (error) throw new Error(error.message)
+  // Fetch all roles with pagination (Supabase default limit is 1000)
+  const allRoles: any[] = []
+  let rolesFrom = 0
+  while (true) {
+    const { data: batch, error } = await supabase
+      .from('roles')
+      .select('title_slug, role_name, original_actor, tier, marlowe_cache')
+      .order('title_slug', { ascending: true })
+      .range(rolesFrom, rolesFrom + 999)
+    if (error) throw new Error(error.message)
+    if (!batch || batch.length === 0) break
+    allRoles.push(...batch)
+    if (batch.length < 1000) break
+    rolesFrom += 1000
+  }
+  const roles = allRoles
+  const error = null
 
   const { data: titles } = await supabase
     .from('titles')
@@ -256,25 +266,24 @@ async function main() {
         allActors,
       })
 
-      // Pre-compute quick searches
+      // Pre-compute quick searches in parallel
       const quickKeys = ['younger', 'cheaper', 'older', 'comedian', 'action star']
+      const quickResults = await Promise.allSettled(quickKeys.map(q =>
+        describeRole({
+          roleName: `${role.role_name} — ${q}`,
+          movie: titleData.title,
+          originalActor: role.original_actor,
+          roleTier: role.tier,
+          castingBrief: titleData.casting_brief ?? null,
+          budget: titleData.budget ?? 50,
+          allActors,
+          overrideQuery: q,
+        })
+      ))
       const marlowe_quick: Record<string, { reply: string; actors: string[]; suggestion: string | null }> = {}
-      for (const q of quickKeys) {
-        try {
-          const qResult = await describeRole({
-            roleName: `${role.role_name} — ${q}`,
-            movie: titleData.title,
-            originalActor: role.original_actor,
-            roleTier: role.tier,
-            castingBrief: titleData.casting_brief ?? null,
-            budget: titleData.budget ?? 50,
-            allActors,
-            overrideQuery: q,
-          })
-          marlowe_quick[q] = qResult
-          await new Promise(r => setTimeout(r, 120))
-        } catch { /* skip failed quick */ }
-      }
+      quickKeys.forEach((q, i) => {
+        if (quickResults[i].status === 'fulfilled') marlowe_quick[q] = (quickResults[i] as PromiseFulfilledResult<any>).value
+      })
 
       const { error: updateError } = await supabase
         .from('roles')
