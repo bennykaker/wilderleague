@@ -115,11 +115,12 @@ async function fetchTitles(): Promise<Title[]> {
   }))
 }
 
-async function fetchRoles(): Promise<Role[]> {
+async function fetchRolesForSlug(slug: string): Promise<Role[]> {
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from('roles')
     .select('title_slug, role_name, original_actor, original_actor_image, tier, seasons_appeared, display_order, marlowe_cache, marlowe_quick')
+    .eq('title_slug', slug)
     .order('display_order', { ascending: true })
 
   if (error) throw new Error(`Failed to fetch roles: ${error.message}`)
@@ -139,7 +140,14 @@ async function fetchRoles(): Promise<Role[]> {
 
 // Cache for 1 hour — revalidate when enrichment updates data
 const getCachedTitles = unstable_cache(fetchTitles, ['titles-v3'], { revalidate: 3600 })
-const getCachedRoles  = unstable_cache(fetchRoles,  ['roles-v4'],  { revalidate: 3600 })
+
+function getCachedRolesForSlug(slug: string) {
+  return unstable_cache(
+    () => fetchRolesForSlug(slug),
+    [`roles-v5-${slug}`],
+    { revalidate: 3600 }
+  )()
+}
 
 export async function getTitles(): Promise<Title[]> {
   return getCachedTitles()
@@ -151,8 +159,7 @@ export async function getTitle(slug: string): Promise<Title | null> {
 }
 
 export async function getRolesForTitle(slug: string): Promise<Role[]> {
-  const roles = await getCachedRoles()
-  return roles.filter(r => r.movie_slug === slug)
+  return getCachedRolesForSlug(slug)
 }
 
 // Suggestions remain file-based for now
