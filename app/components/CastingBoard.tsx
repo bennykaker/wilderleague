@@ -321,6 +321,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       setVisibleActors(available)
       setIsFiltered(true)
       setSuggestedPerRole(prev => ({ ...prev, [activeRole]: available }))
+      return
     } else {
       setVisibleActors([])
     }
