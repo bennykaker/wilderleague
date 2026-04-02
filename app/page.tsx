@@ -22,6 +22,14 @@ export default async function HomePage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
+      <Link href="/challenges" style={{
+        position: 'fixed', top: '20px', right: '24px', zIndex: 50,
+        background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.35)',
+        borderRadius: '10px', padding: '9px 16px', fontSize: '14px', fontWeight: 700,
+        color: '#fbbf24', textDecoration: 'none',
+      }}>
+        Casting Challenges →
+      </Link>
       <style>{`
         .title-card { transition: border-color 0.15s; }
         .title-card:hover { border-color: rgba(255,255,255,0.18) !important; }

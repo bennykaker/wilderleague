@@ -81,6 +81,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [scoreLoading, setScoreLoading] = useState(false)
+  const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
   const [showAllPassed, setShowAllPassed] = useState(false)
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
   const [showMarloweFirst, setShowMarloweFirst] = useState(false)
@@ -528,6 +530,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
             </div>
             <div style={{ fontSize: '14px', color: '#a1a1aa', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
           </div>
+          <button
+            onClick={handleScore}
+            disabled={!allRolesFilled || scoreLoading}
+            title={allRolesFilled ? 'Score your cast with AI' : 'Fill all roles to score'}
+            style={{ background: allRolesFilled ? 'rgba(251,191,36,0.1)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(251,191,36,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#fbbf24' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
+          >
+            {scoreLoading ? 'Scoring…' : 'Score my cast'}
+          </button>
           <button
             onClick={() => {
               if (Object.keys(selections).length === 0) return
@@ -1461,6 +1471,58 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         </div>
       )}
 
+      {/* Score result modal */}
+      {scoreResult && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
+          onClick={() => setScoreResult(null)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(251,191,36,0.2)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '460px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
+              {scoreResult.cached ? 'Cached score' : 'AI score'}
+            </div>
+            <div style={{ fontSize: '18px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.4, marginBottom: '28px', fontStyle: 'italic' }}>
+              "{scoreResult.ai_summary}"
+            </div>
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '28px' }}>
+              {([
+                { label: 'Greenlight', value: scoreResult.green_light_score, color: scoreResult.green_light_score >= 70 ? '#22c55e' : scoreResult.green_light_score >= 40 ? '#f59e0b' : '#ef4444' },
+                { label: 'Quality',   value: scoreResult.quality_score,      color: scoreResult.quality_score >= 70      ? '#3b82f6' : scoreResult.quality_score >= 40      ? '#f59e0b' : '#ef4444' },
+                { label: 'Hear Me Out', value: scoreResult.hear_me_out_score, color: scoreResult.hear_me_out_score >= 70 ? '#a855f7' : scoreResult.hear_me_out_score >= 40  ? '#f97316' : '#6b7280' },
+              ] as { label: string; value: number; color: string }[]).map(s => (
+                <div key={s.label} style={{ flex: 1, textAlign: 'center' }}>
+                  <div style={{ fontSize: '11px', color: '#52525b', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>{s.label}</div>
+                  <div style={{ fontSize: '40px', fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+            {scoreResult.award && (() => {
+              const AWARD_META: Record<string, { emoji: string; label: string; color: string }> = {
+                best_in_show:        { emoji: '🏆', label: 'Best in Show',            color: '#fbbf24' },
+                makable_unwatchable: { emoji: '💰', label: 'Makable but Unwatchable', color: '#f87171' },
+                genius_unmakable:    { emoji: '🧠', label: 'Genius but Unmakable',    color: '#a78bfa' },
+                hear_me_out:         { emoji: '🔮', label: 'Hear Me Out',             color: '#fb923c' },
+              }
+              const a = AWARD_META[scoreResult.award!]
+              return a ? (
+                <div style={{ textAlign: 'center', marginBottom: '24px', fontSize: '15px', fontWeight: 700, color: a.color }}>
+                  {a.emoji} {a.label}
+                </div>
+              ) : null
+            })()}
+            <button
+              onClick={() => setScoreResult(null)}
+              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '12px', color: '#94a3b8', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Submit error modal */}
       {submitError && (
         <div
@@ -1605,6 +1667,38 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       setSubmitError('Something went wrong. Try again.')
     } finally {
       setSubmitLoading(false)
+    }
+  }
+
+  // ── Score cast ──
+  async function handleScore() {
+    if (!allRolesFilled || scoreLoading) return
+    setScoreLoading(true)
+    try {
+      const primarySelections: Record<string, string> = {}
+      roles.forEach(r => {
+        const primary = selections[r.role_name]?.[0]
+        if (primary) primarySelections[r.role_name] = primary
+      })
+      const castWithDetails = roles
+        .filter(r => primarySelections[r.role_name])
+        .map(r => {
+          const actorName = primarySelections[r.role_name]
+          const actor = allActors.find(a => a.name === actorName)
+          return { role: r.role_name, tier: r.tier ?? 'supporting', actor: actorName, cost: actor?.cost ?? 0 }
+        })
+      const res = await fetch('/api/score-cast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movie_slug: slug, movie_title: title, budget, cast: castWithDetails }),
+      })
+      const data = await res.json()
+      if (res.ok) setScoreResult(data)
+      else setSubmitError(data.error ?? 'Scoring failed')
+    } catch {
+      setSubmitError('Something went wrong. Try again.')
+    } finally {
+      setScoreLoading(false)
     }
   }
 
