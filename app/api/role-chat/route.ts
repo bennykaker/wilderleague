@@ -24,6 +24,7 @@ interface RoleChatRequest {
   movie: string
   movieSlug?: string
   originalActor: string
+  roleDescription?: string | null
   roleTier?: string
   budget?: number
   query?: string
@@ -142,7 +143,7 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
 
 export async function POST(request: NextRequest) {
   const body = await request.json() as RoleChatRequest
-  const { action, role, movie, movieSlug, originalActor, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [], useSonnet = false } = body
+  const { action, role, movie, movieSlug, originalActor, roleDescription, roleTier, budget, query = '', pickedActor, pickedActorCost, excludeActors = [], useSonnet = false } = body
 
   if (!action || !role) {
     return Response.json({ reply: '', actors: [] })
@@ -269,7 +270,7 @@ ${tierBudgetGuide}`
 
   const isBook = !originalActor
   const roleContext = isBook
-    ? `an adaptation of "${movie}". The role is ${role} — a character from the book.`
+    ? `an adaptation of "${movie}". The role is ${role} — a character from the book.${roleDescription ? ` Character description: ${roleDescription}` : ''}`
     : `a reboot of "${movie}". The role is ${role}, originally played by ${originalActor}.`
 
   let prompt = ''
@@ -320,7 +321,7 @@ Return ONLY this JSON (no markdown):
     } else if (action === 'react') {
       prompt = `${persona}
 
-You are working on ${isBook ? `an adaptation of "${movie}"` : `a reboot of "${movie}"`}. The director just cast ${pickedActor} as ${role}${!isBook ? ` (originally ${originalActor})` : ''}.${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
+You are working on ${isBook ? `an adaptation of "${movie}"` : `a reboot of "${movie}"`}. The director just cast ${pickedActor} as ${role}${!isBook ? ` (originally ${originalActor})` : ''}${isBook && roleDescription ? ` (${roleDescription})` : ''}.${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
 
 Give a 1–2 sentence reaction — smart move, bold risk, or mistake? Be specific about why this actor works or doesn't for this exact role. If their cost is significantly outside the expected range for a ${tierLabel}, call that out.
 

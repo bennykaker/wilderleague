@@ -22,6 +22,7 @@ export type CastRole = {
   original_actor: string
   original_actor_image?: string
   tier?: string
+  role_description?: string | null
   marlowe_cache?: MarloweCache | null
   marlowe_quick?: Record<string, MarloweCache> | null
 }
@@ -190,6 +191,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           role: roleName,
           movie: title,
           originalActor: role?.original_actor ?? '',
+          roleDescription: role?.role_description ?? null,
           roleTier: role?.tier,
           budget,
           pickedActor: actorName,
@@ -280,6 +282,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
           movie: title,
           movieSlug: slug,
           originalActor: role.original_actor,
+          roleDescription: role.role_description ?? null,
           roleTier: role.tier,
           budget,
           useSonnet: false,

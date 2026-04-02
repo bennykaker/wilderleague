@@ -20,7 +20,9 @@ export default async function HomePage() {
     getTitles(),
     getEnrichedActors(), // warm the cache for movie pages
   ])
-  const featured = all.slice(0, 5)
+  const films = all.filter(t => t.type !== 'book')
+  const books = all.filter(t => t.type === 'book')
+  const featured = films.filter(t => t.poster_path).slice(0, 5)
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
@@ -85,28 +87,11 @@ export default async function HomePage() {
             {featured.map(t => (
               <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
                 <div className="poster-card" style={{ width: '160px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
-                  {t.poster_path ? (
-                    <img
-                      src={t.poster_path}
-                      alt={t.title}
-                      style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
-                    />
-                  ) : t.type === 'book' ? (
-                    <div style={{
-                      width: '100%', aspectRatio: '2/3',
-                      background: 'linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%)',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      padding: '16px 12px', textAlign: 'center', gap: '8px',
-                    }}>
-                      <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#818cf8', fontWeight: 700 }}>Novel</div>
-                      <div style={{ fontSize: '15px', fontWeight: 800, color: '#e0e7ff', lineHeight: 1.3 }}>{t.title}</div>
-                      {(t as any).author && <div style={{ fontSize: '11px', color: '#a5b4fc', lineHeight: 1.4 }}>{(t as any).author}</div>}
-                    </div>
-                  ) : (
-                    <div style={{ width: '100%', aspectRatio: '2/3', background: '#111115', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: '14px', padding: '12px', textAlign: 'center' }}>
-                      {t.title}
-                    </div>
-                  )}
+                  <img
+                    src={t.poster_path}
+                    alt={t.title}
+                    style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+                  />
                   <div style={{ padding: '10px 12px', background: '#111115' }}>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '4px' }}>{t.title}</div>
                     <div style={{ fontSize: '13px', color: '#a1a1aa' }}>
@@ -119,10 +104,52 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Searchable title list */}
-        <div style={{ marginBottom: '20px' }}>
-          <TitleSearch titles={all.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: (t as any).author ?? null }))} />
+        {/* Searchable films list */}
+        <div style={{ marginBottom: '64px' }}>
+          <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
         </div>
+
+        {/* BookTok section */}
+        {books.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ fontSize: '14px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#818cf8', marginBottom: '6px', fontWeight: 700 }}>
+                BookTok
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: '#f8fafc' }}>
+                  Cast the Book
+                </h2>
+                <span style={{ fontSize: '15px', color: '#71717a' }}>Dream adaptations for your favourite reads</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '14px', overflowX: 'auto', paddingBottom: '12px' }}>
+              {books.map(t => (
+                <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
+                  <div className="poster-card" style={{ width: '148px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(99,102,241,0.2)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
+                    <div style={{
+                      width: '100%', aspectRatio: '2/3',
+                      background: 'linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%)',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      padding: '14px 10px', textAlign: 'center', gap: '8px',
+                    }}>
+                      <div style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#818cf8', fontWeight: 700 }}>Novel</div>
+                      <div style={{ fontSize: '14px', fontWeight: 800, color: '#e0e7ff', lineHeight: 1.3 }}>{t.title}</div>
+                      {(t as any).author && (
+                        <div style={{ fontSize: '10px', color: '#a5b4fc', lineHeight: 1.4, marginTop: '2px' }}>{(t as any).author}</div>
+                      )}
+                    </div>
+                    <div style={{ padding: '10px 12px', background: '#0f0f14' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.3, marginBottom: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
+                      <div style={{ fontSize: '12px', color: '#818cf8' }}>Cast it →</div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </main>

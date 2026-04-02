@@ -74,7 +74,17 @@ export default function TitleSearch({ titles }: { titles: Title[] }) {
                   </span>
                 </div>
               ) : (
-                <div style={{ width: '44px', height: '66px', background: '#18181b', borderRadius: '6px', flexShrink: 0 }} />
+                <div style={{
+                  width: '44px', height: '66px', borderRadius: '6px', flexShrink: 0,
+                  background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f2027 100%)',
+                  border: '1px solid rgba(148,163,184,0.15)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px', padding: '4px',
+                }}>
+                  <span style={{ fontSize: '13px', lineHeight: 1 }}>🎬</span>
+                  <span style={{ fontSize: '7px', color: '#94a3b8', fontWeight: 700, textAlign: 'center', lineHeight: 1.3, wordBreak: 'break-word', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t.title.split(' ').slice(0, 3).join(' ')}
+                  </span>
+                </div>
               )}
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: '15px', fontWeight: 700, color: '#f1f5f9', marginBottom: '4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
