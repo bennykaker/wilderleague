@@ -77,45 +77,44 @@ export default async function HomePage() {
 
         </div>
 
-        {/* BookTok section */}
-        {books.length > 0 && (
-          <div style={{ marginBottom: '52px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div>
-                <div style={{ fontSize: '12px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#818cf8', marginBottom: '4px', fontWeight: 700 }}>BookTok</div>
-                <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, color: '#f8fafc' }}>Cast the Book</h2>
-              </div>
-              <span style={{ fontSize: '13px', color: '#52525b' }}>Dream adaptations for your favourite reads</span>
-            </div>
-            <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '12px' }}>
-              {books.map(t => (
-                <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
-                  <div className="poster-card" style={{ width: '136px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(99,102,241,0.2)', boxShadow: '0 4px 20px rgba(0,0,0,0.4)' }}>
-                    <div style={{
-                      width: '100%', aspectRatio: '2/3',
-                      background: 'linear-gradient(160deg, #1e1b4b 0%, #312e81 60%, #4c1d95 100%)',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                      padding: '12px 10px', textAlign: 'center', gap: '6px',
-                    }}>
-                      <div style={{ fontSize: '9px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#818cf8', fontWeight: 700 }}>Novel</div>
-                      <div style={{ fontSize: '13px', fontWeight: 800, color: '#e0e7ff', lineHeight: 1.3 }}>{t.title}</div>
-                      {(t as any).author && (
-                        <div style={{ fontSize: '9px', color: '#a5b4fc', lineHeight: 1.4 }}>{(t as any).author}</div>
-                      )}
-                    </div>
-                    <div style={{ padding: '8px 10px', background: '#0f0f14' }}>
-                      <div style={{ fontSize: '11px', color: '#818cf8', fontWeight: 600 }}>Cast it →</div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Two-column: films left, books right */}
+        <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
 
-        {/* Searchable films list */}
-        <div style={{ marginBottom: '20px' }}>
-          <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
+          {/* Films — 3/4 */}
+          <div style={{ flex: 3, minWidth: 0 }}>
+            <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
+          </div>
+
+          {/* Books — 1/4 */}
+          {books.length > 0 && (
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#818cf8', marginBottom: '4px', fontWeight: 700 }}>BookCast</div>
+              <div style={{ fontSize: '16px', fontWeight: 800, color: '#f8fafc', marginBottom: '14px' }}>Cast the Book</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {books.map(t => (
+                  <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none' }}>
+                    <div className="title-card" style={{
+                      display: 'flex', gap: '10px', alignItems: 'center',
+                      padding: '10px 12px', borderRadius: '10px',
+                      border: '1px solid rgba(99,102,241,0.15)',
+                      background: '#0f0f14',
+                    }}>
+                      <div style={{
+                        width: '30px', height: '44px', borderRadius: '4px', flexShrink: 0,
+                        background: 'linear-gradient(135deg, #1e1b4b 0%, #4c1d95 100%)',
+                        border: '1px solid rgba(99,102,241,0.3)',
+                      }} />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#e0e7ff', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.title}</div>
+                        {(t as any).author && <div style={{ fontSize: '11px', color: '#6366f1', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{(t as any).author}</div>}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
       </div>
