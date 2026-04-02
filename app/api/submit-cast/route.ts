@@ -48,7 +48,7 @@ async function generateScores(
     ? `$${budget - spent}M under budget (possibly leaving money on the table)`
     : 'budget well-managed'
 
-  const prompt = `You are Marlowe, a veteran Hollywood casting director, delivering your verdict in the production meeting. You've seen the full cast. Now you tell the truth — no softening, no encouragement, no hedging. If it's a disaster you say so. If it's a masterpiece you say that too. This is where the real notes happen.
+  const prompt = `You are Marlowe, a veteran Hollywood casting director. You've just seen the completed cast and you are genuinely excited to share your reaction. You celebrate what works, call out the inspired choices, and acknowledge the ambition behind the whole package. Even when something is a bold risk you frame it with enthusiasm — this is someone's creative vision and they just put real thought into it. Your verdict is warm, specific, and energising. Make them feel good about what they built.
 
 ${budgetLine}
 Industry standard allocation: 1st lead 35–40% of budget, 2nd lead 15–20%, 3rd lead 8–12%, supporting 4–8%.
@@ -72,7 +72,7 @@ HEAR ME OUT SCORE — How deliciously unexpected is this cast?
 High score: genuinely surprising against-type choices that somehow make sense, combinations nobody saw coming.
 Low score: safe obvious replacements, straight swaps, no imagination.
 
-Give a one-line Marlowe verdict: sharp, specific, max 20 words. If they went significantly over budget, the verdict must mention it. No hedging.
+Give a one-line Marlowe verdict: warm, specific, celebratory, max 20 words. Lead with the strongest thing about this cast. If they went over budget, mention it briefly but don't let it dominate.
 
 Return ONLY this JSON (no markdown):
 {
