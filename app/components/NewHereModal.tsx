@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 const STEPS = [
   { icon: '🎬', heading: 'Pick a movie', body: 'Choose from our library of films and TV shows. Every title has its original cast ready to be replaced.' },
-  { icon: '🎭', heading: 'Ask Marlowe', body: 'Our AI casting director, Marlowe, will suggest actors for each role and argue their case. Push back, ask for cheaper options, go weird — they can handle it.' },
+  { icon: '🎭', heading: 'Ask Marlowe', body: 'Our AI casting director, Marlowe, will suggest actors for each role and argue his case. Push back, ask for cheaper options, go weird — he can handle it.' },
   { icon: '🖱️', heading: 'Drag and drop your cast', body: 'Drag actors into roles. Track your budget. Add a 2nd and 3rd choice. Ban anyone you never want to see again.' },
   { icon: '🤖', heading: 'Score your cast', body: 'Have the AI score your cast at any time — Greenlight, Quality, and Hear Me Out. No submission required. Just hit Score my cast.' },
   { icon: '🎤', heading: 'Production Meeting', body: 'Submit your full cast for a deep AI breakdown from a director, executive producer, and marketing VP. Directors only.' },

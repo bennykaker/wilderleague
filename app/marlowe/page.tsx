@@ -27,13 +27,13 @@ export default async function MarlowePage() {
             Meet Marlowe.
           </h1>
           <p style={{ fontSize: '18px', color: '#a1a1aa', lineHeight: 1.7, margin: '0 0 20px' }}>
-            Marlowe is technically an AI but we like to think of them as a veteran Hollywood casting director with 30 years of strong opinions and zero patience for safe choices. They know every actor in the pool — their range, their box office history, their reputation on set, and what they bring to a room.
+            Marlowe is technically an AI but we like to think of him as a veteran Hollywood casting director with 30 years of strong opinions and zero patience for safe choices. He knows every actor in the pool — their range, their box office history, their reputation on set, and what they bring to a room.
           </p>
           <p style={{ fontSize: '18px', color: '#a1a1aa', lineHeight: 1.7, margin: '0 0 20px' }}>
-            When you open a role, Marlowe's already done their homework. They pre-select the actors they think can carry it — based on physicality, age, screen persona, and genre credibility. Not who's popular. Who fits.
+            When you open a role, Marlowe's already done his homework. He pre-selects the actors he thinks can carry it — based on physicality, age, screen persona, and genre credibility. Not who's popular. Who fits.
           </p>
           <p style={{ fontSize: '18px', color: '#a1a1aa', lineHeight: 1.7, margin: 0 }}>
-            You can push back. Ask for someone younger, cheaper, a wild card, or a specific type. Marlowe will argue with you if they think you're wrong. They'll tell you when you've made a great call too.
+            You can push back. Ask for someone younger, cheaper, a wild card, or a specific type. Marlowe will argue with you if he thinks you're wrong. He'll tell you when you've made a great call too.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export default async function MarlowePage() {
           </p>
           {!isMember && (
             <Link href="/pricing" style={{ display: 'inline-block', background: '#3b82f6', color: '#fff', textDecoration: 'none', borderRadius: '10px', padding: '13px 24px', fontSize: '15px', fontWeight: 700 }}>
-              Upgrade for $7/month →
+              Upgrade — from $3/month →
             </Link>
           )}
           {isMember && (
