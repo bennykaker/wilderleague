@@ -53,7 +53,7 @@ export default async function MembersPage({
           </div>
         ) : (
           <Link href="/pricing" style={{ display: 'inline-block', background: '#3b82f6', color: '#fff', textDecoration: 'none', borderRadius: '10px', padding: '13px 24px', fontSize: '15px', fontWeight: 700 }}>
-            Upgrade for $7/month →
+            Upgrade — from $3/month →
           </Link>
         )}
 
