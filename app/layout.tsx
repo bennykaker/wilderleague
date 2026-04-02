@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import MobileGate from "./components/MobileGate";
 import "./globals.css";
 
@@ -21,15 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-black text-white">
-        <MobileGate />
-        {children}
-        <Script
+      <head>
+        <script
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER_ID}`}
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
+      </head>
+      <body className="bg-black text-white">
+        <MobileGate />
+        {children}
       </body>
     </html>
   );
