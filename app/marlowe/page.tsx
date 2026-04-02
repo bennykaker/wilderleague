@@ -52,7 +52,7 @@ export default async function MarlowePage() {
               <div style={{ fontSize: '13px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 700, marginBottom: '8px' }}>The Director</div>
               <div style={{ fontSize: '17px', fontWeight: 700, color: '#f1f5f9', marginBottom: '10px' }}>Creative chemistry. Emotional weight. Vision.</div>
               <p style={{ fontSize: '15px', color: '#a1a1aa', lineHeight: 1.65, margin: 0 }}>
-                The director doesn't care about box office. They care whether your cast can carry the emotional weight of the material — whether the chemistry makes sense, whether the surprising choices are inspired or reckless. They'll flag the actors they've worked with before and the ones they've been avoiding for good reason.
+                She doesn't care about box office. She cares whether your cast can carry the emotional weight of the material — whether the chemistry makes sense, whether the surprising choices are inspired or reckless. She'll flag the actors she's worked with before and the ones she's been avoiding for good reason.
               </p>
             </div>
 
@@ -60,7 +60,7 @@ export default async function MarlowePage() {
               <div style={{ fontSize: '13px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 700, marginBottom: '8px' }}>The Executive Producer</div>
               <div style={{ fontSize: '17px', fontWeight: 700, color: '#f1f5f9', marginBottom: '10px' }}>Budget. Track record. Completion risk.</div>
               <p style={{ fontSize: '15px', color: '#a1a1aa', lineHeight: 1.65, margin: 0 }}>
-                The EP is looking at one thing: return on investment. Did you spend the money in the right places? Are the leads proven? Is there a risk someone on your list will blow up the production? They'll tell you if your budget allocation is smart or if you burned half of it on a marquee name who won't move the needle internationally.
+                She's looking at one thing: return on investment. Did you spend the money in the right places? Are the leads proven? Is there a risk someone on your list will blow up the production? She'll tell you if your budget allocation is smart or if you burned half of it on a marquee name who won't move the needle internationally.
               </p>
             </div>
 
@@ -68,7 +68,7 @@ export default async function MarlowePage() {
               <div style={{ fontSize: '13px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 700, marginBottom: '8px' }}>The Marketing VP</div>
               <div style={{ fontSize: '17px', fontWeight: 700, color: '#f1f5f9', marginBottom: '10px' }}>Poster potential. Four-quadrant appeal. Buzz.</div>
               <p style={{ fontSize: '15px', color: '#a1a1aa', lineHeight: 1.65, margin: 0 }}>
-                The marketing VP is already thinking about the trailer, the press junket, and which cast members will actually show up on social media. They know which actors have international pull and which ones are beloved domestically but dead on arrival in Asia. If your cast is unmarketable, they will not soften the blow.
+                He's already thinking about the trailer, the press junket, and which cast members will actually show up on social media. He knows which actors have international pull and which ones are beloved domestically but dead on arrival in Asia. If your cast is unmarketable, he will not soften the blow.
               </p>
             </div>
 

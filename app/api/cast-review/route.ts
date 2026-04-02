@@ -113,19 +113,21 @@ ${castList}${uncastList}
 
 Write three short, punchy reviews of this casting — one from each of these industry voices. Each review should be 3–5 sentences, opinionated, and reference specific casting choices by name. No hedging. These are real people with real agendas.
 
+The Director is a woman. The Executive Producer is a woman. The Marketing VP is a man.
+
 Return ONLY valid JSON, no markdown:
 {
   "director": {
     "verdict": "one-line summary (e.g. 'Inspired chaos' or 'A disaster waiting to happen')",
-    "notes": "3-5 sentences from a director's POV — creative chemistry, vision, whether the actors can carry the emotional weight, any surprising or troubling choices"
+    "notes": "3-5 sentences from a female director's POV — creative chemistry, vision, whether the actors can carry the emotional weight, any surprising or troubling choices"
   },
   "execProducer": {
     "verdict": "one-line financial verdict",
-    "notes": "3-5 sentences from an EP's POV — specifically address whether the budget allocation makes sense: is the money front-loaded on leads or wasted on supporting roles? Call out any actor whose cost is out of proportion to their billing. Comment on proven box office track record and completion risk."
+    "notes": "3-5 sentences from a female EP's POV — specifically address whether the budget allocation makes sense: is the money front-loaded on leads or wasted on supporting roles? Call out any actor whose cost is out of proportion to their billing. Comment on proven box office track record and completion risk."
   },
   "marketer": {
     "verdict": "one-line marketability verdict",
-    "notes": "3-5 sentences from a marketing VP's POV — 4-quadrant appeal, poster/trailer potential, social media buzz, international markets, press junket strength"
+    "notes": "3-5 sentences from a male marketing VP's POV — 4-quadrant appeal, poster/trailer potential, social media buzz, international markets, press junket strength"
   }
 }`
 
