@@ -23,20 +23,27 @@ const supabase = createClient(
 const TMDB_KEY = process.env.TMDB_API_KEY!
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w500'
 
-async function tmdbSearch(endpoint: string, query: string, yearParam = ''): Promise<{ poster_path: string | null; tmdb_id: string | null }> {
+interface TMDBResult {
+  poster_path: string | null
+  backdrop_path: string | null
+  tmdb_id: string | null
+}
+
+async function tmdbSearch(endpoint: string, query: string, yearParam = ''): Promise<TMDBResult> {
   const url = `https://api.themoviedb.org/3/${endpoint}?query=${encodeURIComponent(query)}${yearParam}`
   const res = await fetch(url, { headers: { Authorization: `Bearer ${TMDB_KEY}` } })
-  const data = await res.json() as { results?: Array<{ poster_path?: string; id?: number; popularity?: number }> }
+  const data = await res.json() as { results?: Array<{ poster_path?: string; backdrop_path?: string; id?: number; popularity?: number }> }
   // Pick most popular result that has a poster
   const result = data.results?.filter(r => r.poster_path).sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))[0]
-  if (!result) return { poster_path: null, tmdb_id: null }
+  if (!result) return { poster_path: null, backdrop_path: null, tmdb_id: null }
   return {
-    poster_path: `${TMDB_IMG}${result.poster_path}`,
+    poster_path: result.poster_path ? `${TMDB_IMG}${result.poster_path}` : null,
+    backdrop_path: result.backdrop_path ? `https://image.tmdb.org/t/p/original${result.backdrop_path}` : null,
     tmdb_id: result.id ? String(result.id) : null,
   }
 }
 
-async function searchTMDB(title: string, type: string, year: number | null): Promise<{ poster_path: string | null; tmdb_id: string | null }> {
+async function searchTMDB(title: string, type: string, year: number | null): Promise<TMDBResult> {
   const isStage = type === 'play' || type === 'musical'
   const isTV = type === 'tv'
 
@@ -63,20 +70,21 @@ async function searchTMDB(title: string, type: string, year: number | null): Pro
 }
 
 async function main() {
+  // Fetch titles missing poster OR backdrop (books excluded — no film poster)
   const { data: titles, error } = await supabase
     .from('titles')
-    .select('slug, title, type, year, poster_path, tmdb_id')
-    .or('poster_path.is.null,poster_path.eq.')
+    .select('slug, title, type, year, poster_path, backdrop_path, tmdb_id')
+    .or('poster_path.is.null,poster_path.eq.,backdrop_path.is.null,backdrop_path.eq.')
     .neq('type', 'book')
     .order('type', { ascending: true })
 
   if (error) throw new Error(error.message)
   if (!titles || titles.length === 0) {
-    console.log('All titles already have posters.')
+    console.log('All titles already have posters and backdrops.')
     return
   }
 
-  console.log(`Fetching posters for ${titles.length} titles...\n`)
+  console.log(`Fetching images for ${titles.length} titles...\n`)
 
   let done = 0
   let failed = 0
@@ -84,16 +92,20 @@ async function main() {
 
   for (const t of titles as any[]) {
     try {
-      const { poster_path, tmdb_id } = await searchTMDB(t.title, t.type, t.year)
+      const { poster_path, backdrop_path, tmdb_id } = await searchTMDB(t.title, t.type, t.year)
 
-      if (!poster_path) {
+      if (!poster_path && !backdrop_path) {
         notFound++
         console.log(`  ✗ Not found: ${t.title}`)
         continue
       }
 
-      const update: Record<string, string> = { poster_path }
+      const update: Record<string, string> = {}
+      if (poster_path && (!t.poster_path)) update.poster_path = poster_path
+      if (backdrop_path && (!t.backdrop_path)) update.backdrop_path = backdrop_path
       if (!t.tmdb_id && tmdb_id) update.tmdb_id = tmdb_id
+
+      if (Object.keys(update).length === 0) continue
 
       const { error: updateError } = await supabase
         .from('titles')
@@ -103,7 +115,8 @@ async function main() {
       if (updateError) throw new Error(updateError.message)
 
       done++
-      console.log(`  ✓ ${t.title} (${t.type})`)
+      const got = [poster_path ? 'poster' : null, backdrop_path ? 'backdrop' : null].filter(Boolean).join(' + ')
+      console.log(`  ✓ ${t.title} (${got})`)
 
       await new Promise(r => setTimeout(r, 250)) // rate limit
     } catch (err) {

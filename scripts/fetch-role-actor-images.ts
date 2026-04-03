@@ -63,15 +63,31 @@ async function fetchActorImage(name: string): Promise<string | null> {
   }
 }
 
-async function main() {
-  const { data: roles, error } = await supabase
-    .from('roles')
-    .select('title_slug, role_name, original_actor')
-    .or('original_actor_image.is.null,original_actor_image.eq.')
-    .order('title_slug', { ascending: true })
+async function fetchAllRoles() {
+  const PAGE = 1000
+  const all: { title_slug: string; role_name: string; original_actor: string }[] = []
+  let from = 0
+  while (true) {
+    const { data, error } = await supabase
+      .from('roles')
+      .select('title_slug, role_name, original_actor')
+      .or('original_actor_image.is.null,original_actor_image.eq.')
+      .not('original_actor', 'is', null)
+      .order('title_slug', { ascending: true })
+      .range(from, from + PAGE - 1)
+    if (error) throw new Error(error.message)
+    if (!data || data.length === 0) break
+    all.push(...data)
+    if (data.length < PAGE) break
+    from += PAGE
+  }
+  return all
+}
 
-  if (error) throw new Error(error.message)
-  if (!roles || roles.length === 0) {
+async function main() {
+  const roles = await fetchAllRoles()
+
+  if (roles.length === 0) {
     console.log('All roles already have actor images.')
     return
   }

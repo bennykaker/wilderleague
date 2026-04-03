@@ -79,17 +79,32 @@ Return ONLY a JSON object mapping id to value, like:
   return clean
 }
 
+async function fetchAll(): Promise<{ id: string; name: string; biography: string; nationality: string | null }[]> {
+  const PAGE = 1000
+  const all: { id: string; name: string; biography: string; nationality: string | null }[] = []
+  let from = 0
+  while (true) {
+    const { data, error } = await supabase
+      .from('actors')
+      .select('id, name, biography, nationality')
+      .is('race_ethnicity', null)
+      .order('popularity', { ascending: false })
+      .range(from, from + PAGE - 1)
+    if (error) { console.error(error); process.exit(1) }
+    if (!data || data.length === 0) break
+    all.push(...data)
+    if (data.length < PAGE) break
+    from += PAGE
+  }
+  return all
+}
+
 async function run() {
   console.log('Fetching actors without race_ethnicity...')
 
-  const { data: actors, error } = await supabase
-    .from('actors')
-    .select('id, name, biography, nationality')
-    .is('race_ethnicity', null)
-    .order('popularity', { ascending: false })
+  const actors = await fetchAll()
 
-  if (error) { console.error(error); process.exit(1) }
-  if (!actors || actors.length === 0) { console.log('All actors already classified.'); return }
+  if (actors.length === 0) { console.log('All actors already classified.'); return }
 
   console.log(`${actors.length} actors to classify`)
 

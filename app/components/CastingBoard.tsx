@@ -86,6 +86,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
   const [submitLoading, setSubmitLoading] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
+  const [savedId, setSavedId] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [scoreLoading, setScoreLoading] = useState(false)
   const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
@@ -556,6 +558,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           Meet Marlowe
         </a>
+        {isMember && (
+          <>
+            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+            <a href="/trophy-room" style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+              🏆 Trophy Room
+            </a>
+          </>
+        )}
         {titleType === 'book' && (
           <>
             <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
@@ -609,6 +619,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             style={{ background: allRolesFilled ? 'rgba(34,197,94,0.12)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(34,197,94,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#4ade80' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
           >
             {submitLoading ? 'Submitting…' : 'Submit cast ↑'}
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saveLoading || Object.keys(selections).length === 0}
+            title={!isMember ? 'Members can save casts to their Trophy Room' : Object.keys(selections).length === 0 ? 'Cast some roles first' : savedId ? 'Saved!' : 'Save to Trophy Room'}
+            style={{ background: savedId ? 'rgba(251,191,36,0.12)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.08)' : '#18181b', border: `1px solid ${savedId ? 'rgba(251,191,36,0.5)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.25)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: savedId ? '#fbbf24' : Object.keys(selections).length > 0 ? '#a16207' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
+          >
+            {saveLoading ? 'Saving…' : savedId ? '🏆 Saved' : isMember ? '🏆 Save cast' : '🔒 Save cast'}
           </button>
           <button
             onClick={() => setShowExportCard(true)}
@@ -1700,6 +1718,34 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   }
 
   // ── Submit cast ──
+  async function handleSave() {
+    if (saveLoading) return
+    if (!isMember) { setShowUpgradeModal(true); return }
+    setSaveLoading(true)
+    try {
+      // Build selections: only primary picks
+      const primarySelections: Record<string, string> = {}
+      for (const [role, slots] of Object.entries(selections)) {
+        if (slots[0]) primarySelections[role] = slots[0]
+      }
+      const res = await fetch('/api/save-cast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title_slug: slug,
+          title_name: title,
+          poster_path: null,
+          selections: primarySelections,
+          total_cost: spent,
+          budget,
+        }),
+      })
+      const data = await res.json()
+      if (data.id) setSavedId(data.id)
+    } catch {}
+    finally { setSaveLoading(false) }
+  }
+
   async function handleSubmit() {
     if (!allRolesFilled || submitLoading) return
     setSubmitLoading(true)
