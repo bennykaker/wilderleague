@@ -80,39 +80,47 @@ function sample<T>(arr: T[], n: number, rng: () => number = Math.random): T[] {
   return copy.slice(0, n)
 }
 
-// Sample across popularity tiers (top / mid / emerging) with random ordering.
-// 10 slots are reserved for daily-rotation actors picked by a date seed.
-// Total returned: POOL_SIZE (90 stratified + 10 daily = 100).
-const POOL_SIZE    = 100
-const DAILY_SLOTS  = 10
-const CORE_SIZE    = POOL_SIZE - DAILY_SLOTS
+// Pool composition constants.
+// A-list = $8M+ actors (Tom Cruise tier and above). Hard cap at 2 per pool —
+// the app is about discovery, not re-casting the same 20 famous faces.
+const POOL_SIZE      = 200
+const DAILY_SLOTS    = 10
+const ALIST_CAP      = 2   // max A-list actors in any pool
+const ALIST_COST     = 8   // $8M+ = A-list threshold
 
 function buildPool(pool: EnrichedActor[]): EnrichedActor[] {
   if (pool.length <= POOL_SIZE) return [...pool].sort(() => Math.random() - 0.5)
 
-  // Daily rotation: pick DAILY_SLOTS actors using today's date as a seed.
-  // Same 10 actors appear all day across all users; rotates at midnight.
+  // Separate A-list from the rest
+  const alist   = pool.filter(a => a.cost >= ALIST_COST)
+  const nonAlist = pool.filter(a => a.cost < ALIST_COST)
+
+  // Hard cap: pick at most ALIST_CAP A-listers at random
+  const alistPicks  = sample(alist, ALIST_CAP)
+  const alistNames  = new Set(alistPicks.map(a => a.name))
+
+  // Daily rotation: 10 actors from non-A-listers, same all day via date seed
   const rng = seededRng(dateSeed())
-  const daily = sample(pool, DAILY_SLOTS, rng)
+  const daily = sample(nonAlist, DAILY_SLOTS, rng)
   const dailyNames = new Set(daily.map(a => a.name))
 
-  // Stratify the remainder into thirds, sample CORE_SIZE with random ordering.
-  const rest   = pool.filter(a => !dailyNames.has(a.name))
-  const third  = Math.floor(rest.length / 3)
-  const top    = rest.slice(0, third)
-  const mid    = rest.slice(third, third * 2)
-  const bottom = rest.slice(third * 2)
-  const topN    = Math.round(CORE_SIZE * 0.40)
-  const midN    = Math.round(CORE_SIZE * 0.40)
-  const bottomN = CORE_SIZE - topN - midN
+  // Stratify remaining non-A-listers into thirds (mid-tier heavy)
+  const coreSize = POOL_SIZE - ALIST_CAP - DAILY_SLOTS
+  const stratPool = nonAlist.filter(a => !dailyNames.has(a.name) && !alistNames.has(a.name))
+  const third  = Math.floor(stratPool.length / 3)
+  const top    = stratPool.slice(0, third)
+  const mid    = stratPool.slice(third, third * 2)
+  const bottom = stratPool.slice(third * 2)
+  const topN    = Math.round(coreSize * 0.30)  // less top-tier, more mid/emerging
+  const midN    = Math.round(coreSize * 0.45)
+  const bottomN = coreSize - topN - midN
   const core = [
     ...sample(top, topN),
     ...sample(mid, midN),
     ...sample(bottom, bottomN),
   ]
 
-  // Shuffle daily actors into random positions throughout the list.
-  return [...core, ...daily].sort(() => Math.random() - 0.5)
+  return [...core, ...daily, ...alistPicks].sort(() => Math.random() - 0.5)
 }
 
 // Pre-filter actors to a relevant subset before sending to Marlowe
@@ -327,6 +335,8 @@ export async function POST(request: NextRequest) {
   const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly. You get genuinely energised by inspired choices and you're not shy about saying so. You push back on poor instincts with clarity, not cruelty. This is a professional casting session.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
+
+Discovery is the whole point: surface talented mid-tier and emerging actors the director hasn't thought of. At most 1–2 of your picks should be $8M+ stars — the rest should be working actors, character actors, and rising names who genuinely fit the role. Do not default to the most famous person in the pool. A great unexpected pick is worth ten obvious ones.
 
 Race and ethnicity: You know who ${originalActor} is. Use that knowledge. When suggesting replacements, the overwhelming majority of your picks — ideally all of them — must share the same racial and ethnic background as the original actor. Do not whitewash roles. If the actor pool doesn't give you enough matching options, return fewer names and say so rather than suggesting mismatched actors. Only deviate if the director explicitly asks for a different ethnicity.
 ${castingBriefSection}
