@@ -450,9 +450,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       if (data.sonnetLimitReached) setSonnetLimitReached(true)
       if (data.remaining != null) setChatRemaining(data.remaining)
       if (data.reply) {
+        const isFirstMessage = !(chatMessages[activeRole]?.length > 0)
+        const isNameOnly = query.trim().split(/\s+/).length <= 4 &&
+          !/\b(young|old|cheap|expensive|funny|comedy|comedian|action|drama|thriller|horror|british|australian|rising|emerging|veteran|seasoned|female|male|woman|man|black|white|asian|latino|diverse)\b/i.test(query)
+        const hint = isFirstMessage && isNameOnly ? ' You can also just describe the actor you want.' : ''
         setChatMessages(prev => ({
           ...prev,
-          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply, suggestion: data.suggestion }],
+          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply + hint, suggestion: data.suggestion }],
         }))
       }
       const pickedNames: string[] = data.actors ?? []
@@ -856,7 +860,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               <div style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
                 {chatLimitReached
                   ? 'Marlowe is resting — search by name below.'
-                  : 'Actor Search'}
+                  : 'Look for a different actor here'}
               </div>
               {chatRemaining != null && !chatLimitReached && (
                 <div style={{ fontSize: '12px', color: chatRemaining <= 10 ? '#f59e0b' : '#52525b', flexShrink: 0, marginLeft: '8px' }}>
@@ -893,7 +897,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-                    placeholder='Ask Marlowe…'
+                    placeholder='Actor search…'
                     style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
                   />
                   <button
