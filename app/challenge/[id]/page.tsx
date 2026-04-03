@@ -31,7 +31,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const explicitNames = new Set(challenge.actor_pool.map(n => n.toLowerCase()))
   const hasConstraint = isClcu || explicitNames.size > 0
 
-  const poolActors = hasConstraint
+  const poolActors = (hasConstraint
     ? enriched.filter(a => {
         if (isClcu) {
           const knownFor = a.known_for ?? ''
@@ -40,6 +40,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         return explicitNames.has(a.name.toLowerCase())
       })
     : enriched
+  ).filter(a => a.cost < 8)
 
   const actors = poolActors.map(a => ({
     id: a.tmdb_id || a.name,

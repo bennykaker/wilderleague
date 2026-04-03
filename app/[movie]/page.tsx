@@ -28,7 +28,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   }
 
   const suggestions = getSuggestionsForTitle(slug)
-  const actors = enriched.map(a => ({
+  const actors = enriched.filter(a => a.cost < 8).map(a => ({
     id: a.tmdb_id || a.name,
     name: a.name,
     image: a.headshot_url,
