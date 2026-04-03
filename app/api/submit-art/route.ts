@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendKey}` },
     body: JSON.stringify({
-      from: 'Wilder League <noreply@wilderleague.com>',
+      from: 'Wilder League <onboarding@resend.dev>',
       to: RECIPIENT,
       reply_to: email,
       subject: `Art submission: ${title}${character ? ` — ${character}` : ''} (from ${name})`,
