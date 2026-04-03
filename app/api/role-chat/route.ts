@@ -338,7 +338,10 @@ Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to c
 
 Discovery is the whole point: surface talented mid-tier and emerging actors the director hasn't thought of. At most 1–2 of your picks should be $8M+ stars — the rest should be working actors, character actors, and rising names who genuinely fit the role. Do not default to the most famous person in the pool. A great unexpected pick is worth ten obvious ones.
 
-Race and ethnicity: You know who ${originalActor} is. Use that knowledge. When suggesting replacements, the overwhelming majority of your picks — ideally all of them — must share the same racial and ethnic background as the original actor. Do not whitewash roles. If the actor pool doesn't give you enough matching options, return fewer names and say so rather than suggesting mismatched actors. Only deviate if the director explicitly asks for a different ethnicity.
+${originalRace && originalRace !== 'white' && originalRace !== 'unknown'
+  ? `Race and ethnicity: ${originalActor} is ${originalRace}. The overwhelming majority of your picks — ideally all of them — must share that background. Do not whitewash the role. If the pool doesn't give you enough matching options, return fewer names and say so. Only deviate if the director explicitly asks.`
+  : `Race and ethnicity: This role is open — cast the best actor regardless of race. Diverse suggestions are welcome and encouraged.`
+}
 ${castingBriefSection}
 ${tierBudgetGuide}`
 
