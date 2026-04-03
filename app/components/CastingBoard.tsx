@@ -987,7 +987,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           {!chatLimitReached && (
           <div ref={chatContainerRef} style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, overflowY: 'auto' }}>
             {aiLoading && currentMessages.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="marlowe-spinner" />
+                <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
+              </div>
             )}
             {currentMessages.map((msg, i) => {
               const words = msg.text.split(' ')
@@ -1024,7 +1027,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               )
             })}
             {aiLoading && currentMessages.length > 0 && (
-              <div style={{ fontSize: '14px', color: '#a1a1aa', fontStyle: 'italic' }}>Thinking…</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className="marlowe-spinner" />
+                <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
+              </div>
             )}
           </div>
           )}
@@ -1034,7 +1040,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         {/* ── Right: Actor headshots ── */}
         <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0 }}>
           <div>
-            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px' }}>
+            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {aiLoading && <div className="marlowe-spinner" />}
               {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
             </div>
             {displayActors.length > 0 && !aiLoading && (
@@ -1839,6 +1846,16 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           @keyframes actorCardPop {
             from { opacity: 0; transform: scale(0.92) translateY(4px); }
             to   { opacity: 1; transform: scale(1) translateY(0); }
+          }
+          @keyframes marloweSpinner {
+            to { transform: rotate(360deg); }
+          }
+          .marlowe-spinner {
+            width: 16px; height: 16px; border-radius: 50%;
+            border: 2px solid rgba(59,130,246,0.2);
+            border-top-color: #3b82f6;
+            animation: marloweSpinner 0.7s linear infinite;
+            flex-shrink: 0;
           }
         `}</style>
 
