@@ -13,6 +13,10 @@ export type CastActor = {
   knownFor?: string
   biography?: string
   universeTags?: string[]
+  gender?: string
+  birthYear?: string
+  keywords?: string
+  castingProfile?: string
 }
 
 type MarloweCache = { reply: string; actors: string[]; suggestion: string | null }
@@ -1106,27 +1110,35 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '14px' }}>?</div>
                     )}
                   </div>
-                  <div style={{ padding: '5px 6px 6px' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#e2e8f0', lineHeight: 1.25, marginBottom: '2px' }}>
+                  <div style={{ padding: '6px 7px 7px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: isAssigned ? '#3f3f46' : '#f1f5f9', lineHeight: 1.25, marginBottom: '3px' }}>
                       {actor.name}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
-                      <div style={{ fontSize: '12px', color: '#a1a1aa', fontVariantNumeric: 'tabular-nums' }}>
-                        ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '9px' }}> est</span>}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
+                      <div style={{ fontSize: '11px', color: '#52525b', display: 'flex', gap: '5px' }}>
+                        {actor.gender && <span>{actor.gender}</span>}
+                        {actor.birthYear && <span>b.{actor.birthYear}</span>}
+                        <span style={{ color: isAssigned ? '#3f3f46' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                          ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontWeight: 400, color: '#3f3f46' }}> est</span>}
+                        </span>
                       </div>
                       {!isAssigned && (
                         <button
                           onClick={e => { e.stopPropagation(); setConfirmBan(actor.name) }}
                           title={`Ban ${actor.name}`}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '12px', lineHeight: 1, opacity: 0.4 }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '11px', lineHeight: 1, opacity: 0.35 }}
                         >
                           🚫
                         </button>
                       )}
                     </div>
-                    {actor.knownFor && (
-                      <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                        {actor.knownFor.split(';').map((s: string) => s.trim()).filter(Boolean).slice(0, 3).join(' · ')}
+                    {actor.keywords && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                        {actor.keywords.split(';').map((t: string) => t.trim()).filter(Boolean).slice(0, 3).map(tag => (
+                          <span key={tag} style={{ fontSize: '10px', background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '1px 5px', color: '#71717a' }}>
+                            {tag}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -1818,8 +1830,23 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         )}
 
         <div style={{ padding: '14px' }}>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '4px' }}>{actor.name}</div>
-          <div style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '10px' }}>${actor.cost}M{!actor.salaryConfirmed && ' est'}</div>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '2px' }}>{actor.name}</div>
+          <div style={{ fontSize: '12px', color: '#52525b', marginBottom: '10px', display: 'flex', gap: '6px' }}>
+            {actor.gender && <span>{actor.gender}</span>}
+            {actor.birthYear && <span>b.{actor.birthYear}</span>}
+            <span style={{ color: '#4ade80', fontWeight: 700 }}>${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#52525b', fontWeight: 400 }}> est</span>}</span>
+          </div>
+
+          {actor.castingProfile && (
+            <div style={{ marginBottom: '12px', background: '#0d0f14', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+              <div style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '5px' }}>Marlowe's assessment</div>
+              <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6 }}>{actor.castingProfile}</div>
+            </div>
+          )}
+
+          {bioSnippet && (
+            <div style={{ fontSize: '12px', color: '#71717a', lineHeight: 1.6, marginBottom: '10px' }}>{bioSnippet}</div>
+          )}
 
           {knownForItems.length > 0 && (
             <div style={{ marginBottom: '10px' }}>
@@ -1852,12 +1879,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             </div>
           )}
 
-          {bioSnippet && (
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px' }}>Bio</div>
-              <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.5 }}>{bioSnippet}</div>
-            </div>
-          )}
         </div>
       </div>
     )

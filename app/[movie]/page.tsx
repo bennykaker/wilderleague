@@ -38,6 +38,10 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     knownFor: a.known_for || '',
     biography: a.biography || '',
     universeTags: a.universe_tags ?? [],
+    gender: a.gender || '',
+    birthYear: a.birth_year || '',
+    keywords: a.keywords || '',
+    castingProfile: a.casting_profile || '',
   }))
 
   return (
