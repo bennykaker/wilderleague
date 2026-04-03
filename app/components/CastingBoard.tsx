@@ -589,7 +589,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       )}
 
       {/* Body */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
         {/* ── Left: Cast board ── */}
         <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto', minHeight: 0 }}>
