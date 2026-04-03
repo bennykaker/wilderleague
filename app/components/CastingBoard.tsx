@@ -815,7 +815,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
               <div style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
                 {chatLimitReached
                   ? 'Marlowe is resting — search by name below.'
-                  : 'Search by name or describe what you need — younger, cheaper, a comedian, a wildcard.'}
+                  : 'Actor Search'}
               </div>
               {chatRemaining != null && !chatLimitReached && (
                 <div style={{ fontSize: '12px', color: chatRemaining <= 10 ? '#f59e0b' : '#52525b', flexShrink: 0, marginLeft: '8px' }}>
