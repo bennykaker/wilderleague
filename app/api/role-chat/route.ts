@@ -83,33 +83,9 @@ function sample<T>(arr: T[], n: number, rng: () => number = Math.random): T[] {
 // Pool composition constants.
 // A-list = $8M+ actors. Excluded from the default pool entirely — the app is
 // about discovery. Only included when the director explicitly asks for big names.
-const POOL_SIZE     = 200
-const DAILY_SLOTS   = 10
-const ALIST_COST    = 8    // $8M+ = A-list threshold
-const MIN_POC_SHARE = 0.20 // At least 20% of every pool must be actors of color
-
-function isPoc(a: EnrichedActor): boolean {
-  return !!a.race_ethnicity && a.race_ethnicity !== 'white' && a.race_ethnicity !== 'unknown'
-}
-
-// Guarantee MIN_POC_SHARE POC actors in the pool, pulling from sourcePool if needed.
-function topUpPoc(result: EnrichedActor[], sourcePool: EnrichedActor[], gender?: string): EnrichedActor[] {
-  const target = Math.round(result.length * MIN_POC_SHARE)
-  const pocCount = result.filter(isPoc).length
-  if (pocCount >= target) return result
-
-  const needed = target - pocCount
-  const inResult = new Set(result.map(a => a.name))
-  let extras = sourcePool.filter(a => isPoc(a) && !inResult.has(a.name))
-  if (gender) extras = extras.filter(a => a.gender?.toLowerCase() === gender.toLowerCase())
-
-  const picked = sample(extras, needed)
-  if (picked.length === 0) return result
-
-  const pickedNames = new Set(picked.map(a => a.name))
-  const trimmed = result.filter(a => !pickedNames.has(a.name)).slice(0, result.length - picked.length)
-  return [...trimmed, ...picked].sort(() => Math.random() - 0.5)
-}
+const POOL_SIZE   = 200
+const DAILY_SLOTS = 10
+const ALIST_COST  = 8   // $8M+ = A-list threshold
 
 function buildPool(pool: EnrichedActor[], includeAlist = false): EnrichedActor[] {
   // Strip A-listers unless explicitly requested
@@ -143,8 +119,7 @@ function buildPool(pool: EnrichedActor[], includeAlist = false): EnrichedActor[]
 }
 
 // Pre-filter actors to a relevant subset before sending to Marlowe.
-// allActors is the full unfiltered list used only for POC top-up.
-function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = POOL_SIZE, includeAlist = false, allActors?: EnrichedActor[]): EnrichedActor[] {
+function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = POOL_SIZE, includeAlist = false): EnrichedActor[] {
   const q = query.toLowerCase()
   const currentYear = new Date().getFullYear()
 
@@ -230,10 +205,7 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
     return [...matchPool, ...restPool].sort(() => Math.random() - 0.5)
   }
 
-  // Open role: guarantee at least 20% POC in the pool regardless of role race.
-  // Uses allActors (full list) as the top-up source so gender filter doesn't starve it.
-  const basePool = buildPool(pool, includeAlist)
-  return topUpPoc(basePool, allActors ?? pool, originalGender)
+  return buildPool(pool, includeAlist)
 }
 
 export async function POST(request: NextRequest) {
@@ -327,7 +299,7 @@ export async function POST(request: NextRequest) {
   const originalGender = originalActorData?.gender ?? undefined
   const originalRace = originalActorData?.race_ethnicity ?? undefined
   const wantsExpensive = /\b(expensive|big name|star|marquee|bankable|a.?list|household name)\b/.test((query || role).toLowerCase())
-  const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace, POOL_SIZE, wantsExpensive, allActors)
+  const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace, POOL_SIZE, wantsExpensive)
   const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
   let filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
 
@@ -377,7 +349,7 @@ Mix well-known names with mid-tier and emerging actors. If the director asks for
 
 ${originalRace && originalRace !== 'white' && originalRace !== 'unknown'
   ? `Race and ethnicity: ${originalActor} is ${originalRace}. The overwhelming majority of your picks — ideally all of them — must share that background. Do not whitewash the role. If the pool doesn't give you enough matching options, return fewer names and say so. Only deviate if the director explicitly asks.`
-  : `Race and ethnicity: This role is open — cast the best actor regardless of race. Your pool includes actors of many backgrounds. Make sure your picks reflect that diversity: at least 2–3 of your suggestions should be actors of color. Do not default to all-white suggestions.`
+  : `Race and ethnicity: This role is open — cast the best actor regardless of race.`
 }
 ${castingBriefSection}
 ${tierBudgetGuide}`
