@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getTitles } from './data/titles'
 import { getEnrichedActors } from './data/enrichedActors'
+import { getChallenges } from './data/challenges'
 import NewHereModal from './components/NewHereModal'
 import TitleSearch from './components/TitleSearch'
 import AuthButton from './components/AuthButton'
@@ -19,6 +20,7 @@ const FEATURED_SLUGS = [
 ]
 
 export default async function HomePage() {
+  const featuredChallenge = getChallenges().find(c => c.active) ?? null
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   let isMember = false
@@ -41,12 +43,27 @@ export default async function HomePage() {
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
       <Link href="/challenges" style={{
-        position: 'fixed', top: '20px', right: '24px', zIndex: 50,
-        background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.35)',
-        borderRadius: '10px', padding: '9px 16px', fontSize: '14px', fontWeight: 700,
-        color: '#fbbf24', textDecoration: 'none',
+        position: 'fixed', top: '16px', right: '24px', zIndex: 50,
+        background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.28)',
+        borderRadius: '12px', padding: '10px 16px', textDecoration: 'none',
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1px',
+        maxWidth: '260px',
       }}>
-        Casting Challenges →
+        <span style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800 }}>
+          {featuredChallenge?.badge ?? '🎬'} Challenge
+        </span>
+        {featuredChallenge ? (
+          <>
+            <span style={{ fontSize: '13px', fontWeight: 800, color: '#ede9fe', lineHeight: 1.25, textAlign: 'right' }}>
+              {featuredChallenge.teaser.split('\n')[0]}
+            </span>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a78bfa', lineHeight: 1.25, textAlign: 'right' }}>
+              {featuredChallenge.teaser.split('\n')[1]} →
+            </span>
+          </>
+        ) : (
+          <span style={{ fontSize: '13px', fontWeight: 800, color: '#a78bfa' }}>Casting Challenges →</span>
+        )}
       </Link>
       <style>{`
         .title-card { transition: border-color 0.15s; }
@@ -88,6 +105,9 @@ export default async function HomePage() {
                   🏆 Trophy Room →
                 </Link>
               )}
+              <Link href="/hall-of-fame" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
+                Hall of Fame →
+              </Link>
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
               </Link>

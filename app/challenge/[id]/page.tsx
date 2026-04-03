@@ -1,15 +1,81 @@
 import { notFound } from 'next/navigation'
 import CastingBoard from '../../components/CastingBoard'
-import { getEnrichedActors } from '../../data/enrichedActors'
+import { getEnrichedActors, type EnrichedActor } from '../../data/enrichedActors'
 import { getTitle, getRolesForTitle, getSuggestionsForTitle } from '../../data/titles'
-import { getChallenge } from '../../data/challenges'
+import { getChallenge, type ChallengeFilter } from '../../data/challenges'
 
-// Chuck Lorre shows — used to match known_for field after seed-clcu-actors runs
+// Chuck Lorre shows — matched against actor.known_for field
 const CLCU_SHOWS = [
   'The Big Bang Theory', 'Two and a Half Men', 'Mom', 'Young Sheldon',
   'Mike & Molly', 'Two Broke Girls', 'Dharma & Greg', 'Bob Hearts Abishola',
   'United States of Al', 'Ghosts (US)', 'Roseanne', 'The Kominsky Method',
 ]
+
+function actorMatchesFilter(a: EnrichedActor, filter: ChallengeFilter): boolean {
+  // CLCU special case — matched against curated show list
+  if (filter.known_for_tag === 'CLCU') {
+    const knownFor = a.known_for ?? ''
+    if (!CLCU_SHOWS.some(show => knownFor.includes(show))) return false
+  }
+
+  // known_for_shows — actor must appear in at least one listed show
+  if (filter.known_for_shows && filter.known_for_shows.length > 0) {
+    const knownFor = a.known_for ?? ''
+    if (!filter.known_for_shows.some(show => knownFor.includes(show))) return false
+  }
+
+  // universe_tag — actor.universe_tags must include the tag
+  if (filter.universe_tag) {
+    const tags = a.universe_tags ?? []
+    if (!tags.includes(filter.universe_tag)) return false
+  }
+
+  // nationality (include) — actor.nationality must contain the string
+  if (filter.nationality) {
+    const nat = (a.nationality ?? '').toLowerCase()
+    if (!nat.includes(filter.nationality.toLowerCase())) return false
+  }
+
+  // nationality_exclude — actor.nationality must NOT contain the string
+  if (filter.nationality_exclude) {
+    const nat = (a.nationality ?? '').toLowerCase()
+    if (nat.includes(filter.nationality_exclude.toLowerCase())) return false
+  }
+
+  // race_ethnicity — actor.race_ethnicity must contain the string
+  if (filter.race_ethnicity) {
+    const re = (a.race_ethnicity ?? '').toLowerCase()
+    if (!re.includes(filter.race_ethnicity.toLowerCase())) return false
+  }
+
+  // gender — exact match
+  if (filter.gender) {
+    if (a.gender !== filter.gender) return false
+  }
+
+  // birth_year_max — actor must be born in this year or earlier
+  if (filter.birth_year_max !== undefined) {
+    const by = parseInt(a.birth_year ?? '0')
+    if (!by || by > filter.birth_year_max) return false
+  }
+
+  // birth_year_min — actor must be born in this year or later
+  if (filter.birth_year_min !== undefined) {
+    const by = parseInt(a.birth_year ?? '0')
+    if (!by || by < filter.birth_year_min) return false
+  }
+
+  // keywords_include — actor.keywords must contain the string
+  if (filter.keywords_include) {
+    const kw = (a.keywords ?? '').toLowerCase()
+    const bio = (a.biography ?? '').toLowerCase()
+    const cp = (a.casting_profile ?? '').toLowerCase()
+    const needle = filter.keywords_include.toLowerCase()
+    if (!kw.includes(needle) && !bio.includes(needle) && !cp.includes(needle)) return false
+  }
+
+  return true
+}
 
 export default async function ChallengePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -26,18 +92,18 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   const suggestions = getSuggestionsForTitle(challenge.movie_slug)
   const enriched = await getEnrichedActors()
 
-  // Build actor pool: filter by constraint, explicit list, or use everyone
-  const isClcu = challenge.actor_filter?.known_for_tag === 'CLCU'
+  // Build actor pool
   const explicitNames = new Set(challenge.actor_pool.map(n => n.toLowerCase()))
-  const hasConstraint = isClcu || explicitNames.size > 0
+  const hasFilter = !!challenge.actor_filter && Object.keys(challenge.actor_filter).length > 0
+  const hasConstraint = hasFilter || explicitNames.size > 0
 
   const poolActors = (hasConstraint
     ? enriched.filter(a => {
-        if (isClcu) {
-          const knownFor = a.known_for ?? ''
-          if (CLCU_SHOWS.some(show => knownFor.includes(show))) return true
-        }
-        return explicitNames.has(a.name.toLowerCase())
+        // Explicit names always pass
+        if (explicitNames.has(a.name.toLowerCase())) return true
+        // Apply data-driven filter
+        if (hasFilter) return actorMatchesFilter(a, challenge.actor_filter!)
+        return false
       })
     : enriched
   ).filter(a => a.cost < 8)

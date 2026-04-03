@@ -127,6 +127,34 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (cached) {
+    // Determine user for backfill
+    const cookieStore2 = await cookies()
+    const userSupabase2 = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore2.getAll() },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore2.set(name, value, options))
+          },
+        },
+      }
+    )
+    const { data: { user: cachedUser } } = await userSupabase2.auth.getUser()
+    if (cachedUser) {
+      await serviceSupabase
+        .from('saved_casts')
+        .update({
+          ai_score: cached.green_light_score,
+          quality_score: cached.quality_score,
+          hear_me_out_score: cached.hear_me_out_score,
+          ai_summary: cached.ai_summary,
+        })
+        .eq('user_id', cachedUser.id)
+        .eq('cast_key', key)
+        .is('ai_score', null)
+    }
     return NextResponse.json({ ...cached, cached: true })
   }
 
@@ -192,6 +220,20 @@ export async function POST(req: NextRequest) {
       hear_me_out_score: result.hear_me_out_score,
       award,
     })
+
+    // Backfill scores onto any saved cast with matching key (for this user)
+    if (user) {
+      await serviceSupabase
+        .from('saved_casts')
+        .update({
+          ai_score: result.green_light_score,
+          quality_score: result.quality_score,
+          hear_me_out_score: result.hear_me_out_score,
+          ai_summary: result.summary,
+        })
+        .eq('user_id', user.id)
+        .eq('cast_key', key)
+    }
 
     return NextResponse.json({ ...result, award, cached: false })
   } catch (e) {

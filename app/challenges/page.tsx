@@ -12,14 +12,14 @@ export default function ChallengesPage() {
           <Link href="/" style={{ fontSize: '13px', color: '#71717a', fontWeight: 600, textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>
             ← Home
           </Link>
-          <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '10px', fontWeight: 700 }}>
+          <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#8b5cf6', marginBottom: '10px', fontWeight: 700 }}>
             Challenges
           </div>
           <h1 style={{ fontSize: '36px', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.05 }}>
-            Weekly Challenges
+            Casting Challenges
           </h1>
           <p style={{ fontSize: '15px', color: '#71717a', margin: 0 }}>
-            Constrained casting challenges. See how your cast stacks up.
+            Constrained casting. One rule changes everything.
           </p>
         </div>
 
@@ -35,24 +35,29 @@ export default function ChallengesPage() {
             <div
               key={challenge.id}
               style={{
-                border: '1px solid rgba(251,191,36,0.25)',
+                border: '1px solid rgba(139,92,246,0.2)',
                 borderRadius: '16px',
                 padding: '24px',
-                background: 'rgba(251,191,36,0.04)',
+                background: 'rgba(139,92,246,0.04)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                 <span style={{ fontSize: '22px' }}>{challenge.badge}</span>
-                <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', color: '#7c3aed', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                   {challenge.label}
                 </span>
               </div>
 
-              <div style={{ fontSize: '20px', fontWeight: 800, color: '#fef3c7', lineHeight: 1.3, marginBottom: '8px' }}>
-                {challenge.headline}
+              <div style={{ marginBottom: '12px' }}>
+                <div style={{ fontSize: '22px', fontWeight: 900, color: '#ede9fe', lineHeight: 1.2 }}>
+                  {challenge.teaser.split('\n')[0]}
+                </div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#a78bfa', lineHeight: 1.2 }}>
+                  {challenge.teaser.split('\n')[1]}
+                </div>
               </div>
 
-              <div style={{ fontSize: '14px', color: '#d97706', lineHeight: 1.6, marginBottom: '20px' }}>
+              <div style={{ fontSize: '14px', color: '#c4b5fd', lineHeight: 1.6, marginBottom: '20px', opacity: 0.75 }}>
                 {challenge.description}
               </div>
 
@@ -61,13 +66,13 @@ export default function ChallengesPage() {
                   href={`/challenge/${challenge.id}`}
                   style={{
                     display: 'inline-block',
-                    background: 'rgba(251,191,36,0.12)',
-                    border: '1px solid rgba(251,191,36,0.35)',
+                    background: 'rgba(139,92,246,0.14)',
+                    border: '1px solid rgba(139,92,246,0.35)',
                     borderRadius: '8px',
                     padding: '9px 16px',
                     fontSize: '14px',
                     fontWeight: 700,
-                    color: '#fbbf24',
+                    color: '#a78bfa',
                     textDecoration: 'none',
                   }}
                 >

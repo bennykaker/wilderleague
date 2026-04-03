@@ -23,10 +23,10 @@ const SORT_OPTIONS: { key: SortKey; label: string; color: string }[] = [
 ]
 
 const AWARD_META: Record<string, { emoji: string; label: string; color: string }> = {
-  best_in_show:        { emoji: '🏆', label: 'Best in Show',            color: '#fbbf24' },
+  best_in_show:        { emoji: '🏆', label: 'Best in Show',            color: '#a78bfa' },
   makable_unwatchable: { emoji: '💰', label: 'Makable but Unwatchable', color: '#f87171' },
   genius_unmakable:    { emoji: '🧠', label: 'Genius but Unmakable',    color: '#a78bfa' },
-  hear_me_out:         { emoji: '🔮', label: 'Hear Me Out',             color: '#fb923c' },
+  hear_me_out:         { emoji: '🔮', label: 'Hear Me Out',             color: '#a855f7' },
 }
 
 function scoreColor(value: number, key: SortKey) {
@@ -67,7 +67,7 @@ export default function ChallengeTop10Client({
           <Link href="/challenges" style={{ fontSize: '13px', color: '#71717a', fontWeight: 600, textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>
             ← Challenges
           </Link>
-          <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '10px', fontWeight: 700 }}>
+          <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#8b5cf6', marginBottom: '10px', fontWeight: 700 }}>
             Top 10
           </div>
           <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 6px', lineHeight: 1.1 }}>
@@ -107,7 +107,7 @@ export default function ChallengeTop10Client({
             <div style={{ fontSize: '32px', marginBottom: '12px' }}>🎬</div>
             <div style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>No scored submissions yet</div>
             <div style={{ fontSize: '14px', marginBottom: '24px' }}>Be the first to cast this challenge</div>
-            <Link href={`/challenge/${challengeId}`} style={{ fontSize: '13px', fontWeight: 700, color: '#fbbf24', textDecoration: 'none' }}>
+            <Link href={`/challenge/${challengeId}`} style={{ fontSize: '13px', fontWeight: 700, color: '#a78bfa', textDecoration: 'none' }}>
               Take the challenge →
             </Link>
           </div>
@@ -133,7 +133,7 @@ export default function ChallengeTop10Client({
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
                   {/* Rank number */}
-                  <div style={{ fontSize: '22px', fontWeight: 900, color: i === 0 ? '#fbbf24' : '#3f3f46', minWidth: '28px', lineHeight: 1, paddingTop: '1px' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 900, color: i === 0 ? '#a78bfa' : '#3f3f46', minWidth: '28px', lineHeight: 1, paddingTop: '1px' }}>
                     {i + 1}
                   </div>
 
@@ -226,7 +226,7 @@ export default function ChallengeTop10Client({
           <div style={{ marginTop: '32px', textAlign: 'center' }}>
             <Link
               href={`/challenge/${challengeId}`}
-              style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24', textDecoration: 'none' }}
+              style={{ fontSize: '14px', fontWeight: 700, color: '#a78bfa', textDecoration: 'none' }}
             >
               Take the challenge →
             </Link>

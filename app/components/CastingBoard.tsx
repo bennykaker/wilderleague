@@ -106,7 +106,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
-  const [isCached, setIsCached] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -304,7 +303,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     const firstRole = roles.find(r => r.role_name === activeRole)
     if (firstRole?.marlowe_cache) {
       applyDescribeResult(activeRole, { ...firstRole.marlowe_cache, remaining: undefined })
-      setIsCached(true)
       setAiLoading(false)
     }
 
@@ -345,6 +343,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   useEffect(() => {
     setQuery('')
     setIsFiltered(false)
+    setShowAllPassed(false)
+    setShowDeepDive(false)
+    setExpandedMessages(new Set())
+    setDeepDiveQuery('')
+    setDeepDiveActors([])
     setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
 
     const preloaded = (preloadedSuggestions[activeRole] ?? [])
@@ -566,6 +569,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             </a>
           </>
         )}
+        <>
+          <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+          <a href={`/${slug}/hall-of-fame`} style={{ color: '#71717a', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+            Hall of Fame
+          </a>
+        </>
         {titleType === 'book' && (
           <>
             <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
@@ -645,13 +654,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
 
       {/* Challenge banner */}
       {challenge && (
-        <div style={{ padding: '10px 24px', background: 'rgba(251,191,36,0.07)', borderBottom: '1px solid rgba(251,191,36,0.2)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+        <div style={{ padding: '10px 24px', background: 'rgba(139,92,246,0.07)', borderBottom: '1px solid rgba(139,92,246,0.18)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
           <span style={{ fontSize: '20px' }}>{challenge.badge}</span>
           <div>
-            <span style={{ fontSize: '14px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
-            <span style={{ fontSize: '14px', color: '#fef3c7', fontWeight: 700 }}>{challenge.headline}</span>
+            <span style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
+            <span style={{ fontSize: '14px', color: '#ede9fe', fontWeight: 700 }}>{challenge.headline}</span>
           </div>
-          <div style={{ fontSize: '14px', color: '#d97706', marginLeft: '4px' }}>— {challenge.description}</div>
+          <div style={{ fontSize: '13px', color: '#a78bfa', marginLeft: '4px', opacity: 0.8 }}>— {challenge.description}</div>
         </div>
       )}
 
@@ -939,41 +948,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                   )}
                 </div>
 
-                {/* Quick search buttons — use DB cache if available, otherwise hit API */}
-                {(() => {
-                  const currentRole = roles.find(r => r.role_name === activeRole)
-                  const quickLabels = ['Younger', 'Cheaper', 'Older', 'Comedian', 'Action star']
-                  return (
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '8px' }}>
-                      {quickLabels.map(label => {
-                        const key = label.toLowerCase()
-                        const cached = currentRole?.marlowe_quick?.[key]
-                        return (
-                          <button
-                            key={label}
-                            disabled={aiLoading}
-                            onClick={() => {
-                              if (cached) {
-                                applyDescribeResult(activeRole, cached)
-                              } else {
-                                setQuery(label)
-                                handleSearchWithQuery(label)
-                              }
-                            }}
-                            style={{ background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '5px 11px', fontSize: '13px', color: cached ? '#60a5fa' : '#a1a1aa', cursor: aiLoading ? 'not-allowed' : 'pointer', opacity: aiLoading ? 0.5 : 1 }}
-                          >
-                            {label}
-                          </button>
-                        )
-                      })}
-                      {!isCached && (
-                        <span style={{ fontSize: '12px', color: '#3f3f46', alignSelf: 'center', marginLeft: '4px' }}>
-                          Less popular titles may take a moment to load
-                        </span>
-                      )}
-                    </div>
-                  )
-                })()}
               </>
             )}
 
@@ -1565,10 +1539,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           onClick={() => setScoreResult(null)}
         >
           <div
-            style={{ background: '#111115', border: '1px solid rgba(251,191,36,0.2)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '460px' }}
+            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '460px' }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
+            <div style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
               {scoreResult.cached ? 'Cached score' : 'AI score'}
             </div>
             <div style={{ fontSize: '18px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.4, marginBottom: '28px', fontStyle: 'italic' }}>
@@ -1588,10 +1562,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             </div>
             {scoreResult.award && (() => {
               const AWARD_META: Record<string, { emoji: string; label: string; color: string }> = {
-                best_in_show:        { emoji: '🏆', label: 'Best in Show',            color: '#fbbf24' },
+                best_in_show:        { emoji: '🏆', label: 'Best in Show',            color: '#a78bfa' },
                 makable_unwatchable: { emoji: '💰', label: 'Makable but Unwatchable', color: '#f87171' },
                 genius_unmakable:    { emoji: '🧠', label: 'Genius but Unmakable',    color: '#a78bfa' },
-                hear_me_out:         { emoji: '🔮', label: 'Hear Me Out',             color: '#fb923c' },
+                hear_me_out:         { emoji: '🔮', label: 'Hear Me Out',             color: '#a855f7' },
               }
               const a = AWARD_META[scoreResult.award!]
               return a ? (
