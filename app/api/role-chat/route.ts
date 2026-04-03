@@ -329,7 +329,20 @@ export async function POST(request: NextRequest) {
   const wantsExpensive = /\b(expensive|big name|star|marquee|bankable|a.?list|household name)\b/.test((query || role).toLowerCase())
   const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace, POOL_SIZE, wantsExpensive, allActors)
   const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
-  const filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
+  let filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
+
+  // If the query looks like a specific actor name, guarantee they're in the pool
+  // so Marlowe can actually suggest them rather than saying they're unavailable.
+  const queryTrimmed = (query || '').trim()
+  const looksLikeName = queryTrimmed.split(/\s+/).length >= 2 && queryTrimmed.split(/\s+/).length <= 4 &&
+    !/\b(younger|older|cheaper|expensive|funny|comedy|comedian|action|drama|thriller|british|australian|rising|emerging|veteran|female|male|woman|man|black|white|asian|latino|diverse)\b/i.test(queryTrimmed)
+  if (looksLikeName) {
+    const namedActor = allActors.find(a => a.name.toLowerCase() === queryTrimmed.toLowerCase())
+    if (namedActor && !filteredPool.some(a => a.name === namedActor.name)) {
+      filteredPool = [namedActor, ...filteredPool]
+    }
+  }
+
   const poolText = filteredPool.map(formatActor).join('\n')
   const allNames = new Set(allActors.map(a => a.name))
 
@@ -356,11 +369,11 @@ export async function POST(request: NextRequest) {
     ? `\nCasting brief for this property: ${(titleData as any).casting_brief}`
     : ''
 
-  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly. You get genuinely energised by inspired choices and you're not shy about saying so. You push back on poor instincts with clarity, not cruelty. This is a professional casting session.
+  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly. You get genuinely energised by inspired choices and you're not shy about saying so. You are collaborative, not combative — your job is to help the director find the right actor, not to gatekeep. This is a professional casting session.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
 
-Discovery is the whole point: surface talented mid-tier and emerging actors the director hasn't thought of. At most 1–2 of your picks should be $8M+ stars — the rest should be working actors, character actors, and rising names who genuinely fit the role. Do not default to the most famous person in the pool. A great unexpected pick is worth ten obvious ones.
+Mix well-known names with mid-tier and emerging actors. If the director asks for a specific actor by name and that actor appears in the pool, always include them — your job is to help the director explore, not to veto their instincts. Save strong opinions for cases where budget or fit is genuinely off.
 
 ${originalRace && originalRace !== 'white' && originalRace !== 'unknown'
   ? `Race and ethnicity: ${originalActor} is ${originalRace}. The overwhelming majority of your picks — ideally all of them — must share that background. Do not whitewash the role. If the pool doesn't give you enough matching options, return fewer names and say so. Only deviate if the director explicitly asks.`
@@ -408,9 +421,9 @@ Actor pool (suggest ONLY names that appear exactly in this list):
 ${poolText}
 
 Your tasks:
-1. Pick 6–10 actors from the pool who genuinely match this request. Be rigorous — if only 4 truly fit, return 4.
-2. Give a 1–2 sentence reaction: is this a smart instinct, a bold swing, or a safe play? Be specific.
-3. Optionally write a pointed follow-up question (10–15 words), or null.
+1. Pick 6–10 actors from the pool who match this request. If the director named a specific actor and they're in the pool, include them. If only 4 genuinely fit, return 4.
+2. Give a 1–2 sentence reaction — what works about these picks, what to watch out for. Be specific and encouraging.
+3. Optionally write a follow-up question (10–15 words) to go deeper, or null.
 
 Return ONLY this JSON (no markdown):
 {
@@ -424,9 +437,9 @@ Return ONLY this JSON (no markdown):
 
 You are working on ${isBook ? `an adaptation of "${movie}"` : `a reboot of "${movie}"`}. The director just cast ${pickedActor} as ${role}${!isBook ? ` (originally ${originalActor})` : ''}${isBook && roleDescription ? ` (${roleDescription})` : ''}.${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
 
-Give a 1–2 sentence reaction — smart move, bold risk, or mistake? Be specific about why this actor works or doesn't for this exact role. If their cost is significantly outside the expected range for a ${tierLabel}, call that out.
+Give a 1–2 sentence reaction — what makes this casting work, and any honest caveats (age, budget, range). Be specific about why this actor fits or where the challenge lies. If their cost is significantly outside the expected range for a ${tierLabel}, mention it.
 
-Then write a sharp follow-up suggestion (10–15 words).
+Then write a follow-up suggestion (10–15 words).
 
 Return ONLY this JSON (no markdown):
 {
