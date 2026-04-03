@@ -81,37 +81,32 @@ function sample<T>(arr: T[], n: number, rng: () => number = Math.random): T[] {
 }
 
 // Pool composition constants.
-// A-list = $8M+ actors (Tom Cruise tier and above). Hard cap at 2 per pool —
-// the app is about discovery, not re-casting the same 20 famous faces.
-const POOL_SIZE      = 200
-const DAILY_SLOTS    = 10
-const ALIST_CAP      = 2   // max A-list actors in any pool
-const ALIST_COST     = 8   // $8M+ = A-list threshold
+// A-list = $8M+ actors. Excluded from the default pool entirely — the app is
+// about discovery. Only included when the director explicitly asks for big names.
+const POOL_SIZE  = 200
+const DAILY_SLOTS = 10
+const ALIST_COST  = 8   // $8M+ = A-list threshold
 
-function buildPool(pool: EnrichedActor[]): EnrichedActor[] {
-  if (pool.length <= POOL_SIZE) return [...pool].sort(() => Math.random() - 0.5)
+function buildPool(pool: EnrichedActor[], includeAlist = false): EnrichedActor[] {
+  // Strip A-listers unless explicitly requested
+  const source = includeAlist ? pool : pool.filter(a => a.cost < ALIST_COST)
+  const working = source.length >= 20 ? source : pool  // fallback if filtered pool too small
 
-  // Separate A-list from the rest
-  const alist   = pool.filter(a => a.cost >= ALIST_COST)
-  const nonAlist = pool.filter(a => a.cost < ALIST_COST)
+  if (working.length <= POOL_SIZE) return [...working].sort(() => Math.random() - 0.5)
 
-  // Hard cap: pick at most ALIST_CAP A-listers at random
-  const alistPicks  = sample(alist, ALIST_CAP)
-  const alistNames  = new Set(alistPicks.map(a => a.name))
-
-  // Daily rotation: 10 actors from non-A-listers, same all day via date seed
+  // Daily rotation: 10 actors, same all day via date seed
   const rng = seededRng(dateSeed())
-  const daily = sample(nonAlist, DAILY_SLOTS, rng)
+  const daily = sample(working, DAILY_SLOTS, rng)
   const dailyNames = new Set(daily.map(a => a.name))
 
-  // Stratify remaining non-A-listers into thirds (mid-tier heavy)
-  const coreSize = POOL_SIZE - ALIST_CAP - DAILY_SLOTS
-  const stratPool = nonAlist.filter(a => !dailyNames.has(a.name) && !alistNames.has(a.name))
+  // Stratify remainder into thirds (mid-tier heavy)
+  const coreSize = POOL_SIZE - DAILY_SLOTS
+  const stratPool = working.filter(a => !dailyNames.has(a.name))
   const third  = Math.floor(stratPool.length / 3)
   const top    = stratPool.slice(0, third)
   const mid    = stratPool.slice(third, third * 2)
   const bottom = stratPool.slice(third * 2)
-  const topN    = Math.round(coreSize * 0.30)  // less top-tier, more mid/emerging
+  const topN    = Math.round(coreSize * 0.30)
   const midN    = Math.round(coreSize * 0.45)
   const bottomN = coreSize - topN - midN
   const core = [
@@ -120,11 +115,11 @@ function buildPool(pool: EnrichedActor[]): EnrichedActor[] {
     ...sample(bottom, bottomN),
   ]
 
-  return [...core, ...daily, ...alistPicks].sort(() => Math.random() - 0.5)
+  return [...core, ...daily].sort(() => Math.random() - 0.5)
 }
 
 // Pre-filter actors to a relevant subset before sending to Marlowe
-function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = POOL_SIZE): EnrichedActor[] {
+function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = POOL_SIZE, includeAlist = false): EnrichedActor[] {
   const q = query.toLowerCase()
   const currentYear = new Date().getFullYear()
 
@@ -201,16 +196,16 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
   const wantsEthnicitySwap = /\b(any race|any ethnicity|different race|white version|black version|asian version|latino version)\b/.test(query.toLowerCase())
   if (originalRace && originalRace !== 'white' && originalRace !== 'unknown' && !wantsEthnicitySwap) {
     const matching = pool.filter(a => a.race_ethnicity === originalRace)
-    if (matching.length >= 15) return buildPool(matching)
+    if (matching.length >= 15) return buildPool(matching, includeAlist)
     // Not enough matching — fill remaining slots from the rest
     const rest = pool.filter(a => a.race_ethnicity !== originalRace)
     const matchCount = Math.ceil(limit * 0.67)
-    const matchPool = buildPool(matching).slice(0, matchCount)
-    const restPool  = buildPool(rest).slice(0, limit - matchPool.length)
+    const matchPool = buildPool(matching, includeAlist).slice(0, matchCount)
+    const restPool  = buildPool(rest, includeAlist).slice(0, limit - matchPool.length)
     return [...matchPool, ...restPool].sort(() => Math.random() - 0.5)
   }
 
-  return buildPool(pool)
+  return buildPool(pool, includeAlist)
 }
 
 export async function POST(request: NextRequest) {
@@ -303,7 +298,8 @@ export async function POST(request: NextRequest) {
   const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
   const originalGender = originalActorData?.gender ?? undefined
   const originalRace = originalActorData?.race_ethnicity ?? undefined
-  const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace)
+  const wantsExpensive = /\b(expensive|big name|star|marquee|bankable|a.?list|household name)\b/.test((query || role).toLowerCase())
+  const pool = selectPool(allActors, query || role, originalGender, roleTier, budget, originalRace, POOL_SIZE, wantsExpensive)
   const excludeSet = new Set(excludeActors.map((n: string) => n.toLowerCase()))
   const filteredPool = excludeSet.size > 0 ? pool.filter(a => !excludeSet.has(a.name.toLowerCase())) : pool
   const poolText = filteredPool.map(formatActor).join('\n')
