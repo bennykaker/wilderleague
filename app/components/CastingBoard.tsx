@@ -852,7 +852,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-                    placeholder='Younger? Cheaper? Funnier? Ask Marlowe…'
+                    placeholder='Ask Marlowe…'
                     style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
                   />
                   <button
