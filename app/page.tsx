@@ -6,6 +6,18 @@ import TitleSearch from './components/TitleSearch'
 import AuthButton from './components/AuthButton'
 import { createClient } from '../lib/supabase/server'
 
+const FEATURED_SLUGS = [
+  'the-matrix',
+  'american-beauty',
+  'spider-man-homecoming',
+  'parks-and-recreation',
+  'the-office',
+  'casino-royale',
+  'chinatown',
+  'ferris-buellers-day-off',
+  'fight-club',
+]
+
 export default async function HomePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -20,6 +32,9 @@ export default async function HomePage() {
     getTitles(),
     getEnrichedActors(), // warm the cache for movie pages
   ])
+
+  const titleMap = new Map(all.map(t => [t.slug, t]))
+  const featured = FEATURED_SLUGS.map(s => titleMap.get(s)).filter(Boolean) as typeof all
   const films = all.filter(t => t.type !== 'book')
   const books = all.filter(t => t.type === 'book')
 
@@ -36,13 +51,13 @@ export default async function HomePage() {
       <style>{`
         .title-card { transition: border-color 0.15s; }
         .title-card:hover { border-color: rgba(255,255,255,0.18) !important; }
-        .poster-card { transition: transform 0.15s, box-shadow 0.15s; }
-        .poster-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.6) !important; }
+        .featured-card { transition: transform 0.18s, box-shadow 0.18s; }
+        .featured-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.7) !important; }
       `}</style>
 
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
 
-        {/* Header row: branding + weekly challenge */}
+        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', marginBottom: '52px' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '14px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '12px', fontWeight: 700 }}>
@@ -77,18 +92,67 @@ export default async function HomePage() {
               <AuthButton user={user ? { email: user.email, username, isMember } : null} />
             </div>
           </div>
-
         </div>
 
-        {/* Two-column: films left, books right */}
-        <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+        {/* Two-column layout: main left, books right */}
+        <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
 
-          {/* Films — 3/4 */}
+          {/* Left: featured + full search */}
           <div style={{ flex: 3, minWidth: 0 }}>
-            <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
+
+            {/* Featured titles — poster grid */}
+            <div style={{ marginBottom: '52px' }}>
+              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '18px', fontWeight: 600 }}>
+                Start here
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                {featured.map(t => (
+                  <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="featured-card" style={{
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      background: '#111115',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                    }}>
+                      {t.poster_path ? (
+                        <img
+                          src={t.poster_path}
+                          alt={t.title}
+                          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '100%', aspectRatio: '2/3',
+                          background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f2027 100%)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <span style={{ fontSize: '32px' }}>🎬</span>
+                        </div>
+                      )}
+                      <div style={{ padding: '12px 14px 14px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '3px', lineHeight: 1.3 }}>{t.title}</div>
+                        <div style={{ fontSize: '12px', color: '#71717a' }}>
+                          {t.year} · {t.type === 'tv' ? 'TV' : 'Film'} · ${t.budget}M
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Full searchable library */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '40px' }}>
+              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '18px', fontWeight: 600 }}>
+                Full library
+              </div>
+              <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
+            </div>
+
           </div>
 
-          {/* Books — 1/4 */}
+          {/* Books — right column */}
           {books.length > 0 && (
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#818cf8', marginBottom: '4px', fontWeight: 700 }}>BookCast</div>

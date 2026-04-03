@@ -15,6 +15,8 @@ import { createClient } from '@supabase/supabase-js'
 import { extractJson } from '../lib/extractJson'
 
 const FORCE = process.argv.includes('--force')
+const ONLY_ARG = process.argv.find(a => a.startsWith('--only='))
+const ONLY_SLUGS = ONLY_ARG ? new Set(ONLY_ARG.replace('--only=', '').split(',')) : null
 
 const envPath = path.join(process.cwd(), '.env.local')
 if (fs.existsSync(envPath)) {
@@ -247,9 +249,10 @@ async function main() {
 
   const titleMap = new Map((titles ?? []).map((t: any) => [t.slug, t]))
 
-  const toProcess = FORCE
+  const toProcess = (FORCE
     ? roles ?? []
     : (roles ?? []).filter((r: any) => !r.marlowe_cache)
+  ).filter((r: any) => !ONLY_SLUGS || ONLY_SLUGS.has(r.title_slug))
 
   console.log(`${toProcess.length} roles to process (${FORCE ? 'force mode' : 'skipping cached'}).\n`)
 
