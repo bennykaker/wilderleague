@@ -47,14 +47,76 @@ function formatActor(a: EnrichedActor): string {
   if (a.gender) meta.push(a.gender)
   if (a.birth_year) meta.push(`b.${a.birth_year}`)
   meta.push(`$${a.cost}M`)
+  if (a.race_ethnicity && a.race_ethnicity !== 'unknown') meta.push(a.race_ethnicity)
   if (meta.length) parts.push(`(${meta.join(', ')})`)
   if (a.known_for) parts.push(`known for: ${a.known_for}`)
   if (a.keywords) parts.push(`[${a.keywords}]`)
   return parts.join(' — ')
 }
 
+// Deterministic seeded RNG — same sequence for a given seed (used for daily rotation).
+function seededRng(seed: number) {
+  let s = seed | 0
+  return () => {
+    s = Math.imul(s ^ (s >>> 15), s | 1)
+    s ^= s + Math.imul(s ^ (s >>> 7), s | 61)
+    return ((s ^ (s >>> 14)) >>> 0) / 0x100000000
+  }
+}
+
+// Date string → integer seed (e.g. "2026-04-03" → 20260403)
+function dateSeed(): number {
+  return parseInt(new Date().toISOString().slice(0, 10).replace(/-/g, ''), 10)
+}
+
+// Sample n items from arr using the provided RNG (or Math.random if omitted).
+function sample<T>(arr: T[], n: number, rng: () => number = Math.random): T[] {
+  if (arr.length <= n) return arr
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy.slice(0, n)
+}
+
+// Sample across popularity tiers (top / mid / emerging) with random ordering.
+// 10 slots are reserved for daily-rotation actors picked by a date seed.
+// Total returned: POOL_SIZE (90 stratified + 10 daily = 100).
+const POOL_SIZE    = 100
+const DAILY_SLOTS  = 10
+const CORE_SIZE    = POOL_SIZE - DAILY_SLOTS
+
+function buildPool(pool: EnrichedActor[]): EnrichedActor[] {
+  if (pool.length <= POOL_SIZE) return [...pool].sort(() => Math.random() - 0.5)
+
+  // Daily rotation: pick DAILY_SLOTS actors using today's date as a seed.
+  // Same 10 actors appear all day across all users; rotates at midnight.
+  const rng = seededRng(dateSeed())
+  const daily = sample(pool, DAILY_SLOTS, rng)
+  const dailyNames = new Set(daily.map(a => a.name))
+
+  // Stratify the remainder into thirds, sample CORE_SIZE with random ordering.
+  const rest   = pool.filter(a => !dailyNames.has(a.name))
+  const third  = Math.floor(rest.length / 3)
+  const top    = rest.slice(0, third)
+  const mid    = rest.slice(third, third * 2)
+  const bottom = rest.slice(third * 2)
+  const topN    = Math.round(CORE_SIZE * 0.40)
+  const midN    = Math.round(CORE_SIZE * 0.40)
+  const bottomN = CORE_SIZE - topN - midN
+  const core = [
+    ...sample(top, topN),
+    ...sample(mid, midN),
+    ...sample(bottom, bottomN),
+  ]
+
+  // Shuffle daily actors into random positions throughout the list.
+  return [...core, ...daily].sort(() => Math.random() - 0.5)
+}
+
 // Pre-filter actors to a relevant subset before sending to Marlowe
-function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = 200): EnrichedActor[] {
+function selectPool(actors: EnrichedActor[], query: string, originalGender?: string, roleTier?: string, budget?: number, originalRace?: string, limit = POOL_SIZE): EnrichedActor[] {
   const q = query.toLowerCase()
   const currentYear = new Date().getFullYear()
 
@@ -123,22 +185,24 @@ function selectPool(actors: EnrichedActor[], query: string, originalGender?: str
     if (genreMatches.length >= 20) pool = genreMatches
   }
 
-  // If filters made the pool tiny, relax and take top by popularity
-  if (pool.length < 20) pool = actors.slice(0, limit)
+  // If filters made the pool tiny, relax to full actor list
+  if (pool.length < 20) pool = actors
 
-  // Race boost: if we know the original actor's race, surface matching actors first.
-  // Keep the full pool so Marlowe has fallbacks, but matching actors occupy the top slots.
+  // Race: if original actor's race is known and non-white, restrict pool to matching race only
+  // (or front-load if not enough matching actors exist).
   const wantsEthnicitySwap = /\b(any race|any ethnicity|different race|white version|black version|asian version|latino version)\b/.test(query.toLowerCase())
   if (originalRace && originalRace !== 'white' && originalRace !== 'unknown' && !wantsEthnicitySwap) {
     const matching = pool.filter(a => a.race_ethnicity === originalRace)
+    if (matching.length >= 15) return buildPool(matching)
+    // Not enough matching — fill remaining slots from the rest
     const rest = pool.filter(a => a.race_ethnicity !== originalRace)
-    // Fill first 2/3 of pool with matching actors, rest with everyone else
-    const matchSlice = matching.slice(0, Math.ceil(limit * 0.67))
-    const restSlice = rest.slice(0, limit - matchSlice.length)
-    return [...matchSlice, ...restSlice]
+    const matchCount = Math.ceil(limit * 0.67)
+    const matchPool = buildPool(matching).slice(0, matchCount)
+    const restPool  = buildPool(rest).slice(0, limit - matchPool.length)
+    return [...matchPool, ...restPool].sort(() => Math.random() - 0.5)
   }
 
-  return pool.slice(0, limit)
+  return buildPool(pool)
 }
 
 export async function POST(request: NextRequest) {

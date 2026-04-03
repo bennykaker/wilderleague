@@ -28,7 +28,7 @@ async function generateDescriptions(bookTitle: string, roles: { id: number; role
 
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 600,
+    max_tokens: 2048,
     messages: [{
       role: 'user',
       content: `You are a casting database editor. For the novel "${bookTitle}", write a 1-sentence character description for each of these roles. Focus on their personality, arc, and what kind of actor they demand.

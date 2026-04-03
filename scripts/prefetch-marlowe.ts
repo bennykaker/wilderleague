@@ -108,16 +108,18 @@ async function fetchAllActors(): Promise<ActorRow[]> {
 async function describeRole(params: {
   roleName: string
   movie: string
-  originalActor: string
+  originalActor: string | null
+  roleDescription?: string | null
   roleTier: string
   castingBrief: string | null
   budget: number
   allActors: ActorRow[]
   overrideQuery?: string
 }): Promise<{ reply: string; actors: string[]; suggestion: string | null }> {
-  const { roleName, movie, originalActor, roleTier, castingBrief, budget, allActors, overrideQuery } = params
+  const { roleName, movie, originalActor, roleDescription, roleTier, castingBrief, budget, allActors, overrideQuery } = params
+  const isBook = !originalActor
 
-  const originalActorData = allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase())
+  const originalActorData = originalActor ? allActors.find(a => a.name.toLowerCase() === originalActor.toLowerCase()) : undefined
   const originalGender = originalActorData?.gender ?? undefined
   const pool = selectPool(allActors, overrideQuery ?? roleName, originalGender)
   const poolText = pool.map(formatActor).join('\n')
@@ -140,18 +142,21 @@ async function describeRole(params: {
 
   const castingBriefSection = castingBrief ? `\nCasting brief for this property: ${castingBrief}` : ''
 
-  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience and strong opinions. You use they/them pronouns. Direct, confident, occasionally withering. You do not hedge.
+  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Current year: ${new Date().getFullYear()}.
 ${castingBriefSection}
 ${tierBudgetGuide}`
 
   const baseRole = roleName.includes(' — ') ? roleName.split(' — ')[0] : roleName
+  const roleContext = isBook
+    ? `an adaptation of "${movie}". The role is ${baseRole} — a character from the book.${roleDescription ? ` Character description: ${roleDescription}` : ''}`
+    : `a reboot of "${movie}". The role is ${baseRole}, originally played by ${originalActor}.`
 
   const prompt = overrideQuery
     ? `${persona}
 
-You are working on a reboot of "${movie}". The role is ${baseRole}, originally played by ${originalActor}.
+You are working on ${roleContext}
 
 The director wants: "${overrideQuery}"
 
@@ -171,13 +176,13 @@ Return ONLY this JSON (no markdown):
 }`
     : `${persona}
 
-You are working on a reboot of "${movie}". The role is ${roleName}, originally played by ${originalActor}.
+You are working on ${roleContext}
 
 Actor pool (suggest ONLY names that appear exactly in this list):
 ${poolText}
 
 Your tasks:
-1. Write 2 sharp sentences describing this character — their essence, what they demand from an actor, what the original performance got right or wrong.
+1. Write 2 sharp sentences describing this character — their essence, what they demand from an actor.${isBook ? ' Draw on your knowledge of the book.' : ' Note what the original performance got right or wrong.'}
 2. Pick 6–10 actors from the pool who genuinely fit — think physicality, age, screen persona, genre credibility.
 3. Write a punchy follow-up question (10–15 words) offering to go deeper.
 
@@ -224,7 +229,7 @@ async function main() {
   while (true) {
     const { data: batch, error } = await supabase
       .from('roles')
-      .select('title_slug, role_name, original_actor, tier, marlowe_cache')
+      .select('title_slug, role_name, original_actor, role_description, tier, marlowe_cache')
       .order('title_slug', { ascending: true })
       .range(rolesFrom, rolesFrom + 999)
     if (error) throw new Error(error.message)
@@ -259,7 +264,8 @@ async function main() {
       const result = await describeRole({
         roleName: role.role_name,
         movie: titleData.title,
-        originalActor: role.original_actor,
+        originalActor: role.original_actor ?? null,
+        roleDescription: role.role_description ?? null,
         roleTier: role.tier,
         castingBrief: titleData.casting_brief ?? null,
         budget: titleData.budget ?? 50,
@@ -272,7 +278,8 @@ async function main() {
         describeRole({
           roleName: `${role.role_name} — ${q}`,
           movie: titleData.title,
-          originalActor: role.original_actor,
+          originalActor: role.original_actor ?? null,
+          roleDescription: role.role_description ?? null,
           roleTier: role.tier,
           castingBrief: titleData.casting_brief ?? null,
           budget: titleData.budget ?? 50,

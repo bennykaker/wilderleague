@@ -592,7 +592,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0 }}>
 
         {/* ── Left: Cast board ── */}
-        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto' }}>
+        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 24px', overflowY: 'auto', minHeight: 0 }}>
           <div style={{ fontSize: '14px', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '12px' }}>
             Cast board
           </div>
@@ -790,7 +790,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         </div>
 
         {/* ── Centre: Marlowe chat ── */}
-        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', minHeight: 0 }}>
 
           {/* Role selector */}
           <div>
@@ -992,7 +992,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         </div>
 
         {/* ── Right: Actor headshots ── */}
-        <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0 }}>
           <div>
             <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px' }}>
               {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
