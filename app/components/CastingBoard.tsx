@@ -211,7 +211,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               ...prev,
               [roleName]: [...(prev[roleName] ?? []), { text: data.reply, suggestion: data.suggestion }],
             }))
-            setActiveRole(roleName)
           }
         })
         .catch(() => {})
