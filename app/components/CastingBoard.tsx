@@ -1110,20 +1110,25 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                     <div style={{ fontSize: '14px', fontWeight: 600, color: isAssigned ? '#3f3f46' : '#e2e8f0', lineHeight: 1.25, marginBottom: '2px' }}>
                       {actor.name}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ fontSize: '14px', color: '#a1a1aa', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
+                      <div style={{ fontSize: '12px', color: '#a1a1aa', fontVariantNumeric: 'tabular-nums' }}>
                         ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '9px' }}> est</span>}
                       </div>
                       {!isAssigned && (
                         <button
                           onClick={e => { e.stopPropagation(); setConfirmBan(actor.name) }}
                           title={`Ban ${actor.name}`}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '14px', lineHeight: 1, opacity: 0.5 }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0', fontSize: '12px', lineHeight: 1, opacity: 0.4 }}
                         >
                           🚫
                         </button>
                       )}
                     </div>
+                    {actor.knownFor && (
+                      <div style={{ fontSize: '11px', color: '#52525b', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        {actor.knownFor.split(';').map((s: string) => s.trim()).filter(Boolean).slice(0, 3).join(' · ')}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
