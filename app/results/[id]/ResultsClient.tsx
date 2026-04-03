@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import AdBanner from '../../components/AdBanner'
 
 type CastItem = {
   role: string
@@ -396,11 +395,6 @@ export default function ResultsClient({
               </a>
             </div>
 
-            {!isMember && (
-              <div style={{ marginTop: '8px' }}>
-                <AdBanner slot="results" />
-              </div>
-            )}
           </div>
         )}
       </div>
