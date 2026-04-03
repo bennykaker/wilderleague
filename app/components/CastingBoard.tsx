@@ -46,6 +46,7 @@ type Props = {
   title: string
   slug: string
   budget: number
+  titleType?: string
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
   isMember?: boolean
@@ -60,7 +61,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -547,6 +548,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           Meet Marlowe
         </a>
+        {titleType === 'book' && (
+          <>
+            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+            <a href="/submit/art" style={{ fontSize: '13px', color: '#818cf8', textDecoration: 'none', flexShrink: 0, lineHeight: 1.3 }}>
+              We need character art for this page. Submit yours →
+            </a>
+          </>
+        )}
         <div style={{ flex: 1 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           {blockedActors.size > 0 && (

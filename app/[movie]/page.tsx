@@ -54,6 +54,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       title={title.title}
       slug={slug}
       budget={title.budget}
+      titleType={title.type}
       preloadedSuggestions={suggestions}
       isMember={isMember}
       isDirector={isDirector}
