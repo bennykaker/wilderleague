@@ -146,11 +146,7 @@ async function fetchRolesForSlug(slug: string): Promise<Role[]> {
 const getCachedTitles = unstable_cache(fetchTitles, ['titles-v3'], { revalidate: 3600 })
 
 function getCachedRolesForSlug(slug: string) {
-  return unstable_cache(
-    () => fetchRolesForSlug(slug),
-    [`roles-v5-${slug}`],
-    { revalidate: 3600 }
-  )()
+  return fetchRolesForSlug(slug)
 }
 
 export async function getTitles(): Promise<Title[]> {
