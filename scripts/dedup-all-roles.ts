@@ -24,8 +24,20 @@ const TIER_RANK: Record<string, number> = {
 }
 
 async function main() {
-  const { data, error } = await sb.from('roles').select('id, title_slug, role_name, tier')
-  if (error) { console.error(error); return }
+  // Paginate to avoid the 1000-row Supabase default limit
+  const all: { id: string; title_slug: string; role_name: string; tier: string }[] = []
+  let from = 0
+  while (true) {
+    const { data, error } = await sb.from('roles').select('id, title_slug, role_name, tier').range(from, from + 999)
+    if (error) { console.error(error); return }
+    if (!data || data.length === 0) break
+    all.push(...data)
+    if (data.length < 1000) break
+    from += 1000
+  }
+  const data = all
+  console.log(`Fetched ${data.length} total role rows`)
+  if (!data.length) { console.log('No roles found.'); return }
 
   // Group by title_slug + role_name
   const groups: Record<string, { id: string; tier: string }[]> = {}
@@ -50,12 +62,16 @@ async function main() {
     return
   }
 
-  const { error: delErr } = await sb.from('roles').delete().in('id', toDelete)
-  if (delErr) {
-    console.error('Delete failed:', delErr.message)
-  } else {
-    console.log(`\nDeleted ${toDelete.length} duplicate role rows.`)
+  // Batch deletes to avoid PostgREST URL length limits
+  const BATCH = 100
+  let deleted = 0
+  for (let i = 0; i < toDelete.length; i += BATCH) {
+    const batch = toDelete.slice(i, i + BATCH)
+    const { error: delErr } = await sb.from('roles').delete().in('id', batch)
+    if (delErr) { console.error(`Delete batch failed: ${delErr.message}`); break }
+    deleted += batch.length
   }
+  console.log(`\nDeleted ${deleted} duplicate role rows.`)
 }
 
 main().catch(console.error)
