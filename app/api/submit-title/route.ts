@@ -16,7 +16,7 @@ function getEnv(key: string): string {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { title, year, type, reason } = body
+  const { title, year, type, reason, author, characters, link } = body
 
   if (!title?.trim()) {
     return Response.json({ error: 'Title is required' }, { status: 400 })
@@ -44,11 +44,19 @@ export async function POST(req: NextRequest) {
   }
 
   const service = createServiceClient()
+  // Pack extra fields into reason if the columns don't exist yet
+  const reasonParts: string[] = []
+  if (author?.trim()) reasonParts.push(`Author: ${author.trim()}`)
+  if (characters?.trim()) reasonParts.push(`Characters: ${characters.trim()}`)
+  if (link?.trim()) reasonParts.push(`Link: ${link.trim()}`)
+  if (reason?.trim()) reasonParts.push(reason.trim())
+  const fullReason = reasonParts.join('\n') || null
+
   await service.from('title_submissions').insert({
     title: title.trim(),
     year: year ? Number(year) : null,
     type: type ?? 'movie',
-    reason: reason?.trim() || null,
+    reason: fullReason,
     submitted_by: user?.id ?? null,
     submitter_email: user?.email ?? null,
     is_member: isMember,
@@ -61,15 +69,18 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: 'Wilderleague <onboarding@resend.dev>',
       to: toEmail,
-      subject: `Title submission: ${title}${isMember ? ' [Member]' : ''}`,
+      subject: `Title suggestion: ${title}${type === 'book' ? ' [Book]' : ''}${isMember ? ' [Member]' : ''}`,
       html: `
-        <h2>New Title Submission</h2>
+        <h2>New Title Suggestion</h2>
         <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px">
           <tr><td style="padding:8px;color:#666;width:140px">Title</td><td style="padding:8px;font-weight:bold">${title}</td></tr>
-          <tr><td style="padding:8px;color:#666">Year</td><td style="padding:8px">${year || 'Not provided'}</td></tr>
-          <tr><td style="padding:8px;color:#666">Type</td><td style="padding:8px">${type === 'tv' ? 'TV Series' : 'Movie'}</td></tr>
+          <tr><td style="padding:8px;color:#666">Type</td><td style="padding:8px">${type === 'tv' ? 'TV Series' : type === 'book' ? 'Book' : 'Movie'}</td></tr>
+          ${author ? `<tr><td style="padding:8px;color:#666">Author</td><td style="padding:8px">${author}</td></tr>` : ''}
+          ${year ? `<tr><td style="padding:8px;color:#666">Year</td><td style="padding:8px">${year}</td></tr>` : ''}
+          ${characters ? `<tr><td style="padding:8px;color:#666;vertical-align:top">Characters</td><td style="padding:8px;white-space:pre-wrap">${characters}</td></tr>` : ''}
+          ${link ? `<tr><td style="padding:8px;color:#666">Link</td><td style="padding:8px"><a href="${link}">${link}</a></td></tr>` : ''}
           <tr><td style="padding:8px;color:#666">Member</td><td style="padding:8px">${isMember ? 'Yes' : 'No'}</td></tr>
-          ${reason ? `<tr><td style="padding:8px;color:#666">Why</td><td style="padding:8px">${reason}</td></tr>` : ''}
+          ${reason ? `<tr><td style="padding:8px;color:#666;vertical-align:top">Why</td><td style="padding:8px;white-space:pre-wrap">${reason}</td></tr>` : ''}
           ${user?.email ? `<tr><td style="padding:8px;color:#666">Submitted by</td><td style="padding:8px">${user.email}</td></tr>` : ''}
         </table>
       `,

@@ -97,8 +97,8 @@ export default async function HomePage() {
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Browse actor pool →
               </Link>
-              <Link href="/submit/movie" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Suggest a film →
+              <Link href="/suggest" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
+                Suggest a title →
               </Link>
               {isMember && (
                 <Link href="/trophy-room" style={{ fontSize: '15px', color: '#fbbf24', textDecoration: 'none', borderBottom: '1px solid #78350f', paddingBottom: '2px' }}>
