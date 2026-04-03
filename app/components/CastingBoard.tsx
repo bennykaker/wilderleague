@@ -227,6 +227,36 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
     })
   }
 
+  // ── Daily shown-count tracking ─────────────────────────────────────────────
+  // Each actor can appear in Marlowe's Picks at most 5 times per day.
+  // Once every suggested actor has hit the limit, counts reset automatically.
+  const DAILY_SHOW_LIMIT = 5
+  const shownKey = `marlowe_shown_${new Date().toISOString().slice(0, 10)}`
+
+  function getShownCounts(): Record<string, number> {
+    try { return JSON.parse(localStorage.getItem(shownKey) ?? '{}') } catch { return {} }
+  }
+
+  function recordShown(names: string[]) {
+    const counts = getShownCounts()
+    for (const name of names) counts[name] = (counts[name] ?? 0) + 1
+    localStorage.setItem(shownKey, JSON.stringify(counts))
+  }
+
+  function filterByLimit(picks: CastActor[]): CastActor[] {
+    const counts = getShownCounts()
+    const available = picks.filter(a => (counts[a.name] ?? 0) < DAILY_SHOW_LIMIT)
+    // If everyone hit the limit, reset those actors and start fresh
+    if (available.length === 0 && picks.length > 0) {
+      const fresh = getShownCounts()
+      for (const a of picks) delete fresh[a.name]
+      localStorage.setItem(shownKey, JSON.stringify(fresh))
+      return picks
+    }
+    return available
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
   // Helper: apply a prefetched describe result to state
   function applyDescribeResult(roleName: string, data: { reply: string; actors: string[]; suggestion: string | null; remaining?: number }) {
     if (data.remaining != null) setChatRemaining(data.remaining)
@@ -239,12 +269,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, prelo
         .filter((name: string) => !blockedActors.has(name))
         .map((name: string) => actors.find(a => a.name === name))
         .filter((a): a is CastActor => Boolean(a))
-      setVisibleActors(uniqueByName(picks))
+      const shown = filterByLimit(picks)
+      recordShown(shown.map(a => a.name))
+      setVisibleActors(uniqueByName(shown))
       setIsFiltered(true)
       setSuggestedPerRole(prev => {
         const existing = prev[roleName] ?? []
         const existingNames = new Set(existing.map(a => a.name))
-        return { ...prev, [roleName]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
+        return { ...prev, [roleName]: [...existing, ...shown.filter(a => !existingNames.has(a.name))] }
       })
     }
   }
