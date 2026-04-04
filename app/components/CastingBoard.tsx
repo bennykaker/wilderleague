@@ -105,6 +105,9 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
+  const [topPicks, setTopPicks] = useState<Record<string, { name: string; count: number }[]>>({})
+  const [topPicksLoading, setTopPicksLoading] = useState(false)
+  const [showTopPicks, setShowTopPicks] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -343,6 +346,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     setIsFiltered(false)
     setShowAllPassed(false)
     setShowDeepDive(false)
+    setShowTopPicks(false)
     setExpandedMessages(new Set())
     setDeepDiveQuery('')
     setDeepDiveActors([])
@@ -540,6 +544,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       if (data.remaining != null) setDeepDiveRemaining(data.remaining)
     } catch { alert('Deep dive failed. Try again.') }
     finally { setDeepDiveLoading(false) }
+  }
+
+  async function handleTopPicks() {
+    // Use cache if already fetched for this role
+    if (topPicks[activeRole]) { setShowTopPicks(true); return }
+    setTopPicksLoading(true)
+    setShowTopPicks(true)
+    try {
+      const res = await fetch(`/api/top-picks?slug=${encodeURIComponent(slug)}&role=${encodeURIComponent(activeRole)}`)
+      const data = await res.json()
+      setTopPicks(prev => ({ ...prev, [activeRole]: data.picks ?? [] }))
+    } catch { /* silent */ }
+    finally { setTopPicksLoading(false) }
   }
 
   // Filter blocked actors from visible grid
@@ -880,6 +897,79 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                 <option key={r.role_name} value={r.role_name}>{r.role_name}</option>
               ))}
             </select>
+          </div>
+
+          {/* Community top picks */}
+          <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
+            {!showTopPicks ? (
+              <button
+                onClick={handleTopPicks}
+                style={{
+                  width: '100%', background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.2)',
+                  borderRadius: '8px', padding: '8px 12px', color: '#a78bfa', fontSize: '14px',
+                  fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                }}
+              >
+                <span>👥</span> The crowd says…
+              </button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a78bfa', fontWeight: 700 }}>
+                    Top picks — {activeRole}
+                  </div>
+                  <button
+                    onClick={() => setShowTopPicks(false)}
+                    style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '16px', cursor: 'pointer', lineHeight: 1 }}
+                  >
+                    ×
+                  </button>
+                </div>
+                {topPicksLoading ? (
+                  <div style={{ fontSize: '13px', color: '#52525b', padding: '6px 0' }}>Loading…</div>
+                ) : (topPicks[activeRole]?.length ?? 0) === 0 ? (
+                  <div style={{ fontSize: '13px', color: '#52525b', padding: '6px 0' }}>No submissions yet for this role.</div>
+                ) : (
+                  topPicks[activeRole].map(({ name, count }, i) => {
+                    const actor = allActors.find(a => a.name === name)
+                    const isAssigned = assignedNames.has(name)
+                    return (
+                      <button
+                        key={name}
+                        onClick={() => {
+                          if (!isAssigned) assignToSlot(activeRole, name, 0)
+                        }}
+                        disabled={isAssigned}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '10px',
+                          background: isAssigned ? '#0f0f14' : 'rgba(167,139,250,0.05)',
+                          border: `1px solid ${isAssigned ? '#1c1c1e' : 'rgba(167,139,250,0.15)'}`,
+                          borderRadius: '8px', padding: '8px 10px', cursor: isAssigned ? 'default' : 'pointer',
+                          opacity: isAssigned ? 0.4 : 1, textAlign: 'left', width: '100%',
+                        }}
+                      >
+                        <span style={{ fontSize: '13px', color: '#52525b', fontWeight: 700, width: '16px', flexShrink: 0 }}>
+                          {i + 1}
+                        </span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {name}
+                          </div>
+                          {actor && (
+                            <div style={{ fontSize: '11px', color: '#52525b' }}>
+                              ${actor.cost}M{!actor.salaryConfirmed && ' est'} · {actor.knownFor?.split(',')[0] ?? ''}
+                            </div>
+                          )}
+                        </div>
+                        <span style={{ fontSize: '11px', color: '#6366f1', background: 'rgba(99,102,241,0.12)', borderRadius: '6px', padding: '2px 7px', fontWeight: 700, flexShrink: 0 }}>
+                          {count}×
+                        </span>
+                      </button>
+                    )
+                  })
+                )}
+              </div>
+            )}
           </div>
 
           {/* Search — top of chat */}
