@@ -182,7 +182,8 @@ export default function PricingClient({
         </div>
 
         <p style={{ fontSize: '14px', color: '#52525b', textAlign: 'center' }}>
-          Cancel any time. No commitments. Billed via Stripe.
+          Cancel any time. No commitments. Billed via Stripe.{' '}
+          <a href="/contact" style={{ color: '#71717a', textDecoration: 'underline' }}>Billing questions?</a>
         </p>
 
       </div>
