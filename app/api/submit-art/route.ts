@@ -1,8 +1,7 @@
 import { NextRequest } from 'next/server'
 
-const RECIPIENT = process.env.ART_SUBMISSION_EMAIL!
-
 export async function POST(req: NextRequest) {
+  const RECIPIENT = process.env.ART_SUBMISSION_EMAIL
   const data = await req.formData()
 
   const name      = (data.get('name')      as string | null)?.trim() ?? ''
@@ -18,6 +17,11 @@ export async function POST(req: NextRequest) {
 
   if (file.size > 10 * 1024 * 1024) {
     return Response.json({ error: 'File too large. Max 10MB.' }, { status: 400 })
+  }
+
+  if (!RECIPIENT) {
+    console.error('ART_SUBMISSION_EMAIL not set')
+    return Response.json({ error: 'Email service not configured.' }, { status: 500 })
   }
 
   const resendKey = process.env.RESEND_API_KEY
