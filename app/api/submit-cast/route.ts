@@ -205,7 +205,7 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error('Insert error:', error)
-    return NextResponse.json({ error: 'Failed to save submission' }, { status: 500 })
+    return NextResponse.json({ error: `Failed to save submission: ${error.message}` }, { status: 500 })
   }
 
   return NextResponse.json({ id: data.id })
