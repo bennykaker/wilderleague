@@ -235,7 +235,7 @@ export async function POST(req: NextRequest) {
         .eq('cast_key', key)
     }
 
-    return NextResponse.json({ ...result, award, cached: false })
+    return NextResponse.json({ ai_summary: result.summary, green_light_score: result.green_light_score, quality_score: result.quality_score, hear_me_out_score: result.hear_me_out_score, award, cached: false })
   } catch (e) {
     console.error('Scoring error:', e)
     return NextResponse.json({ error: 'Scoring failed' }, { status: 500 })
