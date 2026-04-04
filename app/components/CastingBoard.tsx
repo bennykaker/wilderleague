@@ -527,7 +527,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   async function handleDeepDive() {
     if (!deepDiveQuery.trim()) return
     setDeepDiveLoading(true)
-    const excludeNames = actors.map(a => a.name)
+    const excludeNames = Array.from(assignedNames)
     try {
       const res = await fetch('/api/deep-dive', {
         method: 'POST',
