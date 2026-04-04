@@ -105,6 +105,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
+  const [confirmStartOver, setConfirmStartOver] = useState(false)
   const [topPicks, setTopPicks] = useState<Record<string, { name: string; count: number }[]>>({})
   const [topPicksLoading, setTopPicksLoading] = useState(false)
   const [showTopPicks, setShowTopPicks] = useState(false)
@@ -116,13 +117,17 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const prefetchedRef = useRef<Record<string, { reply: string; actors: string[]; suggestion: string | null; remaining?: number } | 'loading' | 'error'>>({})
   const prefetchFiredRef = useRef(false)
 
-  // Load blocklist from localStorage
+  // Load blocklist + selections from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('wilderleague_blocked')
       if (saved) setBlockedActors(new Set(JSON.parse(saved) as string[]))
     } catch {}
-  }, [])
+    try {
+      const savedSelections = localStorage.getItem(`wl_cast_${slug}`)
+      if (savedSelections) setSelections(JSON.parse(savedSelections))
+    } catch {}
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function blockActor(name: string) {
     setBlockedActors(prev => {
@@ -141,6 +146,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       return next
     })
   }
+
+  // Persist selections to localStorage on every change
+  useEffect(() => {
+    if (Object.keys(selections).length > 0) {
+      localStorage.setItem(`wl_cast_${slug}`, JSON.stringify(selections))
+    }
+  }, [selections, slug])
 
   // Merge server actors with any deep-dive additions for this session
   const allActors = extraActors.length > 0
@@ -606,6 +618,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '8px', padding: '6px 10px', color: '#f87171', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               🚫 {blockedActors.size} banned
+            </button>
+          )}
+          {Object.keys(selections).length > 0 && (
+            <button
+              onClick={() => setConfirmStartOver(true)}
+              style={{ background: 'none', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 10px', color: '#52525b', fontSize: '13px', cursor: 'pointer' }}
+            >
+              Start over
             </button>
           )}
           <div style={{ fontSize: '14px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
@@ -1451,6 +1471,44 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       )}
 
       {/* Ban confirmation dialog */}
+      {confirmStartOver && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}
+          onClick={() => setConfirmStartOver(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '16px', padding: '28px 28px 24px', width: '340px', textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '28px', marginBottom: '12px' }}>🎬</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, marginBottom: '8px', color: '#f8fafc' }}>Start over?</div>
+            <div style={{ fontSize: '14px', color: '#71717a', marginBottom: '24px', lineHeight: 1.5 }}>
+              This will clear your entire cast for {title}. Can't be undone.
+            </div>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setConfirmStartOver(false)}
+                style={{ background: '#18181b', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 20px', color: '#a1a1aa', fontSize: '14px', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setSelections({})
+                  setSavedId(null)
+                  setScoreResult(null)
+                  localStorage.removeItem(`wl_cast_${slug}`)
+                  setConfirmStartOver(false)
+                }}
+                style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '10px', padding: '10px 20px', color: '#f87171', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Start over
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {confirmBan && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}
