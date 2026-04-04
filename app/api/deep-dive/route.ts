@@ -60,12 +60,20 @@ export async function POST(req: NextRequest) {
   // Search full actor DB beyond top 2000
   const service = createServiceClient()
   const excludeSet = new Set((excludeNames as string[]).map((n: string) => n.toLowerCase()))
-  const q = query.toLowerCase().trim()
+
+  // Split on commas into individual terms, build one OR condition per term per field
+  const terms = query.toLowerCase().split(',').map((t: string) => t.trim()).filter(Boolean)
+  const orParts = terms.flatMap((t: string) => [
+    `name.ilike.%${t}%`,
+    `known_for.ilike.%${t}%`,
+    `biography.ilike.%${t}%`,
+    `casting_profile.ilike.%${t}%`,
+  ])
 
   const { data: actors, error } = await service
     .from('actors')
     .select('name, headshot_url, popularity, cost, salary_estimate, salary_confirmed, gender, birth_year, known_for, biography, universe_tags')
-    .or(`name.ilike.%${q}%,known_for.ilike.%${q}%,keywords.ilike.%${q}%`)
+    .or(orParts.join(','))
     .order('popularity', { ascending: false })
     .limit(30)
 
