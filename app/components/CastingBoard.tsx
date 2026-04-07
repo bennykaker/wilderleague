@@ -107,6 +107,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [chatRemaining, setChatRemaining] = useState<number | null>(null)
   const [chatLimitReached, setChatLimitReached] = useState(false)
   const [marloweBusy, setMarloweBusy] = useState(false)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const shareMenuRef = useRef<HTMLDivElement>(null)
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
@@ -134,6 +136,17 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       if (savedSelections) setSelections(JSON.parse(savedSelections))
     } catch {}
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!showShareMenu) return
+    function handleClickOutside(e: MouseEvent) {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(e.target as Node)) {
+        setShowShareMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showShareMenu])
 
   function blockActor(name: string) {
     setBlockedActors(prev => {
@@ -557,17 +570,82 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     finally { setAiLoading(false) }
   }
 
-  async function copyShareLink() {
+  function buildShareContent() {
     const params = new URLSearchParams()
     for (const [role, arr] of Object.entries(selections)) {
       if (arr[0]) params.set(role, arr[0])
     }
     const url = `${window.location.href.split('?')[0]}?${params.toString()}`
+
+    const castLines = roles
+      .map(r => {
+        const name = getSlots(r.role_name)[0]
+        return name ? `${r.role_name}: ${name}` : null
+      })
+      .filter(Boolean)
+
+    const constraintLine = challenge ? `Challenge: ${challenge.headline} — ${challenge.description}` : ''
+    const budgetLine = `Budget: $${spent.toLocaleString()}M / $${budget.toLocaleString()}M`
+
+    const body = [
+      `My recast of ${title} on Wilder League:`,
+      constraintLine,
+      '',
+      castLines.join('\n'),
+      '',
+      budgetLine,
+      '',
+      url,
+    ].filter(l => l !== undefined && !(l === '' && !castLines.length)).join('\n')
+
+    const subject = `My ${title} recast on Wilder League`
+    return { url, body, subject }
+  }
+
+  async function handleNativeShare() {
+    const { url, body, subject } = buildShareContent()
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: subject, text: body, url })
+        return true
+      } catch { /* user cancelled or not supported */ }
+    }
+    return false
+  }
+
+  function shareViaWhatsApp() {
+    const { body } = buildShareContent()
+    window.open(`https://wa.me/?text=${encodeURIComponent(body)}`, '_blank')
+    setShowShareMenu(false)
+  }
+
+  function shareViaFacebook() {
+    const { url } = buildShareContent()
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
+    setShowShareMenu(false)
+  }
+
+  function shareViaEmail() {
+    const { body, subject } = buildShareContent()
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    setShowShareMenu(false)
+  }
+
+  async function copyShareLink() {
+    const { url } = buildShareContent()
     try {
       await navigator.clipboard.writeText(url)
       alert('Link copied to clipboard.')
     } catch {
       alert(url)
+    }
+    setShowShareMenu(false)
+  }
+
+  async function handleShareClick() {
+    const shared = await handleNativeShare()
+    if (!shared) {
+      setShowShareMenu(prev => !prev)
     }
   }
 
@@ -749,12 +827,37 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           >
             Export card
           </button>
-          <button
-            onClick={copyShareLink}
-            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
-          >
-            Share ↗
-          </button>
+          <div style={{ position: 'relative' }} ref={shareMenuRef}>
+            <button
+              onClick={handleShareClick}
+              style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Share ↗
+            </button>
+            {showShareMenu && (
+              <div
+                style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '6px', zIndex: 100, minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '2px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+              >
+                <button onClick={shareViaWhatsApp} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span>💬</span> WhatsApp
+                </button>
+                <button onClick={shareViaFacebook} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span>📘</span> Facebook
+                </button>
+                <button onClick={shareViaEmail} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span>✉️</span> Email
+                </button>
+                <div style={{ height: '1px', background: '#27272a', margin: '2px 0' }} />
+                <button onClick={copyShareLink} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                  <span>🔗</span> Copy link
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
