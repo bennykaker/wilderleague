@@ -29,20 +29,45 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
 
   const rawSuggestions = getSuggestionsForTitle(slug)
   const costMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.cost]))
+  const raceMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.race_ethnicity ?? '']))
 
-  // Build Marlowe's Picks: affordable actors only (cost < 8), padded to ~6 per role
-  // using marlowe_quick.cheaper then marlowe_cache as supplements
+  // Build Marlowe's Picks per role:
+  // - If original actor is Black, only suggest Black actors
+  // - Otherwise, affordable actors only (cost < 8), padded to ~6 from marlowe caches
   const suggestions: Record<string, string[]> = {}
   for (const role of roles) {
-    const csv = (rawSuggestions[role.role_name] ?? []).filter(n => (costMap.get(n.toLowerCase()) ?? 99) < 8)
+    const originalRace = raceMap.get((role.original_actor ?? '').toLowerCase()) ?? ''
+    const blackRole = originalRace.toLowerCase().includes('black')
+
+    const quick = (role.marlowe_quick as Record<string, { actors?: string[] }> | null) ?? {}
+    const cacheActors = (role.marlowe_cache as { actors?: string[] } | null)?.actors ?? []
+    const csvNames = rawSuggestions[role.role_name] ?? []
+
+    if (blackRole) {
+      // Only suggest Black actors — pull from all sources and filter
+      const candidates = [...csvNames, ...(quick['cheaper']?.actors ?? []), ...cacheActors]
+      const seen = new Set<string>()
+      const picks: string[] = []
+      for (const name of candidates) {
+        const key = name.toLowerCase()
+        if (seen.has(key)) continue
+        seen.add(key)
+        if (raceMap.get(key)?.toLowerCase().includes('black')) picks.push(name)
+        if (picks.length >= 6) break
+      }
+      if (picks.length > 0) suggestions[role.role_name] = picks
+      continue
+    }
+
+    // Standard: affordable actors, padded to ~6
+    const csv = csvNames.filter(n => (costMap.get(n.toLowerCase()) ?? 99) < 8)
     if (csv.length >= 6) { suggestions[role.role_name] = csv; continue }
 
     const seen = new Set(csv.map(n => n.toLowerCase()))
     const extras: string[] = []
-    const quick = (role.marlowe_quick as Record<string, { actors?: string[] }> | null) ?? {}
     const candidates = [
       ...(quick['cheaper']?.actors ?? []),
-      ...((role.marlowe_cache as { actors?: string[] } | null)?.actors ?? []),
+      ...cacheActors,
     ]
     for (const name of candidates) {
       if (seen.has(name.toLowerCase())) continue
