@@ -7,20 +7,9 @@ import TitleSearch from './components/TitleSearch'
 import AuthButton from './components/AuthButton'
 import { createClient } from '../lib/supabase/server'
 
-const FEATURED_SLUGS = [
-  'the-matrix',
-  'american-beauty',
-  'spider-man-homecoming',
-  'parks-and-recreation',
-  'the-office',
-  'casino-royale',
-  'chinatown',
-  'ferris-buellers-day-off',
-  'fight-club',
-]
-
 export default async function HomePage() {
-  const featuredChallenge = getChallenges().find(c => c.active) ?? null
+  const allChallenges = getChallenges().filter(c => c.active)
+  const featuredChallenges = allChallenges.slice(0, 9)
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   let isMember = false
@@ -38,13 +27,8 @@ export default async function HomePage() {
   ])
 
   const titleMap = new Map(all.map(t => [t.slug, t]))
-  const featured = FEATURED_SLUGS.map(s => titleMap.get(s)).filter(Boolean) as typeof all
   const films = all.filter(t => t.type !== 'book')
   const books = all.filter(t => t.type === 'book')
-  const rebootList = [...all]
-    .filter(t => t.reboot_potential != null)
-    .sort((a, b) => (b.reboot_potential ?? 0) - (a.reboot_potential ?? 0))
-    .slice(0, 6)
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
@@ -56,20 +40,9 @@ export default async function HomePage() {
         maxWidth: '260px',
       }}>
         <span style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800 }}>
-          {featuredChallenge?.badge ?? '🎬'} Challenge
+          🎬 Casting Challenges
         </span>
-        {featuredChallenge ? (
-          <>
-            <span style={{ fontSize: '13px', fontWeight: 800, color: '#ede9fe', lineHeight: 1.25, textAlign: 'right' }}>
-              {featuredChallenge.teaser.split('\n')[0]}
-            </span>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#a78bfa', lineHeight: 1.25, textAlign: 'right' }}>
-              {featuredChallenge.teaser.split('\n')[1]} →
-            </span>
-          </>
-        ) : (
-          <span style={{ fontSize: '13px', fontWeight: 800, color: '#a78bfa' }}>Casting Challenges →</span>
-        )}
+        <span style={{ fontSize: '13px', fontWeight: 800, color: '#a78bfa' }}>More Casting Challenges →</span>
       </Link>
       <style>{`
         .title-card { transition: border-color 0.15s; }
@@ -98,13 +71,16 @@ export default async function HomePage() {
                 Meet Marlowe →
               </Link>
               <Link href="/challenges" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Casting Challenges →
+                More Casting Challenges →
               </Link>
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Browse actor pool →
               </Link>
               <Link href="/suggest" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Suggest a title →
+              </Link>
+              <Link href="/submit/actor" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
+                Suggest an actor →
               </Link>
               {isMember && (
                 <Link href="/trophy-room" style={{ fontSize: '15px', color: '#fbbf24', textDecoration: 'none', borderBottom: '1px solid #78350f', paddingBottom: '2px' }}>
@@ -128,96 +104,73 @@ export default async function HomePage() {
           {/* Left: featured + full search */}
           <div style={{ flex: 3, minWidth: 0 }}>
 
-            {/* Featured titles — poster grid */}
+            {/* Challenge Castings — featured grid */}
             <div style={{ marginBottom: '52px' }}>
-              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '18px', fontWeight: 600 }}>
-                Start here
+              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#7c3aed', marginBottom: '18px', fontWeight: 600 }}>
+                Casting Challenges
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-                {featured.map(t => (
-                  <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div className="featured-card" style={{
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      background: '#111115',
-                      border: '1px solid rgba(255,255,255,0.07)',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-                    }}>
-                      {t.poster_path ? (
-                        <img
-                          src={t.poster_path}
-                          alt={t.title}
-                          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: '100%', aspectRatio: '2/3',
-                          background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 60%, #0f2027 100%)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <span style={{ fontSize: '32px' }}>🎬</span>
-                        </div>
-                      )}
-                      <div style={{ padding: '12px 14px 14px' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '3px', lineHeight: 1.3 }}>{t.title}</div>
-                        <div style={{ fontSize: '12px', color: '#71717a' }}>
-                          {t.year} · {t.type === 'tv' ? 'TV' : 'Film'} · ${t.budget}M
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Reboot Potential */}
-            {rebootList.length > 0 && (
-              <div style={{ marginBottom: '52px' }}>
-                <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '18px', fontWeight: 600 }}>
-                  Reboot Potential
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {rebootList.map(t => (
-                    <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none' }}>
-                      <div className="title-card" style={{
-                        display: 'flex', alignItems: 'center', gap: '14px',
-                        padding: '12px 14px', borderRadius: '10px',
-                        border: '1px solid rgba(251,191,36,0.12)',
-                        background: '#0e0e0e',
+                {featuredChallenges.map(c => {
+                  const t = titleMap.get(c.movie_slug)
+                  return (
+                    <Link key={c.id} href={`/challenge/${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <div className="featured-card" style={{
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        background: '#111115',
+                        border: '1px solid rgba(139,92,246,0.18)',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                        position: 'relative',
                       }}>
-                        {t.poster_path ? (
-                          <img src={t.poster_path} alt={t.title} style={{ width: '32px', height: '48px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
-                        ) : (
-                          <div style={{ width: '32px', height: '48px', borderRadius: '4px', background: '#1c1c1e', flexShrink: 0 }} />
-                        )}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '3px' }}>{t.title}</div>
-                          {t.reboot_notes && (
-                            <div style={{ fontSize: '12px', color: '#71717a', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
-                              {t.reboot_notes}
+                        <div style={{ position: 'relative' }}>
+                          {t?.poster_path ? (
+                            <img
+                              src={t.poster_path}
+                              alt={t.title}
+                              style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+                            />
+                          ) : (
+                            <div style={{
+                              width: '100%', aspectRatio: '2/3',
+                              background: 'linear-gradient(160deg, #1e1b4b 0%, #2e1065 60%, #0f0f1a 100%)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                              <span style={{ fontSize: '32px' }}>{c.badge}</span>
                             </div>
                           )}
+                          <div style={{
+                            position: 'absolute', top: '10px', left: '10px',
+                            background: 'rgba(109,40,217,0.92)', backdropFilter: 'blur(4px)',
+                            borderRadius: '6px', padding: '3px 8px',
+                            fontSize: '10px', fontWeight: 800, color: '#ede9fe',
+                            letterSpacing: '0.1em', textTransform: 'uppercase',
+                          }}>
+                            {c.badge} Challenge Cast
+                          </div>
                         </div>
-                        <div style={{
-                          display: 'flex', flexDirection: 'column', alignItems: 'center',
-                          background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
-                          borderRadius: '8px', padding: '6px 10px', flexShrink: 0,
-                        }}>
-                          <span style={{ fontSize: '16px', fontWeight: 900, color: '#fde68a', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{t.reboot_potential}</span>
-                          <span style={{ fontSize: '10px', color: '#92400e', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>/10</span>
+                        <div style={{ padding: '12px 14px 14px' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#f1f5f9', marginBottom: '4px', lineHeight: 1.3 }}>
+                            {c.teaser.split('\n')[0]}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#a78bfa', lineHeight: 1.4 }}>
+                            {c.teaser.split('\n')[1]}
+                          </div>
                         </div>
                       </div>
                     </Link>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
-            )}
+            </div>
 
             {/* Full searchable library */}
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '40px' }}>
-              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '18px', fontWeight: 600 }}>
-                Full library
+              <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#a1a1aa', marginBottom: '6px', fontWeight: 600 }}>
+                Regular Re-casts
               </div>
+              <p style={{ fontSize: '14px', color: '#71717a', marginBottom: '20px', lineHeight: 1.5 }}>
+                Use our whole library of actors to come up with the best cast possible.
+              </p>
               <TitleSearch titles={films.map(t => ({ slug: t.slug, title: t.title, year: t.year, type: t.type, budget: t.budget, poster_path: t.poster_path, author: null }))} />
             </div>
 
