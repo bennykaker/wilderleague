@@ -106,7 +106,9 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         return false
       })
     : enriched
-  ).filter(a => a.cost < 8)
+  // No cost cap on constrained pools — the pool is already narrow, don't exclude anyone
+  // For unconstrained boards, cap at 8 to prevent all-star stacking
+  ).filter(a => hasConstraint ? true : a.cost < 8)
 
   const actors = poolActors.map(a => ({
     id: a.tmdb_id || a.name,
