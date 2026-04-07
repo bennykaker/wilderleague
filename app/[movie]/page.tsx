@@ -28,7 +28,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   }
 
   const suggestions = getSuggestionsForTitle(slug)
-  const actors = enriched.filter(a => a.cost < 8).map(a => ({
+  const actors = enriched.map(a => ({
     id: a.tmdb_id || a.name,
     name: a.name,
     image: a.headshot_url,
@@ -43,6 +43,15 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     keywords: a.keywords || '',
     castingProfile: a.casting_profile || '',
   }))
+
+  // Marlowe's Picks only suggests affordable actors — expensive ones stay in the pool
+  // but don't dominate the recommendations
+  const affordableNames = new Set(enriched.filter(a => a.cost < 8).map(a => a.name.toLowerCase()))
+  const filteredSuggestions: Record<string, string[]> = {}
+  for (const [role, names] of Object.entries(suggestions)) {
+    const filtered = (names as string[]).filter(n => affordableNames.has(n.toLowerCase()))
+    if (filtered.length > 0) filteredSuggestions[role] = filtered
+  }
 
   return (
     <CastingBoard
@@ -59,7 +68,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       slug={slug}
       budget={title.budget}
       titleType={title.type}
-      preloadedSuggestions={suggestions}
+      preloadedSuggestions={filteredSuggestions}
       isMember={isMember}
       isDirector={isDirector}
       rebootPotential={title.reboot_potential ?? null}
