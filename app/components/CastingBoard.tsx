@@ -770,6 +770,20 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
+      {/* Reboot banner */}
+      {rebootPotential != null && rebootPotential >= 7 && (
+        <div style={{ padding: '10px 24px', background: 'rgba(251,191,36,0.06)', borderBottom: '1px solid rgba(251,191,36,0.15)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
+          <span style={{ fontSize: '20px' }}>⭐</span>
+          <div>
+            <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginRight: '10px' }}>Top Reboot Pick</span>
+            <span style={{ fontSize: '14px', color: '#fde68a', fontWeight: 700 }}>{rebootPotential}/10</span>
+          </div>
+          {rebootNotes && (
+            <div style={{ fontSize: '13px', color: '#fcd34d', marginLeft: '4px', opacity: 0.8 }}>— {rebootNotes}</div>
+          )}
+        </div>
+      )}
+
       {/* Body */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
