@@ -43,13 +43,11 @@ async function fetchActors(): Promise<EnrichedActor[]> {
   const all: EnrichedActor[] = []
   let from = 0
   const PAGE = 1000
-  const LIMIT = 2000
 
-  while (all.length < LIMIT) {
+  while (true) {
     const { data, error } = await supabase
       .from('actors')
       .select(ACTOR_COLUMNS)
-      .order('popularity', { ascending: false })
       .range(from, from + PAGE - 1)
 
     if (error) throw new Error(`Failed to fetch actors: ${error.message}`)
@@ -86,7 +84,7 @@ async function fetchActors(): Promise<EnrichedActor[]> {
 }
 
 // Cache for 1 hour across serverless invocations
-const getCachedActors = unstable_cache(fetchActors, ['enriched-actors-v2'], { revalidate: 3600 })
+const getCachedActors = unstable_cache(fetchActors, ['enriched-actors-v3'], { revalidate: 3600 })
 
 export async function getEnrichedActors(): Promise<EnrichedActor[]> {
   return getCachedActors()
