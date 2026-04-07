@@ -27,7 +27,34 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     isDirector = profile?.is_director ?? false
   }
 
-  const suggestions = getSuggestionsForTitle(slug)
+  const rawSuggestions = getSuggestionsForTitle(slug)
+  const costMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.cost]))
+
+  // Build Marlowe's Picks: affordable actors only (cost < 8), padded to ~6 per role
+  // using marlowe_quick.cheaper then marlowe_cache as supplements
+  const suggestions: Record<string, string[]> = {}
+  for (const role of roles) {
+    const csv = (rawSuggestions[role.role_name] ?? []).filter(n => (costMap.get(n.toLowerCase()) ?? 99) < 8)
+    if (csv.length >= 6) { suggestions[role.role_name] = csv; continue }
+
+    const seen = new Set(csv.map(n => n.toLowerCase()))
+    const extras: string[] = []
+    const quick = (role.marlowe_quick as Record<string, { actors?: string[] }> | null) ?? {}
+    const candidates = [
+      ...(quick['cheaper']?.actors ?? []),
+      ...((role.marlowe_cache as { actors?: string[] } | null)?.actors ?? []),
+    ]
+    for (const name of candidates) {
+      if (seen.has(name.toLowerCase())) continue
+      if ((costMap.get(name.toLowerCase()) ?? 99) >= 8) continue
+      extras.push(name)
+      seen.add(name.toLowerCase())
+      if (csv.length + extras.length >= 6) break
+    }
+    const combined = [...csv, ...extras]
+    if (combined.length > 0) suggestions[role.role_name] = combined
+  }
+
   const actors = enriched.map(a => ({
     id: a.tmdb_id || a.name,
     name: a.name,
