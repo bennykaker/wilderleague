@@ -86,7 +86,7 @@ async function fetchActors(): Promise<EnrichedActor[]> {
 }
 
 // Cache for 1 hour across serverless invocations
-const getCachedActors = unstable_cache(fetchActors, ['enriched-actors'], { revalidate: 3600 })
+const getCachedActors = unstable_cache(fetchActors, ['enriched-actors-v2'], { revalidate: 3600 })
 
 export async function getEnrichedActors(): Promise<EnrichedActor[]> {
   return getCachedActors()
