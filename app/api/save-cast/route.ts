@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { title_slug, title_name, poster_path, selections, total_cost, budget, cast_name } = body
+  const { title_slug, title_name, poster_path, selections, total_cost, budget, cast_name, pitch } = body
 
   if (!title_slug || !title_name || !selections) {
     return Response.json({ error: 'Missing required fields' }, { status: 400 })
@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       total_cost: total_cost || 0,
       budget: budget || 50,
       cast_name: cast_name || null,
+      pitch: pitch?.trim() || null,
       cast_key,
       ...(existingScore ? {
         ai_score: existingScore.green_light_score,

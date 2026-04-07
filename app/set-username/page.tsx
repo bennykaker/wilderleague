@@ -12,6 +12,8 @@ function SetUsernameForm() {
   const [username, setUsername] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
+  const [tosConfirmed, setTosConfirmed] = useState(false)
 
   const isValid = /^[a-zA-Z0-9_]{3,20}$/.test(username)
 
@@ -78,15 +80,42 @@ function SetUsernameForm() {
             </div>
           )}
 
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={e => setAgeConfirmed(e.target.checked)}
+              style={{ marginTop: '2px', accentColor: '#3b82f6', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
+              I confirm I am 13 years of age or older
+            </span>
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={tosConfirmed}
+              onChange={e => setTosConfirmed(e.target.checked)}
+              style={{ marginTop: '2px', accentColor: '#3b82f6', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
+              I agree to the{' '}
+              <a href="/terms" target="_blank" style={{ color: '#3b82f6', textDecoration: 'underline' }}>
+                Terms of Service
+              </a>
+            </span>
+          </label>
+
           <button
             type="submit"
-            disabled={loading || !isValid}
+            disabled={loading || !isValid || !ageConfirmed || !tosConfirmed}
             style={{
-              background: isValid ? '#3b82f6' : '#18181b',
-              color: isValid ? '#fff' : '#52525b',
+              background: isValid && ageConfirmed && tosConfirmed ? '#3b82f6' : '#18181b',
+              color: isValid && ageConfirmed && tosConfirmed ? '#fff' : '#52525b',
               border: 'none', borderRadius: '10px', padding: '14px',
               fontSize: '15px', fontWeight: 700,
-              cursor: loading || !isValid ? 'not-allowed' : 'pointer',
+              cursor: loading || !isValid || !ageConfirmed || !tosConfirmed ? 'not-allowed' : 'pointer',
               transition: 'background 0.12s',
             }}
           >

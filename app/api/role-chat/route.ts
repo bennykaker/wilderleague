@@ -423,6 +423,144 @@ Return ONLY this JSON (no markdown):
     // Haiku for everyone by default; directors can opt into Sonnet
     const model = wantsSonnet ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
 
+    // ── Streaming path ──────────────────────────────────────────────────────
+    const isStreaming = request.nextUrl.searchParams.get('stream') === '1'
+
+    if (isStreaming) {
+      // Streaming prompts: plain text reply first, then separator, then JSON
+      let streamPrompt = ''
+
+      if (action === 'describe') {
+        streamPrompt = `${persona}
+
+You are working on ${roleContext}
+
+Actor pool (suggest ONLY names that appear exactly in this list):
+${poolText}
+
+Write 2 sharp sentences describing this character — their essence, what they demand from an actor.${isBook ? ' Draw on your knowledge of the book.' : ' Note what the original performance got right or wrong.'}
+
+Write those 2 sentences as plain prose (no JSON, no quotes, no markdown).
+Then on a new line write exactly: ---
+Then on the next line write ONLY this JSON (no other text):
+{"actors": ["ExactName1", "ExactName2"], "suggestion": "follow-up question 10-15 words"}`
+
+      } else if (action === 'search') {
+        streamPrompt = `${persona}
+
+You are working on ${roleContext}
+
+The director just said: "${query}"
+
+Actor pool (suggest ONLY names that appear exactly in this list):
+${poolText}
+
+Give a 1–2 sentence reaction — what works about these picks, what to watch out for. Be specific and encouraging.
+
+Write your reaction as plain prose (no JSON, no quotes, no markdown).
+Then on a new line write exactly: ---
+Then on the next line write ONLY this JSON (no other text):
+{"actors": ["ExactName1", "ExactName2"], "suggestion": "follow-up question or null"}`
+
+      } else if (action === 'react') {
+        streamPrompt = `${persona}
+
+You are working on ${isBook ? `an adaptation of "${movie}"` : `a reboot of "${movie}"`}. The director just cast ${pickedActor} as ${role}${!isBook ? ` (originally ${originalActor})` : ''}${isBook && roleDescription ? ` (${roleDescription})` : ''}.${pickedActorCost != null ? ` Cost: $${pickedActorCost}M.` : ''}
+
+Give a 1–2 sentence reaction — what makes this casting work, and any honest caveats (age, budget, range). Be specific. If their cost is significantly outside the expected range for a ${tierLabel}, mention it.
+
+Write your reaction as plain prose (no JSON, no quotes, no markdown).
+Then on a new line write exactly: ---
+Then on the next line write ONLY this JSON (no other text):
+{"suggestion": "follow-up suggestion 10-15 words"}`
+      }
+
+      if (!streamPrompt) return Response.json({ reply: '', actors: [] })
+
+      const encoder = new TextEncoder()
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            const msgStream = client.messages.stream({
+              model,
+              max_tokens: 600,
+              messages: [{ role: 'user', content: streamPrompt }],
+            })
+
+            let fullText = ''
+            let sentUpTo = 0
+
+            for await (const event of msgStream) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                fullText += event.delta.text
+                const sepIdx = fullText.indexOf('\n---\n')
+                if (sepIdx !== -1) {
+                  if (sepIdx > sentUpTo) {
+                    controller.enqueue(encoder.encode(fullText.slice(sentUpTo, sepIdx)))
+                    sentUpTo = sepIdx
+                  }
+                } else {
+                  const safeUpTo = Math.max(sentUpTo, fullText.length - 5)
+                  if (safeUpTo > sentUpTo) {
+                    controller.enqueue(encoder.encode(fullText.slice(sentUpTo, safeUpTo)))
+                    sentUpTo = safeUpTo
+                  }
+                }
+              }
+            }
+
+            // Flush any remaining reply text
+            const finalSepIdx = fullText.indexOf('\n---\n')
+            if (finalSepIdx !== -1 && finalSepIdx > sentUpTo) {
+              controller.enqueue(encoder.encode(fullText.slice(sentUpTo, finalSepIdx)))
+            } else if (finalSepIdx === -1 && fullText.length > sentUpTo) {
+              controller.enqueue(encoder.encode(fullText.slice(sentUpTo)))
+            }
+
+            // Parse JSON after separator
+            const jsonPart = finalSepIdx !== -1 ? fullText.slice(finalSepIdx + 5).trim() : '{}'
+            let actors: string[] = []
+            let suggestion: string | null = null
+            try {
+              const jsonStr = extractJson(jsonPart) ?? jsonPart
+              const parsed = JSON.parse(jsonStr)
+              actors = (parsed.actors ?? []).filter((n: string) =>
+                allNames.has(n) || allActors.some(a => a.name.toLowerCase() === n.toLowerCase())
+              )
+              suggestion = parsed.suggestion ?? null
+            } catch { /* no actors/suggestion — still stream the reply */ }
+
+            // Send sentinel with metadata
+            controller.enqueue(encoder.encode(
+              `\n---\n${JSON.stringify({ actors, suggestion, remaining: rollingLimit - rollingCount - 1 })}`
+            ))
+          } catch (err) {
+            console.error('Streaming error:', err)
+            const isAnthropicBusy = err instanceof Error && (
+              err.message.includes('overloaded') ||
+              err.message.includes('rate limit') ||
+              err.message.includes('quota') ||
+              ('status' in err && (err as any).status === 529) ||
+              ('status' in err && (err as any).status === 429) ||
+              ('status' in err && (err as any).status === 402)
+            )
+            controller.enqueue(encoder.encode(`\n---\n${JSON.stringify({ actors: [], suggestion: null, marloweBusy: isAnthropicBusy })}`))
+          } finally {
+            controller.close()
+          }
+        }
+      })
+
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+          'X-Accel-Buffering': 'no',
+        }
+      })
+    }
+    // ── End streaming path ──────────────────────────────────────────────────
+
     const message = await client.messages.create({
       model,
       max_tokens: 600,
@@ -454,6 +592,17 @@ Return ONLY this JSON (no markdown):
     })
   } catch (err) {
     console.error('Role chat error:', err)
+    const isAnthropicBusy = err instanceof Error && (
+      err.message.includes('overloaded') ||
+      err.message.includes('rate limit') ||
+      err.message.includes('quota') ||
+      ('status' in err && (err as any).status === 529) ||
+      ('status' in err && (err as any).status === 429) ||
+      ('status' in err && (err as any).status === 402)
+    )
+    if (isAnthropicBusy) {
+      return Response.json({ marloweBusy: true, reply: '', actors: [] }, { status: 503 })
+    }
     const msg = err instanceof Error ? err.message : String(err)
     return Response.json({ error: msg, reply: '', actors: [] })
   }

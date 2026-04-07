@@ -21,6 +21,12 @@ export default function SubmitArtPage() {
       return
     }
 
+    if (file.size > 4 * 1024 * 1024) {
+      setErrorMsg('File too large. Please resize to under 4MB before uploading.')
+      setStatus('error')
+      return
+    }
+
     if (!agreed) {
       setErrorMsg('Please confirm the licence declaration before submitting.')
       return
@@ -130,7 +136,7 @@ export default function SubmitArtPage() {
                 ) : (
                   <div>
                     <div style={{ fontSize: '14px', color: '#71717a' }}>Drop your image here, or click to browse</div>
-                    <div style={{ fontSize: '12px', color: '#52525b', marginTop: '4px' }}>PNG, JPG, WEBP · Max 10MB</div>
+                    <div style={{ fontSize: '12px', color: '#52525b', marginTop: '4px' }}>PNG, JPG, WEBP · Max 4MB</div>
                   </div>
                 )}
               </div>

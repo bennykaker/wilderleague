@@ -54,6 +54,8 @@ type Props = {
   challenge?: ChallengeInfo
   isMember?: boolean
   isDirector?: boolean
+  rebootPotential?: number | null
+  rebootNotes?: string | null
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -64,7 +66,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false, rebootPotential, rebootNotes }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -87,6 +89,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [submitLoading, setSubmitLoading] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
   const [savedId, setSavedId] = useState<string | null>(null)
+  const [showPitchModal, setShowPitchModal] = useState(false)
+  const [pitch, setPitch] = useState('')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [scoreLoading, setScoreLoading] = useState(false)
   const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
@@ -102,6 +106,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [extraActors, setExtraActors] = useState<CastActor[]>([])
   const [chatRemaining, setChatRemaining] = useState<number | null>(null)
   const [chatLimitReached, setChatLimitReached] = useState(false)
+  const [marloweBusy, setMarloweBusy] = useState(false)
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
@@ -109,6 +114,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [topPicks, setTopPicks] = useState<Record<string, { name: string; count: number }[]>>({})
   const [topPicksLoading, setTopPicksLoading] = useState(false)
   const [showTopPicks, setShowTopPicks] = useState(false)
+  const [streamingText, setStreamingText] = useState<Record<string, string>>({})
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -203,23 +209,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     if (slot === 0) {
       const role = roles.find(r => r.role_name === roleName)
       const actor = allActors.find(a => a.name === actorName)
-      fetch('/api/role-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'react',
-          role: roleName,
-          movie: title,
-          originalActor: role?.original_actor ?? '',
-          roleDescription: role?.role_description ?? null,
-          roleTier: role?.tier,
-          budget,
-          pickedActor: actorName,
-          pickedActorCost: actor?.cost,
-        }),
-      })
-        .then(r => r.json())
+      streamRoleChat({
+        action: 'react',
+        role: roleName,
+        movie: title,
+        originalActor: role?.original_actor ?? '',
+        roleDescription: role?.role_description ?? null,
+        roleTier: role?.tier,
+        budget,
+        pickedActor: actorName,
+        pickedActorCost: actor?.cost,
+      }, roleName)
         .then(data => {
+          if (data.marloweBusy) { setMarloweBusy(true); return }
           if (data.reply) {
             setChatMessages(prev => ({
               ...prev,
@@ -362,6 +364,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     setExpandedMessages(new Set())
     setDeepDiveQuery('')
     setDeepDiveActors([])
+    setMarloweBusy(false)
     setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
 
     const preloaded = (preloadedSuggestions[activeRole] ?? [])
@@ -402,43 +405,40 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       return
     }
 
-    // Not prefetched (e.g. challenge mode or error) — fetch now
+    // Not prefetched (e.g. challenge mode or error) — fetch now with streaming
     setAiLoading(true)
+    const abortCtrl = new AbortController()
     let cancelled = false
 
-    fetch('/api/role-chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'describe',
-        role: activeRole,
-        movie: title,
-        movieSlug: slug,
-        originalActor: role.original_actor,
-        roleTier: role.tier,
-        budget,
-        actors: actors.map(a => a.name),
-        useSonnet,
-      }),
-    })
-      .then(r => r.json())
+    const capturedRole = activeRole
+    streamRoleChat({
+      action: 'describe',
+      role: capturedRole,
+      movie: title,
+      movieSlug: slug,
+      originalActor: role.original_actor,
+      roleTier: role.tier,
+      budget,
+      useSonnet,
+    }, capturedRole, abortCtrl.signal)
       .then(data => {
         if (cancelled) return
+        if (data.marloweBusy) { setMarloweBusy(true); setAiLoading(false); return }
         if (data.limitReached) { setChatLimitReached(true); setAiLoading(false); return }
-        if (data.sonnetLimitReached) { setSonnetLimitReached(true) }
+        if (data.sonnetLimitReached) setSonnetLimitReached(true)
         if (data.remaining != null) setChatRemaining(data.remaining)
-        applyDescribeResult(activeRole, { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: data.suggestion ?? null, remaining: data.remaining })
+        applyDescribeResult(capturedRole, { reply: data.reply, actors: data.actors, suggestion: data.suggestion, remaining: data.remaining })
       })
       .catch(err => {
         if (cancelled) return
         setChatMessages(prev => ({
           ...prev,
-          [activeRole]: [{ text: `Error: ${err?.message ?? 'fetch failed'}`, suggestion: null }],
+          [capturedRole]: [{ text: `Error: ${err?.message ?? 'fetch failed'}`, suggestion: null }],
         }))
       })
       .finally(() => { if (!cancelled) setAiLoading(false) })
 
-    return () => { cancelled = true }
+    return () => { cancelled = true; abortCtrl.abort() }
   }, [activeRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -446,29 +446,87 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     if (container) container.scrollTop = container.scrollHeight
   }, [chatMessages])
 
+  async function streamRoleChat(
+    body: object,
+    roleName: string,
+    signal?: AbortSignal
+  ): Promise<{ reply: string; actors: string[]; suggestion: string | null; remaining?: number; limitReached?: boolean; sonnetLimitReached?: boolean; marloweBusy?: boolean }> {
+    const res = await fetch('/api/role-chat?stream=1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal,
+    })
+
+    if (!res.ok || !res.body) {
+      const data = await res.json().catch(() => ({}))
+      return { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: null, ...data }
+    }
+
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    setStreamingText(prev => ({ ...prev, [roleName]: '' }))
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const sepIdx = buffer.indexOf('\n---\n')
+        setStreamingText(prev => ({
+          ...prev,
+          [roleName]: (sepIdx !== -1 ? buffer.slice(0, sepIdx) : buffer).trimStart(),
+        }))
+      }
+    } finally {
+      setStreamingText(prev => { const n = { ...prev }; delete n[roleName]; return n })
+    }
+
+    const sepIdx = buffer.indexOf('\n---\n')
+    const replyText = (sepIdx !== -1 ? buffer.slice(0, sepIdx) : buffer).trim()
+    const jsonStr = sepIdx !== -1 ? buffer.slice(sepIdx + 5).trim() : '{}'
+
+    let actors: string[] = []
+    let suggestion: string | null = null
+    let remaining: number | undefined
+    let limitReached = false
+    let sonnetLimitReached = false
+    let marloweBusy = false
+
+    try {
+      const parsed = JSON.parse(jsonStr)
+      actors = parsed.actors ?? []
+      suggestion = parsed.suggestion ?? null
+      remaining = parsed.remaining
+      limitReached = parsed.limitReached ?? false
+      sonnetLimitReached = parsed.sonnetLimitReached ?? false
+      marloweBusy = parsed.marloweBusy ?? false
+    } catch { /* use defaults */ }
+
+    return { reply: replyText, actors, suggestion, remaining, limitReached, sonnetLimitReached, marloweBusy }
+  }
+
   async function handleSearch() {
     if (!query.trim()) return
     setVisibleActors([])
     setAiLoading(true)
     const role = roles.find(r => r.role_name === activeRole)
     try {
-      const res = await fetch('/api/role-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'search',
-          role: activeRole,
-          movie: title,
-          movieSlug: slug,
-          originalActor: role?.original_actor ?? '',
-          roleTier: role?.tier,
-          budget,
-          query,
-          excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
-          useSonnet,
-        }),
-      })
-      const data = await res.json()
+      const data = await streamRoleChat({
+        action: 'search',
+        role: activeRole,
+        movie: title,
+        movieSlug: slug,
+        originalActor: role?.original_actor ?? '',
+        roleTier: role?.tier,
+        budget,
+        query,
+        excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
+        useSonnet,
+      }, activeRole)
+      if (data.marloweBusy) { setMarloweBusy(true); return }
       if (data.limitReached) { setChatLimitReached(true); return }
       if (data.sonnetLimitReached) setSonnetLimitReached(true)
       if (data.remaining != null) setChatRemaining(data.remaining)
@@ -584,6 +642,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </a>
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</div>
+        {rebootPotential != null && (
+          <div
+            title={rebootNotes ?? undefined}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '5px',
+              background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
+              borderRadius: '8px', padding: '4px 10px', flexShrink: 0, cursor: rebootNotes ? 'help' : 'default',
+            }}
+          >
+            <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 700 }}>Reboot Potential</span>
+            <span style={{ fontSize: '13px', fontWeight: 900, color: '#fde68a', fontVariantNumeric: 'tabular-nums' }}>{rebootPotential}/10</span>
+          </div>
+        )}
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           Meet Marlowe
@@ -1095,7 +1166,17 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           {/* AI chat — hidden when limit reached */}
           {!chatLimitReached && (
           <div ref={chatContainerRef} style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, overflowY: 'auto' }}>
-            {aiLoading && currentMessages.length === 0 && (
+            {marloweBusy && (
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', padding: '10px 12px', background: 'rgba(251,191,36,0.07)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: '10px' }}>
+                <span style={{ fontSize: '14px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
+                  Marlowe
+                </span>
+                <span style={{ fontSize: '14px', color: '#fde68a', lineHeight: 1.6 }}>
+                  Taking a short break — come back in a few minutes.
+                </span>
+              </div>
+            )}
+            {!marloweBusy && aiLoading && currentMessages.length === 0 && !streamingText[activeRole] && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div className="marlowe-spinner" />
                 <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
@@ -1135,7 +1216,18 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                 </div>
               )
             })}
-            {aiLoading && currentMessages.length > 0 && (
+            {streamingText[activeRole] !== undefined && (
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
+                  Marlowe
+                </span>
+                <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                  {streamingText[activeRole]}
+                  <span className="marlowe-cursor" />
+                </div>
+              </div>
+            )}
+            {!marloweBusy && aiLoading && currentMessages.length > 0 && !streamingText[activeRole] && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div className="marlowe-spinner" />
                 <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
@@ -1754,6 +1846,61 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
+      {/* Pitch modal */}
+      {showPitchModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
+          onClick={() => setShowPitchModal(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '480px' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800, marginBottom: '10px' }}>
+              Production Meeting
+            </div>
+            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', margin: '0 0 8px' }}>
+              Want to add an elevator pitch?
+            </h2>
+            <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 20px', lineHeight: 1.6 }}>
+              Why does this cast work? Why now? Sell it in a few sentences.
+            </p>
+            <textarea
+              value={pitch}
+              onChange={e => setPitch(e.target.value)}
+              placeholder="e.g. This is a grittier, street-level take. Instead of spectacle, we lean into character — every actor here disappears into the role. The budget tells studios we're serious without overcommitting..."
+              maxLength={600}
+              rows={5}
+              autoFocus
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                background: '#0e0e12', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '10px', padding: '12px 14px',
+                fontSize: '14px', color: '#e2e8f0', lineHeight: 1.6,
+                resize: 'vertical', outline: 'none', fontFamily: 'inherit',
+              }}
+            />
+            <div style={{ fontSize: '12px', color: '#3f3f46', textAlign: 'right', marginTop: '4px', marginBottom: '20px' }}>
+              {pitch.length}/600
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => handleSaveWithPitch(pitch)}
+                style={{ flex: 1, background: '#7c3aed', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, color: '#fff', cursor: 'pointer' }}
+              >
+                {pitch.trim() ? '🏆 Save with pitch' : '🏆 Save cast'}
+              </button>
+              <button
+                onClick={() => setShowPitchModal(false)}
+                style={{ background: 'none', border: '1px solid #27272a', borderRadius: '10px', padding: '12px 18px', fontSize: '14px', color: '#71717a', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Upgrade modal */}
       {showUpgradeModal && (
         <div
@@ -1796,23 +1943,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     setAiLoading(true)
     const role = roles.find(r => r.role_name === activeRole)
     try {
-      const res = await fetch('/api/role-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'search',
-          role: activeRole,
-          movie: title,
-          movieSlug: slug,
-          originalActor: role?.original_actor ?? '',
-          roleTier: role?.tier,
-          budget,
-          query: q,
-          excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
-          useSonnet,
-        }),
-      })
-      const data = await res.json()
+      const data = await streamRoleChat({
+        action: 'search',
+        role: activeRole,
+        movie: title,
+        movieSlug: slug,
+        originalActor: role?.original_actor ?? '',
+        roleTier: role?.tier,
+        budget,
+        query: q,
+        excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
+        useSonnet,
+      }, activeRole)
+      if (data.marloweBusy) { setMarloweBusy(true); return }
       if (data.limitReached) { setChatLimitReached(true); return }
       if (data.sonnetLimitReached) setSonnetLimitReached(true)
       if (data.remaining != null) setChatRemaining(data.remaining)
@@ -1840,12 +1983,17 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   }
 
   // ── Submit cast ──
-  async function handleSave() {
+  function handleSave() {
     if (saveLoading) return
     if (!isMember) { setShowUpgradeModal(true); return }
+    setPitch('')
+    setShowPitchModal(true)
+  }
+
+  async function handleSaveWithPitch(pitchText: string) {
+    setShowPitchModal(false)
     setSaveLoading(true)
     try {
-      // Build selections: only primary picks
       const primarySelections: Record<string, string> = {}
       for (const [role, slots] of Object.entries(selections)) {
         if (slots[0]) primarySelections[role] = slots[0]
@@ -1860,6 +2008,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           selections: primarySelections,
           total_cost: spent,
           budget,
+          pitch: pitchText || null,
         }),
       })
       const data = await res.json()
@@ -1988,6 +2137,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           @keyframes actorCardPop {
             from { opacity: 0; transform: scale(0.92) translateY(4px); }
             to   { opacity: 1; transform: scale(1) translateY(0); }
+          }
+          @keyframes marloweBlink {
+            0%, 100% { opacity: 1 }
+            50% { opacity: 0 }
+          }
+          .marlowe-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 13px;
+            background: #3b82f6;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: marloweBlink 0.9s step-end infinite;
           }
           @keyframes marloweSpinner {
             to { transform: rotate(360deg); }

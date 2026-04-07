@@ -25,10 +25,12 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser()
   let isMember = false
   let username: string | null = null
+  let memberNumber: number | null = null
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member, username').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_member, username, member_number').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
     username = profile?.username ?? null
+    memberNumber = profile?.member_number ?? null
   }
   const [all] = await Promise.all([
     getTitles(),
@@ -39,6 +41,10 @@ export default async function HomePage() {
   const featured = FEATURED_SLUGS.map(s => titleMap.get(s)).filter(Boolean) as typeof all
   const films = all.filter(t => t.type !== 'book')
   const books = all.filter(t => t.type === 'book')
+  const rebootList = [...all]
+    .filter(t => t.reboot_potential != null)
+    .sort((a, b) => (b.reboot_potential ?? 0) - (a.reboot_potential ?? 0))
+    .slice(0, 6)
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
@@ -111,7 +117,7 @@ export default async function HomePage() {
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
               </Link>
-              <AuthButton user={user ? { email: user.email, username, isMember } : null} />
+              <AuthButton user={user ? { email: user.email, username, isMember, memberNumber } : null} />
             </div>
           </div>
         </div>
@@ -163,6 +169,49 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
+
+            {/* Reboot Potential */}
+            {rebootList.length > 0 && (
+              <div style={{ marginBottom: '52px' }}>
+                <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '18px', fontWeight: 600 }}>
+                  Reboot Potential
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {rebootList.map(t => (
+                    <Link key={t.slug} href={`/${t.slug}`} style={{ textDecoration: 'none' }}>
+                      <div className="title-card" style={{
+                        display: 'flex', alignItems: 'center', gap: '14px',
+                        padding: '12px 14px', borderRadius: '10px',
+                        border: '1px solid rgba(251,191,36,0.12)',
+                        background: '#0e0e0e',
+                      }}>
+                        {t.poster_path ? (
+                          <img src={t.poster_path} alt={t.title} style={{ width: '32px', height: '48px', objectFit: 'cover', borderRadius: '4px', flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: '32px', height: '48px', borderRadius: '4px', background: '#1c1c1e', flexShrink: 0 }} />
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#f1f5f9', marginBottom: '3px' }}>{t.title}</div>
+                          {t.reboot_notes && (
+                            <div style={{ fontSize: '12px', color: '#71717a', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>
+                              {t.reboot_notes}
+                            </div>
+                          )}
+                        </div>
+                        <div style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center',
+                          background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
+                          borderRadius: '8px', padding: '6px 10px', flexShrink: 0,
+                        }}>
+                          <span style={{ fontSize: '16px', fontWeight: 900, color: '#fde68a', fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{t.reboot_potential}</span>
+                          <span style={{ fontSize: '10px', color: '#92400e', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>/10</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Full searchable library */}
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '40px' }}>

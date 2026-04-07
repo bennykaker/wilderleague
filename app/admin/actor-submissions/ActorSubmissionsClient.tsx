@@ -62,7 +62,10 @@ export default function ActorSubmissionsClient({ submissions }: { submissions: S
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: '10px', fontWeight: 700 }}>Admin</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700 }}>Admin</div>
+          <a href="/admin/users" style={{ fontSize: '13px', color: '#71717a', textDecoration: 'none', fontWeight: 600 }}>User Access →</a>
+        </div>
         <h1 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 6px' }}>Actor Submissions</h1>
         <p style={{ fontSize: '14px', color: '#71717a', marginBottom: '40px' }}>
           {pending.length} pending · {done.length} processed

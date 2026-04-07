@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '../../lib/supabase/client'
 
-type User = { email?: string | null; username?: string | null; isMember?: boolean }
+type User = { email?: string | null; username?: string | null; isMember?: boolean; memberNumber?: number | null }
 
 export default function AuthButton({ user }: { user: User | null }) {
   const [loading, setLoading] = useState(false)
@@ -35,7 +35,7 @@ export default function AuthButton({ user }: { user: User | null }) {
         )}
         {user.isMember ? (
           <Link href="/members" style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 700, textDecoration: 'none', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '8px', padding: '4px 10px' }}>
-            Member ✦
+            {user.memberNumber != null ? `#${user.memberNumber} ✦` : 'Member ✦'}
           </Link>
         ) : (
           <Link href="/pricing" style={{ fontSize: '12px', color: '#a1a1aa', textDecoration: 'none', border: '1px solid #27272a', borderRadius: '8px', padding: '4px 10px' }}>

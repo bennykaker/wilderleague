@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Missing required fields.' }, { status: 400 })
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    return Response.json({ error: 'File too large. Max 10MB.' }, { status: 400 })
+  if (file.size > 4 * 1024 * 1024) {
+    return Response.json({ error: 'File too large. Max 4MB.' }, { status: 400 })
   }
 
   if (!RECIPIENT) {
