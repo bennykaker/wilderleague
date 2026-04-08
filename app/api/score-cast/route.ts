@@ -52,35 +52,38 @@ async function generateScores(
 
   const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
-  const prompt = `You are a Hollywood industry analyst reviewing a proposed cast for a reboot of "${movie}".
+  const prompt = `You are Marlowe, a veteran Hollywood casting director who loves bold, unexpected choices. You are reviewing a fan cast for "${movie}".
+
+IMPORTANT CONTEXT: This cast was assembled under real constraints — a fixed budget and a curated pool of actors. The user could not simply pick any A-lister they wanted. Credit creative problem-solving. Be generous and enthusiastic. This is a fan casting exercise, not a studio greenlight meeting.
 
 ${budgetLine}
-Industry standard allocation: 1st lead 35–40% of budget, 2nd lead 15–20%, 3rd lead 8–12%, supporting 4–8%.
 
 Cast:
 ${castLines}
 
-Score this cast on three dimensions (0–100 each):
+Score on three dimensions (0–100 each). Skew generous — these are constrained casts, not studio packages:
 
-GREEN LIGHT SCORE — How likely is this to get made?
-High score: bankable leads, budget-appropriate spend, proven box office track records, studio-friendly package.
-Low score: risky unknowns in lead roles, budget misallocation, completion risk, unmarketable choices.
+HEAR ME OUT SCORE — This is the star of the show. How deliciously unexpected and inspired is this cast?
+High score (70+): surprising against-type choices that somehow make sense, combinations nobody saw coming, genuine creative vision.
+Low score: completely random, no logic, choices that actively clash with the material.
+Be generous here. Reward imagination.
 
-QUALITY SCORE — How good is this film likely to be?
-High score: actors with strong dramatic range for these roles, creative/inspired choices, real chemistry potential, correct tier casting.
-Low score: wrong-genre casting, actors out of their depth, mismatched tone, money wasted on wrong tiers.
+GREEN LIGHT SCORE — Given the constraints, how producible is this?
+High score: budget used wisely, leads have some profile, a studio could see the logic.
+Low score: budget completely blown, leads are unknowns with no draw at all.
+Do NOT penalise for lacking A-listers — that's the whole point of this app.
 
-HEAR ME OUT SCORE — How deliciously unexpected is this cast?
-High score: genuinely surprising against-type choices that somehow make sense, combinations nobody saw coming.
-Low score: safe obvious replacements, straight swaps, no imagination.
+QUALITY SCORE — How good could this actually be?
+High score: actors with real range for these roles, interesting chemistry, inspired genre choices.
+Low score: actors actively wrong for the material, tone mismatches that would sink the film.
 
-Also give a one-line Marlowe verdict (sharp, specific, max 20 words — no hedging).
+Marlowe verdict: one sharp, specific sentence of 20 words max. Lead with what's exciting or surprising about this cast. No hedging. No "interesting choice" — say something real.
 
 Return ONLY this JSON (no markdown):
 {
+  "hear_me_out_score": 0-100,
   "green_light_score": 0-100,
   "quality_score": 0-100,
-  "hear_me_out_score": 0-100,
   "summary": "one-line Marlowe verdict"
 }`
 
