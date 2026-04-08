@@ -42,23 +42,28 @@ async function generateScores(
   spent: number,
   cast: CastItem[],
   model: string,
+  isChallenge: boolean = false,
 ): Promise<{ summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number }> {
   const tierLabel = (t: string) =>
     t === 'first_lead' ? '1st lead' : t === 'second_lead' ? '2nd lead' : t === 'third_lead' ? '3rd lead' : 'supporting'
 
   const castLines = cast
-    .map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor} ($${c.cost}M)`)
+    .map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor}`)
     .join('\n')
 
-  const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
+  const budgetLine = isChallenge
+    ? ''
+    : `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})\n`
+
+  const challengeContext = isChallenge
+    ? `IMPORTANT CONTEXT: This is a Challenge Cast — the user could only choose from a specific curated universe of actors. Budget is not a factor. Judge entirely on creativity, fit, and imagination within those constraints.`
+    : `IMPORTANT CONTEXT: This cast was assembled under real constraints — a fixed budget and a curated pool of actors. The user could not simply pick any A-lister they wanted. Credit creative problem-solving. Be generous and enthusiastic. This is a fan casting exercise, not a studio greenlight meeting.`
 
   const prompt = `You are Marlowe, a veteran Hollywood casting director who loves bold, unexpected choices. You are reviewing a fan cast for "${movie}".
 
-IMPORTANT CONTEXT: This cast was assembled under real constraints — a fixed budget and a curated pool of actors. The user could not simply pick any A-lister they wanted. Credit creative problem-solving. Be generous and enthusiastic. This is a fan casting exercise, not a studio greenlight meeting.
+${challengeContext}
 
-${budgetLine}
-
-Cast:
+${budgetLine}Cast:
 ${castLines}
 
 Score on three dimensions (0–100 each). Skew generous — these are constrained casts, not studio packages:
@@ -114,7 +119,7 @@ const serviceSupabase = createClient(
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { movie_slug, movie_title, budget = 100, cast = [] } = body
+  const { movie_slug, movie_title, budget = 100, cast = [], isChallenge = false } = body
 
   if (!movie_slug || !cast.length) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -210,7 +215,7 @@ export async function POST(req: NextRequest) {
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
   try {
-    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast, model)
+    const result = await generateScores(movie_title ?? movie_slug, budget, spent, cast, model, isChallenge)
     const award = computeAward(result.green_light_score, result.quality_score, result.hear_me_out_score)
 
     // Store in cache

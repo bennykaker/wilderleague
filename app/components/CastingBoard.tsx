@@ -777,15 +777,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               Start over
             </button>
           )}
-          <div style={{ fontSize: '14px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-            ${remaining}M left
-          </div>
-          <div style={{ width: '80px' }}>
-            <div style={{ height: '3px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${Math.min((spent / budget) * 100, 100)}%`, background: overBudget ? '#ef4444' : '#22c55e', transition: 'width 0.2s' }} />
-            </div>
-            <div style={{ fontSize: '14px', color: '#a1a1aa', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
-          </div>
+          {!challenge && (
+            <>
+              <div style={{ fontSize: '14px', color: overBudget ? '#f87171' : '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                ${remaining}M left
+              </div>
+              <div style={{ width: '80px' }}>
+                <div style={{ height: '3px', background: '#27272a', borderRadius: '2px', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.min((spent / budget) * 100, 100)}%`, background: overBudget ? '#ef4444' : '#22c55e', transition: 'width 0.2s' }} />
+                </div>
+                <div style={{ fontSize: '14px', color: '#a1a1aa', marginTop: '3px', fontVariantNumeric: 'tabular-nums' }}>${spent}M of ${budget}M</div>
+              </div>
+            </>
+          )}
           <button
             onClick={handleScore}
             disabled={!allRolesFilled || scoreLoading}
@@ -1665,9 +1669,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             })}
 
             <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
-                ${spent}M / ${budget}M
-              </div>
+              {!challenge && (
+                <div style={{ fontSize: '14px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
+                  ${spent}M / ${budget}M
+                </div>
+              )}
               <button
                 onClick={copyShareLink}
                 style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
@@ -2193,7 +2199,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       const res = await fetch('/api/score-cast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movie_slug: slug, movie_title: title, budget, cast: castWithDetails }),
+        body: JSON.stringify({ movie_slug: slug, movie_title: title, budget, cast: castWithDetails, isChallenge: !!challenge }),
       })
       const data = await res.json()
       if (res.ok) setScoreResult(data)
