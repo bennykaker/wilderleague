@@ -140,13 +140,29 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
     if (csvNames.length >= 6) { filteredSuggestions[role.role_name] = csvNames.slice(0, 6); continue }
 
     const extras: string[] = []
+    const localSeen = new Set(csvNames.map(n => n.toLowerCase()))
+
+    // First pass: prefer actors not yet suggested for other roles
     for (const name of poolByPopularity) {
       const key = name.toLowerCase()
-      if (globalSeen.has(key)) continue
+      if (globalSeen.has(key) || localSeen.has(key)) continue
       extras.push(name)
+      localSeen.add(key)
       globalSeen.add(key)
       if (csvNames.length + extras.length >= 6) break
     }
+
+    // Second pass: if still under 6, allow repeats from full pool
+    if (csvNames.length + extras.length < 6) {
+      for (const name of poolByPopularity) {
+        const key = name.toLowerCase()
+        if (localSeen.has(key)) continue
+        extras.push(name)
+        localSeen.add(key)
+        if (csvNames.length + extras.length >= 6) break
+      }
+    }
+
     const combined = [...csvNames, ...extras]
     if (combined.length > 0) filteredSuggestions[role.role_name] = combined
   }
