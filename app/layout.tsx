@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MobileGate from "./components/MobileGate";
+import ProgressBar from "./components/ProgressBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
+        <ProgressBar />
         <MobileGate />
         {children}
       </body>
