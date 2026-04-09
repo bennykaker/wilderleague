@@ -131,7 +131,8 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   // Build Marlowe's Picks: each role gets 6 unique suggestions from the pool.
   // Use a global seen set so the same actor isn't suggested for multiple roles.
   const filteredSuggestions: Record<string, string[]> = {}
-  const poolByPopularity = [...poolActors].sort((a, b) => b.popularity - a.popularity).map(a => a.name)
+  const genderMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.gender ?? '']))
+  const poolSorted = [...poolActors].sort((a, b) => b.popularity - a.popularity)
   const globalSeen = new Set<string>()
 
   for (const role of roles) {
@@ -139,11 +140,17 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
     csvNames.forEach(n => globalSeen.add(n.toLowerCase()))
     if (csvNames.length >= 6) { filteredSuggestions[role.role_name] = csvNames.slice(0, 6); continue }
 
+    // Match gender of original actor so we don't suggest men for female roles
+    const originalGender = genderMap.get((role.original_actor ?? '').toLowerCase()) ?? ''
+    const genderFiltered = originalGender
+      ? poolSorted.filter(a => a.gender === originalGender).map(a => a.name)
+      : poolSorted.map(a => a.name)
+
     const extras: string[] = []
     const localSeen = new Set(csvNames.map(n => n.toLowerCase()))
 
     // First pass: prefer actors not yet suggested for other roles
-    for (const name of poolByPopularity) {
+    for (const name of genderFiltered) {
       const key = name.toLowerCase()
       if (globalSeen.has(key) || localSeen.has(key)) continue
       extras.push(name)
@@ -152,9 +159,9 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
       if (csvNames.length + extras.length >= 6) break
     }
 
-    // Second pass: if still under 6, allow repeats from full pool
+    // Second pass: if still under 6, allow repeats from same-gender pool
     if (csvNames.length + extras.length < 6) {
-      for (const name of poolByPopularity) {
+      for (const name of genderFiltered) {
         const key = name.toLowerCase()
         if (localSeen.has(key)) continue
         extras.push(name)
