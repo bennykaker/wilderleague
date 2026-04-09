@@ -1512,8 +1512,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             )
           })()}
 
-          {/* Deep Dive */}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
+          {/* Deep Dive — hidden for challenge casting (universe pool is the full search space) */}
+          {!challenge && (<div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
             {!showDeepDive ? (
               <div
                 title={isMember ? undefined : 'Expand your search past the top 2,000 working actors.'}
@@ -1613,6 +1613,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               </div>
             )}
           </div>
+          )}
 
         </div>
       </div>

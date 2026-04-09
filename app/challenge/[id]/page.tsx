@@ -117,15 +117,35 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
     popularity: a.popularity,
     cost: a.cost,
     salaryConfirmed: a.salary_confirmed,
+    knownFor: a.known_for || '',
+    biography: a.biography || '',
+    universeTags: a.universe_tags ?? [],
+    gender: a.gender || '',
+    birthYear: a.birth_year || '',
+    keywords: a.keywords || '',
+    castingProfile: a.casting_profile || '',
   }))
 
   const poolNameSet = new Set(actors.map(a => a.name.toLowerCase()))
 
-  // Filter preloaded suggestions to pool actors only
+  // Build Marlowe's Picks: filter CSV suggestions to pool actors, pad to 6 from pool by popularity
   const filteredSuggestions: Record<string, string[]> = {}
-  for (const [role, names] of Object.entries(suggestions)) {
-    const filtered = names.filter(n => poolNameSet.has(n.toLowerCase()))
-    if (filtered.length > 0) filteredSuggestions[role] = filtered
+  const poolByPopularity = [...poolActors].sort((a, b) => b.popularity - a.popularity).map(a => a.name)
+
+  for (const role of roles) {
+    const csvNames = (suggestions[role.role_name] ?? []).filter(n => poolNameSet.has(n.toLowerCase()))
+    if (csvNames.length >= 6) { filteredSuggestions[role.role_name] = csvNames.slice(0, 6); continue }
+
+    const seen = new Set(csvNames.map(n => n.toLowerCase()))
+    const extras: string[] = []
+    for (const name of poolByPopularity) {
+      if (seen.has(name.toLowerCase())) continue
+      extras.push(name)
+      seen.add(name.toLowerCase())
+      if (csvNames.length + extras.length >= 6) break
+    }
+    const combined = [...csvNames, ...extras]
+    if (combined.length > 0) filteredSuggestions[role.role_name] = combined
   }
 
   return (
