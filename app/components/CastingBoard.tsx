@@ -109,6 +109,8 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [marloweBusy, setMarloweBusy] = useState(false)
   const [showShareMenu, setShowShareMenu] = useState(false)
   const shareMenuRef = useRef<HTMLDivElement>(null)
+  const [copyingImage, setCopyingImage] = useState(false)
+  const shareCardRef = useRef<HTMLDivElement>(null)
   const [useSonnet, setUseSonnet] = useState(false)
   const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
   const [manualSearch, setManualSearch] = useState('')
@@ -649,6 +651,32 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     }
   }
 
+  async function copyAsImage() {
+    if (!shareCardRef.current) return
+    setCopyingImage(true)
+    try {
+      const { toPng } = await import('html-to-image')
+      const dataUrl = await toPng(shareCardRef.current, { pixelRatio: 2, cacheBust: true })
+      const res = await fetch(dataUrl)
+      const blob = await res.blob()
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+        alert('Cast image copied to clipboard!')
+      } catch {
+        // Fallback: download the image
+        const a = document.createElement('a')
+        a.href = dataUrl
+        a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-cast.png`
+        a.click()
+      }
+    } catch (e) {
+      console.error('Image generation failed:', e)
+      alert('Could not generate image. Try again.')
+    } finally {
+      setCopyingImage(false)
+    }
+  }
+
   async function handleCastReview() {
     setReviewLoading(true)
     setShowReview(true)
@@ -831,37 +859,14 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           >
             Export card
           </button>
-          <div style={{ position: 'relative' }} ref={shareMenuRef}>
-            <button
-              onClick={handleShareClick}
-              style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
-            >
-              Share ↗
-            </button>
-            {showShareMenu && (
-              <div
-                style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '6px', zIndex: 100, minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '2px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
-              >
-                <button onClick={shareViaWhatsApp} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
-                  <span>💬</span> WhatsApp
-                </button>
-                <button onClick={shareViaFacebook} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
-                  <span>📘</span> Facebook
-                </button>
-                <button onClick={shareViaEmail} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
-                  <span>✉️</span> Email
-                </button>
-                <div style={{ height: '1px', background: '#27272a', margin: '2px 0' }} />
-                <button onClick={copyShareLink} style={{ background: 'none', border: 'none', color: '#e4e4e7', fontSize: '14px', padding: '8px 12px', cursor: 'pointer', borderRadius: '6px', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '8px' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#27272a')} onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
-                  <span>🔗</span> Copy link
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={copyAsImage}
+            disabled={copyingImage || !allRolesFilled}
+            title={allRolesFilled ? 'Copy cast image to clipboard' : 'Fill all roles first'}
+            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: allRolesFilled ? 'pointer' : 'not-allowed', opacity: allRolesFilled ? 1 : 0.4 }}
+          >
+            {copyingImage ? 'Generating…' : 'Share ↗'}
+          </button>
         </div>
       </div>
 
@@ -2058,6 +2063,77 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
 
       {/* Actor hover popup */}
       {ActorHoverCard()}
+
+      {/* Hidden share card — captured by html-to-image */}
+      <div
+        ref={shareCardRef}
+        style={{
+          position: 'fixed', left: '-9999px', top: 0,
+          width: '680px',
+          background: '#09090b',
+          padding: '32px',
+          fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+          color: '#f8fafc',
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <div>
+            <div style={{ fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700, marginBottom: '4px' }}>Wilder League</div>
+            <div style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc' }}>{title}</div>
+            {challenge && <div style={{ fontSize: '12px', color: '#a78bfa', marginTop: '4px' }}>{challenge.badge} {challenge.headline}</div>}
+          </div>
+          {scoreResult && (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {[
+                { label: 'Hear Me Out', value: scoreResult.hear_me_out_score, color: '#a855f7' },
+                { label: 'Greenlight', value: scoreResult.green_light_score, color: '#22c55e' },
+                { label: 'Quality', value: scoreResult.quality_score, color: '#3b82f6' },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '24px', fontWeight: 900, color: s.color, fontVariantNumeric: 'tabular-nums' }}>{s.value}</div>
+                  <div style={{ fontSize: '10px', color: '#71717a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Marlowe verdict */}
+        {scoreResult?.ai_summary && (
+          <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            "{scoreResult.ai_summary}"
+          </div>
+        )}
+
+        {/* Cast grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+          {roles.map(r => {
+            const actorName = selections[r.role_name]?.[0]
+            const actor = allActors.find(a => a.name === actorName)
+            return (
+              <div key={r.role_name} style={{ background: '#111115', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div style={{ display: 'flex', gap: '10px', padding: '10px' }}>
+                  <div style={{ width: '48px', height: '64px', borderRadius: '6px', overflow: 'hidden', background: '#1c1c1e', flexShrink: 0 }}>
+                    {actor?.image
+                      ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} crossOrigin="anonymous" />
+                      : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
+                    }
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '10px', color: '#71717a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.role_name}</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: actorName ? '#f1f5f9' : '#3f3f46', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actorName || '—'}</div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Footer */}
+        <div style={{ marginTop: '20px', fontSize: '11px', color: '#3f3f46', textAlign: 'right' }}>wilderleague.com</div>
+      </div>
+
     </div>
   )
 
