@@ -30,6 +30,16 @@ export type CastRole = {
   marlowe_quick?: Record<string, MarloweCache> | null
 }
 
+type AIMatch = {
+  actor: CastActor | null
+  name: string
+  category: 'A' | 'B'
+  justification: string
+  productionNote?: string
+  confidence: string
+  inDatabase: boolean
+}
+
 type ChallengeInfo = {
   id: string
   label: string
@@ -93,6 +103,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [topPicks, setTopPicks] = useState<Record<string, { name: string; count: number }[]>>({})
   const [topPicksLoading, setTopPicksLoading] = useState(false)
   const [showTopPicks, setShowTopPicks] = useState(false)
+  const [showAskYourAI, setShowAskYourAI] = useState(false)
+  const [yourAIPaste, setYourAIPaste] = useState('')
+  const [yourAIMatches, setYourAIMatches] = useState<AIMatch[]>([])
+  const [aiPromptCopied, setAIPromptCopied] = useState(false)
+  const [rolePromptModal, setRolePromptModal] = useState<{ roleName: string } | null>(null)
+  const [rolePromptExtra, setRolePromptExtra] = useState('')
+  const [rolePromptCopied, setRolePromptCopied] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropSucceededRef = useRef(false)
 
@@ -353,6 +370,103 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       setTopPicks(prev => ({ ...prev, [activeRole]: data.picks ?? [] }))
     } catch { /* silent */ }
     finally { setTopPicksLoading(false) }
+  }
+
+  function buildAIPrompt(roleName?: string): string {
+    const resolvedName = roleName ?? activeRole
+    const role = roles.find(r => r.role_name === resolvedName)
+    if (!role) return ''
+
+    const tierLabel = role.tier === 'first_lead' ? '1st lead' : role.tier === 'second_lead' ? '2nd lead' : role.tier === 'third_lead' ? '3rd lead' : 'supporting role'
+    const origActor = actors.find(a => a.name.toLowerCase() === (role.original_actor ?? '').toLowerCase())
+
+    const genderLine = origActor?.gender ? `Gender: ${origActor.gender}` : ''
+    const ageLine = origActor?.birthYear ? `Approximate age range: ${origActor.birthYear} birth year — cast accordingly` : ''
+
+    const marloweDesc = (role.marlowe_cache as MarloweCache | null)?.reply
+      ? `Character description (from our casting notes):\n${((role.marlowe_cache as MarloweCache).reply).slice(0, 350).trim()}…`
+      : ''
+    const profileLine = origActor?.castingProfile ? `Casting profile: ${origActor.castingProfile.slice(0, 300)}` : ''
+    const keywordsLine = origActor?.keywords ? `Casting tags: ${origActor.keywords.split(',').slice(0, 20).join(', ')}` : ''
+
+    const budgetNote = challenge ? '' : `Budget ceiling for this role: approximately $${Math.min(remaining + (actors.find(a => a.name === getSlots(resolvedName)[0])?.cost ?? 0), budget)}M.`
+    const challengeNote = challenge ? `CONSTRAINT: This is a themed challenge — "${challenge.headline}". Only suggest actors who belong to that universe.` : ''
+
+    // For the active role, exclude what's currently shown; for other roles just skip assigned + blocked
+    const alreadyShown = resolvedName === activeRole ? visibleActors.map(a => a.name) : []
+    const skipNames = [...new Set([...blockedActors, ...assignedNames, ...alreadyShown, ...(role.original_actor ? [role.original_actor] : [])])]
+    const skipList = skipNames.length > 0 ? `Do not suggest any of these:\n${skipNames.map(n => `- ${n}`).join('\n')}` : ''
+
+    const roleDetails = [genderLine, ageLine, marloweDesc, profileLine, keywordsLine, budgetNote, challengeNote].filter(Boolean).join('\n')
+
+    return `You are a casting assistant for Wilder League, a platform where users recast famous films and TV shows.
+
+PRODUCTION: ${title}
+ROLE: ${resolvedName} (${tierLabel})
+ORIGINAL ACTOR: ${role.original_actor ?? 'not specified'}
+${roleDetails}
+
+${skipList}
+
+Your task: suggest SIX actors for this role — three matched choices and three wildcards.
+
+CATEGORY A — Matched casting (3 actors):
+Grounded, defensible choices that closely match the character's gender, approximate age, and type. These are the credible, castable picks a traditional studio would greenlight.
+
+CATEGORY B — Wildcard casting (3 actors):
+Genuinely surprising, unexpected, or genre-bending choices. May differ in age, gender, or acting style from the original. Must be genuinely defensible creative choices — not random or absurd. Think about what a visionary director might do with this role.
+
+RULES:
+- All suggested actors must be living and currently active in film or television
+- Do not suggest ${role.original_actor ?? 'the original actor'}
+- Do not repeat any actor across both categories
+- Spell names exactly as they appear in standard film databases
+
+OUTPUT FORMAT — return exactly these six lines and nothing else:
+CATEGORY_A_1: [Actor Name] | [One sentence: why this actor fits] | [Confidence: High/Medium/Low]
+CATEGORY_A_2: [Actor Name] | [One sentence: why this actor fits] | [Confidence: High/Medium/Low]
+CATEGORY_A_3: [Actor Name] | [One sentence: why this actor fits] | [Confidence: High/Medium/Low]
+CATEGORY_B_1: [Actor Name] | [One sentence: the creative logic] | [What would need to be true about the production for this to work] | [Confidence: High/Medium/Low]
+CATEGORY_B_2: [Actor Name] | [One sentence: the creative logic] | [What would need to be true about the production for this to work] | [Confidence: High/Medium/Low]
+CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would need to be true about the production for this to work] | [Confidence: High/Medium/Low]`
+  }
+
+  function handleAIPaste(text: string) {
+    setYourAIPaste(text)
+    if (!text.trim()) { setYourAIMatches([]); return }
+
+    const matches: AIMatch[] = []
+    const seen = new Set<string>()
+
+    for (const line of text.split('\n')) {
+      const catA = line.match(/^CATEGORY_A_\d:\s*(.+)/)
+      const catB = line.match(/^CATEGORY_B_\d:\s*(.+)/)
+      const match = catA ?? catB
+      if (!match) continue
+
+      const parts = match[1].split('|').map(p => p.trim())
+      const name = parts[0]
+      if (!name || seen.has(name.toLowerCase())) continue
+      seen.add(name.toLowerCase())
+
+      const actor = actors.find(a => a.name.toLowerCase() === name.toLowerCase())
+      if (catA) {
+        matches.push({ actor: actor ?? null, name, category: 'A', justification: parts[1] ?? '', confidence: parts[2] ?? '', inDatabase: !!actor })
+      } else {
+        matches.push({ actor: actor ?? null, name, category: 'B', justification: parts[1] ?? '', productionNote: parts[2] ?? '', confidence: parts[3] ?? '', inDatabase: !!actor })
+      }
+    }
+
+    setYourAIMatches(matches)
+  }
+
+  async function copyAIPrompt() {
+    const prompt = buildAIPrompt()
+    try {
+      await navigator.clipboard.writeText(prompt)
+      setAIPromptCopied(true)
+      setTimeout(() => setAIPromptCopied(false), 2000)
+    } catch { /* silent */ }
   }
 
   const displayActors = visibleActors.filter(a => !blockedActors.has(a.name))
@@ -656,6 +770,18 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                     </div>
                   </div>
                 </div>
+                <button
+                  onClick={e => { e.stopPropagation(); setRolePromptModal({ roleName: role.role_name }); setRolePromptExtra(''); setRolePromptCopied(false) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '5px', marginTop: '10px',
+                    background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)',
+                    borderRadius: '7px', padding: '5px 11px', cursor: 'pointer',
+                    fontSize: '12px', color: '#34d399', fontWeight: 600, width: '100%',
+                    justifyContent: 'center',
+                  }}
+                >
+                  ✦ Ask AI for this role
+                </button>
               </div>
             )
           })}
@@ -752,6 +878,20 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                 )}
               </div>
             )}
+          </div>
+
+          {/* Ask your AI */}
+          <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '14px' }}>
+            <button
+              onClick={() => { setYourAIPaste(''); setYourAIMatches([]); setShowAskYourAI(true) }}
+              style={{
+                width: '100%', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)',
+                borderRadius: '8px', padding: '8px 12px', color: '#34d399', fontSize: '14px',
+                fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+              }}
+            >
+              <span>🤖</span> Ask your AI
+            </button>
           </div>
 
           {/* Tag search */}
@@ -1361,8 +1501,292 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
+      {/* Per-role AI prompt modal */}
+      {rolePromptModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '24px' }}
+          onClick={() => setRolePromptModal(null)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>AI casting prompt</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9' }}>{rolePromptModal.roleName}</div>
+                <div style={{ fontSize: '13px', color: '#52525b', marginTop: '4px' }}>Copy this prompt into any AI to get casting suggestions.</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+                  {[
+                    { label: 'ChatGPT', href: 'https://chat.openai.com', note: 'free' },
+                    { label: 'Claude', href: 'https://claude.ai', note: 'free' },
+                    { label: 'Gemini', href: 'https://gemini.google.com', note: 'free' },
+                    { label: 'Copilot', href: 'https://copilot.microsoft.com', note: 'free' },
+                    { label: 'Meta AI', href: 'https://meta.ai', note: 'free' },
+                  ].map(({ label, href, note }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px', padding: '5px 10px', fontSize: '12px',
+                        color: '#a1a1aa', textDecoration: 'none', fontWeight: 600,
+                      }}
+                    >
+                      {label}
+                      <span style={{ fontSize: '10px', color: '#34d399', fontWeight: 700 }}>{note}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <button
+                onClick={() => setRolePromptModal(null)}
+                style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '24px', cursor: 'pointer', lineHeight: 1, marginTop: '-4px', flexShrink: 0 }}
+              >×</button>
+            </div>
+
+            {/* Prompt box */}
+            <div style={{ position: 'relative', marginBottom: '20px' }}>
+              <pre style={{
+                background: '#0d0d12', border: '1px solid #27272a', borderRadius: '12px',
+                padding: '16px', paddingRight: '100px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.65,
+                whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, fontFamily: 'inherit',
+                maxHeight: '240px', overflowY: 'auto',
+              }}>
+                {buildAIPrompt(rolePromptModal.roleName)}{rolePromptExtra.trim() ? `\n\nAdditional context from the user:\n${rolePromptExtra.trim()}` : ''}
+              </pre>
+              <button
+                onClick={async () => {
+                  const base = buildAIPrompt(rolePromptModal.roleName)
+                  const full = rolePromptExtra.trim() ? `${base}\n\nAdditional context from the user:\n${rolePromptExtra.trim()}` : base
+                  try { await navigator.clipboard.writeText(full) } catch { /* silent */ }
+                  setRolePromptCopied(true)
+                  setTimeout(() => setRolePromptCopied(false), 2000)
+                }}
+                style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  background: rolePromptCopied ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${rolePromptCopied ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                  borderRadius: '8px', padding: '5px 12px', fontSize: '12px', fontWeight: 700,
+                  color: rolePromptCopied ? '#34d399' : '#a1a1aa', cursor: 'pointer',
+                }}
+              >
+                {rolePromptCopied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+
+            {/* Extra detail */}
+            <div>
+              <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '8px', fontWeight: 600 }}>
+                Add extra context <span style={{ color: '#52525b', fontWeight: 400 }}>(optional — appended to the prompt)</span>
+              </div>
+              <textarea
+                value={rolePromptExtra}
+                onChange={e => setRolePromptExtra(e.target.value)}
+                placeholder={`e.g. The tone is darkly comedic. We want someone who can do physical comedy. Budget is tight so lean toward emerging talent.`}
+                rows={4}
+                style={{
+                  width: '100%', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px',
+                  padding: '12px', color: '#f8fafc', fontSize: '14px', outline: 'none',
+                  resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Actor hover popup */}
       {ActorHoverCard()}
+
+      {/* Ask your AI modal */}
+      {showAskYourAI && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '24px' }}
+          onClick={() => setShowAskYourAI(false)}
+        >
+          <div
+            style={{ background: '#111115', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '640px', maxHeight: '85vh', overflowY: 'auto' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>Ask your AI</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9' }}>Casting prompt — {activeRole}</div>
+                <div style={{ fontSize: '13px', color: '#52525b', marginTop: '4px' }}>Copy this prompt into any AI. Paste the response back below.</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+                  {[
+                    { label: 'ChatGPT', href: 'https://chat.openai.com', note: 'free tier' },
+                    { label: 'Claude', href: 'https://claude.ai', note: 'free tier' },
+                    { label: 'Gemini', href: 'https://gemini.google.com', note: 'free tier' },
+                    { label: 'Copilot', href: 'https://copilot.microsoft.com', note: 'free' },
+                    { label: 'Meta AI', href: 'https://meta.ai', note: 'free' },
+                  ].map(({ label, href, note }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '8px', padding: '5px 10px', fontSize: '12px',
+                        color: '#a1a1aa', textDecoration: 'none', fontWeight: 600,
+                      }}
+                    >
+                      {label}
+                      <span style={{ fontSize: '10px', color: '#34d399', fontWeight: 700 }}>{note}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <button onClick={() => setShowAskYourAI(false)} style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '24px', cursor: 'pointer', lineHeight: 1, marginTop: '-4px' }}>×</button>
+            </div>
+
+            {/* Prompt box */}
+            <div style={{ position: 'relative', marginBottom: '24px' }}>
+              <pre style={{
+                background: '#0d0d12', border: '1px solid #27272a', borderRadius: '12px',
+                padding: '16px', fontSize: '13px', color: '#94a3b8', lineHeight: 1.65,
+                whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0, fontFamily: 'inherit',
+                maxHeight: '260px', overflowY: 'auto',
+              }}>
+                {buildAIPrompt()}
+              </pre>
+              <button
+                onClick={copyAIPrompt}
+                style={{
+                  position: 'absolute', top: '10px', right: '10px',
+                  background: aiPromptCopied ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)',
+                  border: `1px solid ${aiPromptCopied ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.12)'}`,
+                  borderRadius: '8px', padding: '5px 12px', fontSize: '12px', fontWeight: 700,
+                  color: aiPromptCopied ? '#34d399' : '#a1a1aa', cursor: 'pointer',
+                }}
+              >
+                {aiPromptCopied ? 'Copied!' : 'Copy prompt'}
+              </button>
+            </div>
+
+            {/* Paste back */}
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '8px', fontWeight: 600 }}>
+                Paste the AI&apos;s response here
+              </div>
+              <textarea
+                value={yourAIPaste}
+                onChange={e => handleAIPaste(e.target.value)}
+                placeholder={'1. Cate Blanchett\n2. Tilda Swinton\n3. …'}
+                rows={6}
+                style={{
+                  width: '100%', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px',
+                  padding: '12px', color: '#f8fafc', fontSize: '14px', outline: 'none',
+                  resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Results */}
+            {yourAIMatches.length > 0 && (() => {
+              const catA = yourAIMatches.filter(m => m.category === 'A')
+              const catB = yourAIMatches.filter(m => m.category === 'B')
+              const inDb = yourAIMatches.filter(m => m.inDatabase).length
+
+              function MatchCard({ m }: { m: AIMatch }) {
+                const isAssigned = assignedNames.has(m.name)
+                const isBlocked = blockedActors.has(m.name)
+                const castable = m.inDatabase && !isAssigned && !isBlocked
+                return (
+                  <div style={{ background: '#0d0d12', border: `1px solid ${m.inDatabase ? 'rgba(255,255,255,0.08)' : '#1c1c1e'}`, borderRadius: '10px', overflow: 'hidden', opacity: isAssigned || isBlocked ? 0.4 : 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 12px' }}>
+                      {m.actor && (
+                        <div style={{ width: '36px', height: '50px', borderRadius: '5px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
+                          {m.actor.image
+                            ? <img src={m.actor.image} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
+                          }
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 700, color: m.inDatabase ? '#f1f5f9' : '#52525b' }}>{m.name}</span>
+                          {!m.inDatabase && <span style={{ fontSize: '10px', color: '#3f3f46', fontWeight: 600, background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '1px 5px' }}>not in database</span>}
+                          {m.confidence && <span style={{ fontSize: '10px', color: m.confidence === 'High' ? '#4ade80' : m.confidence === 'Medium' ? '#fbbf24' : '#94a3b8', fontWeight: 700 }}>{m.confidence}</span>}
+                        </div>
+                        {m.actor && (
+                          <div style={{ fontSize: '11px', color: '#52525b' }}>
+                            ${m.actor.cost}M{!m.actor.salaryConfirmed && ' est'}
+                            {m.actor.knownFor && <> · {m.actor.knownFor.split(',')[0]}</>}
+                          </div>
+                        )}
+                      </div>
+                      {castable && (
+                        <button
+                          onClick={() => { assignToSlot(activeRole, m.name, 0); setShowAskYourAI(false) }}
+                          style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: '7px', padding: '5px 10px', fontSize: '12px', fontWeight: 700, color: '#34d399', cursor: 'pointer', flexShrink: 0 }}
+                        >
+                          Cast →
+                        </button>
+                      )}
+                      {isAssigned && <span style={{ fontSize: '11px', color: '#52525b', flexShrink: 0 }}>Already cast</span>}
+                      {isBlocked && <span style={{ fontSize: '11px', color: '#52525b', flexShrink: 0 }}>Banned</span>}
+                    </div>
+                    {m.justification && (
+                      <div style={{ padding: '0 12px 10px', fontSize: '12px', color: '#71717a', lineHeight: 1.55, borderTop: '1px solid #18181b', paddingTop: '8px' }}>
+                        {m.justification}
+                        {m.productionNote && (
+                          <div style={{ marginTop: '5px', fontSize: '11px', color: '#3f3f46', fontStyle: 'italic' }}>
+                            Would work if: {m.productionNote}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              }
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div style={{ fontSize: '11px', color: '#52525b' }}>
+                    {inDb} of {yourAIMatches.length} suggestions found in our database
+                  </div>
+
+                  {catA.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#60a5fa', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        Category A — Matched casting
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {catA.map(m => <MatchCard key={m.name} m={m} />)}
+                      </div>
+                    </div>
+                  )}
+
+                  {catB.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>
+                        Category B — Wildcard casting
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {catB.map(m => <MatchCard key={m.name} m={m} />)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
+
+            {yourAIPaste.trim() && yourAIMatches.length === 0 && (
+              <div style={{ fontSize: '14px', color: '#52525b', lineHeight: 1.6 }}>
+                No results parsed. Make sure the AI returned lines starting with <code style={{ background: '#18181b', padding: '1px 5px', borderRadius: '4px', fontSize: '12px' }}>CATEGORY_A_1:</code> — you may need to ask it to reformat.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Hidden share card — captured by html-to-image */}
       <div
