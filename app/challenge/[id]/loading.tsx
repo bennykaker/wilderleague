@@ -11,12 +11,12 @@ export default function Loading() {
       fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
       gap: '16px',
     }}>
-      <div style={{ fontSize: '32px' }}>🎬</div>
+      <div style={{ fontSize: '32px' }}>⚡</div>
       <div style={{ fontSize: '18px', fontWeight: 700, color: '#f1f5f9' }}>
-        Setting up the casting board…
+        Loading challenge…
       </div>
       <div style={{ fontSize: '14px', color: '#52525b' }}>
-        Loading actors and roles.
+        Building the actor pool.
       </div>
     </div>
   )
