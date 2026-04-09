@@ -138,7 +138,7 @@ export async function POST(req: NextRequest) {
     const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
   }
-  const scoringModel = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+  const scoringModel = 'claude-haiku-4-5-20251001'
 
   // Rebuild cast with costs from DB
   const title = await getTitle(submission.movie_slug)

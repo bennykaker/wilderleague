@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
     { onConflict: 'ip,date,type' }
   )
 
-  const model = isMember ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+  const model = 'claude-haiku-4-5-20251001'
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
   try {
