@@ -82,14 +82,6 @@ export default async function HomePage() {
               <Link href="/submit/actor" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Suggest an actor →
               </Link>
-              {isMember && (
-                <Link href="/trophy-room" style={{ fontSize: '15px', color: '#fbbf24', textDecoration: 'none', borderBottom: '1px solid #78350f', paddingBottom: '2px' }}>
-                  🏆 Trophy Room →
-                </Link>
-              )}
-              <Link href="/hall-of-fame" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Hall of Fame →
-              </Link>
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
               </Link>

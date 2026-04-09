@@ -750,20 +750,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           Meet Marlowe
         </a>
-        {isMember && (
-          <>
-            <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
-            <a href="/trophy-room" style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
-              🏆 Trophy Room
-            </a>
-          </>
-        )}
-        <>
-          <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
-          <a href={`/${slug}/hall-of-fame`} style={{ color: '#71717a', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
-            Hall of Fame
-          </a>
-        </>
         {titleType === 'book' && (
           <>
             <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
@@ -833,7 +819,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           <button
             onClick={handleSave}
             disabled={saveLoading || Object.keys(selections).length === 0}
-            title={!isMember ? 'Members can save casts to their Trophy Room' : Object.keys(selections).length === 0 ? 'Cast some roles first' : savedId ? 'Saved!' : 'Save to Trophy Room'}
+            title={!isMember ? 'Members can save casts' : Object.keys(selections).length === 0 ? 'Cast some roles first' : savedId ? 'Saved!' : 'Save cast'}
             style={{ background: savedId ? 'rgba(251,191,36,0.12)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.08)' : '#18181b', border: `1px solid ${savedId ? 'rgba(251,191,36,0.5)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.25)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: savedId ? '#fbbf24' : Object.keys(selections).length > 0 ? '#a16207' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
           >
             {saveLoading ? 'Saving…' : savedId ? '🏆 Saved' : isMember ? '🏆 Save cast' : '🔒 Save cast'}
