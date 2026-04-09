@@ -62,10 +62,10 @@ export default async function HomePage() {
                 Browse actor pool →
               </Link>
               <Link href="/suggest" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Suggest a title →
+                Did we miss a film? →
               </Link>
               <Link href="/submit/actor" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Suggest an actor →
+                Did we miss an actor? →
               </Link>
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
