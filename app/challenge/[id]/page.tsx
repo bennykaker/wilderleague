@@ -128,20 +128,23 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
 
   const poolNameSet = new Set(actors.map(a => a.name.toLowerCase()))
 
-  // Build Marlowe's Picks: filter CSV suggestions to pool actors, pad to 6 from pool by popularity
+  // Build Marlowe's Picks: each role gets 6 unique suggestions from the pool.
+  // Use a global seen set so the same actor isn't suggested for multiple roles.
   const filteredSuggestions: Record<string, string[]> = {}
   const poolByPopularity = [...poolActors].sort((a, b) => b.popularity - a.popularity).map(a => a.name)
+  const globalSeen = new Set<string>()
 
   for (const role of roles) {
     const csvNames = (suggestions[role.role_name] ?? []).filter(n => poolNameSet.has(n.toLowerCase()))
+    csvNames.forEach(n => globalSeen.add(n.toLowerCase()))
     if (csvNames.length >= 6) { filteredSuggestions[role.role_name] = csvNames.slice(0, 6); continue }
 
-    const seen = new Set(csvNames.map(n => n.toLowerCase()))
     const extras: string[] = []
     for (const name of poolByPopularity) {
-      if (seen.has(name.toLowerCase())) continue
+      const key = name.toLowerCase()
+      if (globalSeen.has(key)) continue
       extras.push(name)
-      seen.add(name.toLowerCase())
+      globalSeen.add(key)
       if (csvNames.length + extras.length >= 6) break
     }
     const combined = [...csvNames, ...extras]
