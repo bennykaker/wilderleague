@@ -32,18 +32,6 @@ export default async function HomePage() {
 
   return (
     <main style={{ minHeight: '100vh', background: '#09090b', color: '#f8fafc', padding: '48px 28px', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
-      <Link href="/challenges" style={{
-        position: 'fixed', top: '16px', right: '24px', zIndex: 50,
-        background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.28)',
-        borderRadius: '12px', padding: '10px 16px', textDecoration: 'none',
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1px',
-        maxWidth: '260px',
-      }}>
-        <span style={{ fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800 }}>
-          🎬 Casting Challenges
-        </span>
-        <span style={{ fontSize: '13px', fontWeight: 800, color: '#a78bfa' }}>More Casting Challenges →</span>
-      </Link>
       <style>{`
         .title-card { transition: border-color 0.15s; }
         .title-card:hover { border-color: rgba(255,255,255,0.18) !important; }
@@ -69,9 +57,6 @@ export default async function HomePage() {
               <NewHereModal />
               <Link href="/marlowe" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Meet Marlowe →
-              </Link>
-              <Link href="/challenges" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                More Casting Challenges →
               </Link>
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Browse actor pool →
