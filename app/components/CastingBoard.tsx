@@ -785,6 +785,25 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             </div>
           </div>
 
+          {/* Show full pool — challenge pages only */}
+          {challenge && (
+            <button
+              onClick={() => {
+                const all = actors.filter(a => !blockedActors.has(a.name))
+                setVisibleActors(all)
+                setIsFiltered(true)
+                setQuery('')
+              }}
+              style={{
+                width: '100%', background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)',
+                borderRadius: '8px', padding: '8px 12px', color: '#a78bfa', fontSize: '14px',
+                fontWeight: 600, cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              Show all {actors.filter(a => !blockedActors.has(a.name)).length} eligible actors →
+            </button>
+          )}
+
         </div>
 
         {/* ── Right: Actor headshots ── */}
