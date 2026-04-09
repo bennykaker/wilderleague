@@ -430,14 +430,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             {reviewLoading ? 'Reading the room…' : isDirector ? 'Production Meeting' : '🔒 Production Meeting'}
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={!allRolesFilled || submitLoading}
-            title={allRolesFilled ? 'Submit your cast to the vote' : 'Fill all roles to submit'}
-            style={{ background: allRolesFilled ? 'rgba(34,197,94,0.12)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(34,197,94,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#4ade80' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
-          >
-            {submitLoading ? 'Submitting…' : 'Submit cast ↑'}
-          </button>
-          <button
             onClick={handleSave}
             disabled={saveLoading || Object.keys(selections).length === 0}
             title={!isMember ? 'Members can save casts' : Object.keys(selections).length === 0 ? 'Cast some roles first' : savedId ? 'Saved!' : 'Save cast'}
