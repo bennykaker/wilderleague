@@ -30,11 +30,6 @@ export type CastRole = {
   marlowe_quick?: Record<string, MarloweCache> | null
 }
 
-type ChatMsg = {
-  text: string
-  suggestion?: string | null
-}
-
 type ChallengeInfo = {
   id: string
   label: string
@@ -70,8 +65,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
   const [draggingActor, setDraggingActor] = useState<string | null>(null)
   const [draggingFromSlot, setDraggingFromSlot] = useState<{ role: string; slot: number } | null>(null)
-  const [chatMessages, setChatMessages] = useState<Record<string, ChatMsg[]>>({})
-  const [aiLoading, setAiLoading] = useState(false)
   const [query, setQuery] = useState('')
   const [visibleActors, setVisibleActors] = useState<CastActor[]>([])
   const [isFiltered, setIsFiltered] = useState(false)
@@ -93,37 +86,15 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [scoreLoading, setScoreLoading] = useState(false)
   const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
   const [showAllPassed, setShowAllPassed] = useState(false)
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
-  const [showMarloweFirst, setShowMarloweFirst] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  const [showDeepDive, setShowDeepDive] = useState(false)
-  const [deepDiveQuery, setDeepDiveQuery] = useState('')
-  const [deepDiveLoading, setDeepDiveLoading] = useState(false)
-  const [deepDiveRemaining, setDeepDiveRemaining] = useState<number | null>(null)
-  const [deepDiveActors, setDeepDiveActors] = useState<CastActor[]>([])
-  const [extraActors, setExtraActors] = useState<CastActor[]>([])
-  const [chatRemaining, setChatRemaining] = useState<number | null>(null)
-  const [chatLimitReached, setChatLimitReached] = useState(false)
-  const [marloweBusy, setMarloweBusy] = useState(false)
-  const [showShareMenu, setShowShareMenu] = useState(false)
-  const shareMenuRef = useRef<HTMLDivElement>(null)
   const [copyingImage, setCopyingImage] = useState(false)
   const shareCardRef = useRef<HTMLDivElement>(null)
-  const [useSonnet, setUseSonnet] = useState(false)
-  const [sonnetLimitReached, setSonnetLimitReached] = useState(false)
-  const [manualSearch, setManualSearch] = useState('')
   const [confirmStartOver, setConfirmStartOver] = useState(false)
   const [topPicks, setTopPicks] = useState<Record<string, { name: string; count: number }[]>>({})
   const [topPicksLoading, setTopPicksLoading] = useState(false)
   const [showTopPicks, setShowTopPicks] = useState(false)
-  const [streamingText, setStreamingText] = useState<Record<string, string>>({})
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const chatEndRef = useRef<HTMLDivElement>(null)
-  const chatContainerRef = useRef<HTMLDivElement>(null)
   const dropSucceededRef = useRef(false)
-  // Pre-fetched describe results keyed by role name
-  const prefetchedRef = useRef<Record<string, { reply: string; actors: string[]; suggestion: string | null; remaining?: number } | 'loading' | 'error'>>({})
-  const prefetchFiredRef = useRef(false)
 
   // Load blocklist + selections from localStorage
   useEffect(() => {
@@ -136,17 +107,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       if (savedSelections) setSelections(JSON.parse(savedSelections))
     } catch {}
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!showShareMenu) return
-    function handleClickOutside(e: MouseEvent) {
-      if (shareMenuRef.current && !shareMenuRef.current.contains(e.target as Node)) {
-        setShowShareMenu(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showShareMenu])
 
   function blockActor(name: string) {
     setBlockedActors(prev => {
@@ -173,17 +133,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     }
   }, [selections, slug])
 
-  // Merge server actors with any deep-dive additions for this session
-  const allActors = extraActors.length > 0
-    ? [...actors, ...extraActors.filter(e => !actors.find(a => a.name === e.name))]
-    : actors
+  const allActors = actors
 
-  // All actor names assigned to any slot across all roles
   const assignedNames = new Set(
     Object.values(selections).flatMap(arr => arr).filter(Boolean)
   )
 
-  // Budget only counts primary (slot 0) choices
   const spent = Object.values(selections).reduce((sum, arr) => {
     const name = arr[0]
     return sum + (name ? (allActors.find(a => a.name === name)?.cost ?? 0) : 0)
@@ -200,7 +155,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     setSelections(prev => {
       const next: Selections = {}
       for (const [r, arr] of Object.entries(prev)) {
-        // For primary slot: remove actor from any other role's slot 0
         if (slot === 0 && arr[0] === actorName && r !== roleName) {
           const trimmed = arr.slice(1)
           if (trimmed.some(Boolean)) next[r] = trimmed
@@ -209,7 +163,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         }
       }
       const current = [...(next[roleName] ?? [])]
-      // Remove this actor from other slots in the same role
       for (let i = 0; i < current.length; i++) {
         if (current[i] === actorName && i !== slot) current[i] = ''
       }
@@ -217,33 +170,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       next[roleName] = current
       return next
     })
-
-    // Only fire reaction message when assigning primary slot
-    if (slot === 0) {
-      const role = roles.find(r => r.role_name === roleName)
-      const actor = allActors.find(a => a.name === actorName)
-      streamRoleChat({
-        action: 'react',
-        role: roleName,
-        movie: title,
-        originalActor: role?.original_actor ?? '',
-        roleDescription: role?.role_description ?? null,
-        roleTier: role?.tier,
-        budget,
-        pickedActor: actorName,
-        pickedActorCost: actor?.cost,
-      }, roleName)
-        .then(data => {
-          if (data.marloweBusy) { setMarloweBusy(true); return }
-          if (data.reply) {
-            setChatMessages(prev => ({
-              ...prev,
-              [roleName]: [...(prev[roleName] ?? []), { text: data.reply, suggestion: data.suggestion }],
-            }))
-          }
-        })
-        .catch(() => {})
-    }
   }
 
   function clearSlot(roleName: string, slot: number) {
@@ -261,124 +187,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     })
   }
 
-  // ── Daily shown-count tracking ─────────────────────────────────────────────
-  // Each actor can appear in Marlowe's Picks at most 5 times per day.
-  // Once every suggested actor has hit the limit, counts reset automatically.
-  const DAILY_SHOW_LIMIT = 5
-  const shownKey = `marlowe_shown_${new Date().toISOString().slice(0, 10)}`
-
-  function getShownCounts(): Record<string, number> {
-    try { return JSON.parse(localStorage.getItem(shownKey) ?? '{}') } catch { return {} }
-  }
-
-  function recordShown(names: string[]) {
-    const counts = getShownCounts()
-    for (const name of names) counts[name] = (counts[name] ?? 0) + 1
-    localStorage.setItem(shownKey, JSON.stringify(counts))
-  }
-
-  function filterByLimit(picks: CastActor[]): CastActor[] {
-    const counts = getShownCounts()
-    const available = picks.filter(a => (counts[a.name] ?? 0) < DAILY_SHOW_LIMIT)
-    // If everyone hit the limit, reset those actors and start fresh
-    if (available.length === 0 && picks.length > 0) {
-      const fresh = getShownCounts()
-      for (const a of picks) delete fresh[a.name]
-      localStorage.setItem(shownKey, JSON.stringify(fresh))
-      return picks
-    }
-    return available
-  }
-  // ──────────────────────────────────────────────────────────────────────────
-
-  // Helper: apply a prefetched describe result to state
-  function applyDescribeResult(roleName: string, data: { reply: string; actors: string[]; suggestion: string | null; remaining?: number }) {
-    if (data.remaining != null) setChatRemaining(data.remaining)
-    setChatMessages(prev => ({
-      ...prev,
-      [roleName]: [{ text: data.reply || 'No response from AI.', suggestion: data.suggestion ?? null }],
-    }))
-    if (data.actors?.length) {
-      const picks = data.actors
-        .filter((name: string) => !blockedActors.has(name))
-        .map((name: string) => actors.find(a => a.name === name))
-        .filter((a): a is CastActor => Boolean(a))
-      const shown = filterByLimit(picks)
-      recordShown(shown.map(a => a.name))
-      setVisibleActors(uniqueByName(shown))
-      setIsFiltered(true)
-      setSuggestedPerRole(prev => {
-        const existing = prev[roleName] ?? []
-        const existingNames = new Set(existing.map(a => a.name))
-        return { ...prev, [roleName]: [...existing, ...shown.filter(a => !existingNames.has(a.name))] }
-      })
-    }
-  }
-
-  // Pre-fetch all role descriptions in parallel on mount
-  useEffect(() => {
-    if (prefetchFiredRef.current || challenge) return
-    prefetchFiredRef.current = true
-
-    // Seed the prefetch cache from DB-stored marlowe_cache first (instant, no API call)
-    for (const role of roles) {
-      if (role.marlowe_cache) {
-        prefetchedRef.current[role.role_name] = { ...role.marlowe_cache, remaining: undefined }
-      }
-    }
-
-    // Apply DB cache to the initial active role immediately
-    const firstRole = roles.find(r => r.role_name === activeRole)
-    if (firstRole?.marlowe_cache) {
-      applyDescribeResult(activeRole, { ...firstRole.marlowe_cache, remaining: undefined })
-      setAiLoading(false)
-    }
-
-    // Only fetch from API for roles that have no DB cache
-    const rolesToFetch = roles.filter(r => !r.marlowe_cache && !(preloadedSuggestions[r.role_name]?.length))
-    for (const role of rolesToFetch) {
-      prefetchedRef.current[role.role_name] = 'loading'
-      fetch('/api/role-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'describe',
-          role: role.role_name,
-          movie: title,
-          movieSlug: slug,
-          originalActor: role.original_actor,
-          roleDescription: role.role_description ?? null,
-          roleTier: role.tier,
-          budget,
-          useSonnet: false,
-        }),
-      })
-        .then(r => r.json())
-        .then(data => {
-          if (data.limitReached) { setChatLimitReached(true); prefetchedRef.current[role.role_name] = 'error'; return }
-          if (data.remaining != null) setChatRemaining(data.remaining)
-          prefetchedRef.current[role.role_name] = { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: data.suggestion ?? null, remaining: data.remaining }
-          if (role.role_name === activeRole) {
-            applyDescribeResult(role.role_name, prefetchedRef.current[role.role_name] as any)
-            setAiLoading(false)
-          }
-        })
-        .catch(() => { prefetchedRef.current[role.role_name] = 'error' })
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Fetch role description when active role changes
+  // Load preloaded suggestions when active role changes
   useEffect(() => {
     setQuery('')
-    setIsFiltered(false)
     setShowAllPassed(false)
-    setShowDeepDive(false)
     setShowTopPicks(false)
-    setExpandedMessages(new Set())
-    setDeepDiveQuery('')
-    setDeepDiveActors([])
-    setMarloweBusy(false)
-    setChatMessages(prev => ({ ...prev, [activeRole]: [] }))
 
     const preloaded = (preloadedSuggestions[activeRole] ?? [])
       .filter(name => !blockedActors.has(name))
@@ -389,185 +202,53 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       setVisibleActors(uniqueByName(picks))
       setIsFiltered(true)
       setSuggestedPerRole(prev => ({ ...prev, [activeRole]: picks }))
-      setAiLoading(false)
-      return
     } else if (challenge) {
       const available = actors.filter(a => !blockedActors.has(a.name))
       setVisibleActors(available)
       setIsFiltered(true)
       setSuggestedPerRole(prev => ({ ...prev, [activeRole]: available }))
-      return
     } else {
       setVisibleActors([])
+      setIsFiltered(false)
     }
-
-    const role = roles.find(r => r.role_name === activeRole)
-    if (!role) return
-
-    // Check if already prefetched
-    const cached = prefetchedRef.current[activeRole]
-    if (cached && cached !== 'loading' && cached !== 'error') {
-      applyDescribeResult(activeRole, cached)
-      setAiLoading(false)
-      return
-    }
-
-    // Still loading from prefetch — wait for it (show spinner, prefetch will apply when done)
-    if (cached === 'loading') {
-      setAiLoading(true)
-      return
-    }
-
-    // Not prefetched (e.g. challenge mode or error) — fetch now with streaming
-    setAiLoading(true)
-    const abortCtrl = new AbortController()
-    let cancelled = false
-
-    const capturedRole = activeRole
-    streamRoleChat({
-      action: 'describe',
-      role: capturedRole,
-      movie: title,
-      movieSlug: slug,
-      originalActor: role.original_actor,
-      roleTier: role.tier,
-      budget,
-      useSonnet,
-    }, capturedRole, abortCtrl.signal)
-      .then(data => {
-        if (cancelled) return
-        if (data.marloweBusy) { setMarloweBusy(true); setAiLoading(false); return }
-        if (data.limitReached) { setChatLimitReached(true); setAiLoading(false); return }
-        if (data.sonnetLimitReached) setSonnetLimitReached(true)
-        if (data.remaining != null) setChatRemaining(data.remaining)
-        applyDescribeResult(capturedRole, { reply: data.reply, actors: data.actors, suggestion: data.suggestion, remaining: data.remaining })
-      })
-      .catch(err => {
-        if (cancelled) return
-        setChatMessages(prev => ({
-          ...prev,
-          [capturedRole]: [{ text: `Error: ${err?.message ?? 'fetch failed'}`, suggestion: null }],
-        }))
-      })
-      .finally(() => { if (!cancelled) setAiLoading(false) })
-
-    return () => { cancelled = true; abortCtrl.abort() }
   }, [activeRole]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const container = chatContainerRef.current
-    if (container) container.scrollTop = container.scrollHeight
-  }, [chatMessages])
-
-  async function streamRoleChat(
-    body: object,
-    roleName: string,
-    signal?: AbortSignal
-  ): Promise<{ reply: string; actors: string[]; suggestion: string | null; remaining?: number; limitReached?: boolean; sonnetLimitReached?: boolean; marloweBusy?: boolean }> {
-    const res = await fetch('/api/role-chat?stream=1', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal,
-    })
-
-    if (!res.ok || !res.body) {
-      const data = await res.json().catch(() => ({}))
-      return { reply: data.reply ?? '', actors: data.actors ?? [], suggestion: null, ...data }
-    }
-
-    const reader = res.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
-
-    setStreamingText(prev => ({ ...prev, [roleName]: '' }))
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-        const sepIdx = buffer.indexOf('\n---\n')
-        setStreamingText(prev => ({
-          ...prev,
-          [roleName]: (sepIdx !== -1 ? buffer.slice(0, sepIdx) : buffer).trimStart(),
-        }))
-      }
-    } finally {
-      setStreamingText(prev => { const n = { ...prev }; delete n[roleName]; return n })
-    }
-
-    const sepIdx = buffer.indexOf('\n---\n')
-    const replyText = (sepIdx !== -1 ? buffer.slice(0, sepIdx) : buffer).trim()
-    const jsonStr = sepIdx !== -1 ? buffer.slice(sepIdx + 5).trim() : '{}'
-
-    let actors: string[] = []
-    let suggestion: string | null = null
-    let remaining: number | undefined
-    let limitReached = false
-    let sonnetLimitReached = false
-    let marloweBusy = false
-
-    try {
-      const parsed = JSON.parse(jsonStr)
-      actors = parsed.actors ?? []
-      suggestion = parsed.suggestion ?? null
-      remaining = parsed.remaining
-      limitReached = parsed.limitReached ?? false
-      sonnetLimitReached = parsed.sonnetLimitReached ?? false
-      marloweBusy = parsed.marloweBusy ?? false
-    } catch { /* use defaults */ }
-
-    return { reply: replyText, actors, suggestion, remaining, limitReached, sonnetLimitReached, marloweBusy }
-  }
-
-  async function handleSearch() {
-    if (!query.trim()) return
-    setVisibleActors([])
-    setAiLoading(true)
-    const role = roles.find(r => r.role_name === activeRole)
-    try {
-      const data = await streamRoleChat({
-        action: 'search',
-        role: activeRole,
-        movie: title,
-        movieSlug: slug,
-        originalActor: role?.original_actor ?? '',
-        roleTier: role?.tier,
-        budget,
-        query,
-        excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
-        useSonnet,
-      }, activeRole)
-      if (data.marloweBusy) { setMarloweBusy(true); return }
-      if (data.limitReached) { setChatLimitReached(true); return }
-      if (data.sonnetLimitReached) setSonnetLimitReached(true)
-      if (data.remaining != null) setChatRemaining(data.remaining)
-      if (data.reply) {
-        const isFirstMessage = !(chatMessages[activeRole]?.length > 0)
-        const isNameOnly = query.trim().split(/\s+/).length <= 4 &&
-          !/\b(young|old|cheap|expensive|funny|comedy|comedian|action|drama|thriller|horror|british|australian|rising|emerging|veteran|seasoned|female|male|woman|man|black|white|asian|latino|diverse)\b/i.test(query)
-        const hint = isFirstMessage && isNameOnly ? ' You can also just describe the actor you want.' : ''
-        setChatMessages(prev => ({
-          ...prev,
-          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply + hint, suggestion: data.suggestion }],
-        }))
-      }
-      const pickedNames: string[] = data.actors ?? []
-      const picks = pickedNames
+  // Tag-based local search
+  function handleTagSearch(q: string) {
+    setQuery(q)
+    if (!q.trim()) {
+      // Reset to preloaded suggestions
+      const preloaded = (preloadedSuggestions[activeRole] ?? [])
         .filter(name => !blockedActors.has(name))
-        .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
-        .filter((a): a is CastActor => Boolean(a))
-      setVisibleActors(uniqueByName(picks))
-      setIsFiltered(true)
-      setSuggestedPerRole(prev => {
-        const existing = prev[activeRole] ?? []
-        const existingNames = new Set(existing.map(a => a.name))
-        return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
-      })
-      setQuery('')
-    } catch {}
-    finally { setAiLoading(false) }
+      if (preloaded.length > 0) {
+        const picks = preloaded
+          .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
+          .filter((a): a is CastActor => Boolean(a))
+        setVisibleActors(uniqueByName(picks))
+        setIsFiltered(true)
+      } else if (challenge) {
+        setVisibleActors(actors.filter(a => !blockedActors.has(a.name)))
+        setIsFiltered(true)
+      } else {
+        setVisibleActors([])
+        setIsFiltered(false)
+      }
+      return
+    }
+    const terms = q.toLowerCase().split(/\s+/).filter(Boolean)
+    const matches = actors.filter(a => {
+      if (blockedActors.has(a.name)) return false
+      const searchable = [
+        a.name,
+        a.keywords ?? '',
+        a.knownFor ?? '',
+        a.castingProfile ?? '',
+        a.biography ?? '',
+      ].join(' ').toLowerCase()
+      return terms.every(term => searchable.includes(term))
+    })
+    setVisibleActors(matches.slice(0, 40))
+    setIsFiltered(true)
   }
 
   function buildShareContent() {
@@ -602,35 +283,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     return { url, body, subject }
   }
 
-  async function handleNativeShare() {
-    const { url, body, subject } = buildShareContent()
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: subject, text: body, url })
-        return true
-      } catch { /* user cancelled or not supported */ }
-    }
-    return false
-  }
-
-  function shareViaWhatsApp() {
-    const { body } = buildShareContent()
-    window.open(`https://wa.me/?text=${encodeURIComponent(body)}`, '_blank')
-    setShowShareMenu(false)
-  }
-
-  function shareViaFacebook() {
-    const { url } = buildShareContent()
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank')
-    setShowShareMenu(false)
-  }
-
-  function shareViaEmail() {
-    const { body, subject } = buildShareContent()
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    setShowShareMenu(false)
-  }
-
   async function copyShareLink() {
     const { url } = buildShareContent()
     try {
@@ -638,14 +290,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
       alert('Link copied to clipboard.')
     } catch {
       alert(url)
-    }
-    setShowShareMenu(false)
-  }
-
-  async function handleShareClick() {
-    const shared = await handleNativeShare()
-    if (!shared) {
-      setShowShareMenu(prev => !prev)
     }
   }
 
@@ -661,7 +305,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
         alert('Cast image copied to clipboard!')
       } catch {
-        // Fallback: download the image
         const a = document.createElement('a')
         a.href = dataUrl
         a.download = `${title.replace(/\s+/g, '-').toLowerCase()}-cast.png`
@@ -686,7 +329,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         const actor = allActors.find(a => a.name === name)
         return { role: r.role_name, tier: r.tier ?? 'supporting', originalActor: r.original_actor, newActor: name, cost: actor?.cost ?? 0, salaryConfirmed: actor?.salaryConfirmed ?? false }
       })
-      .filter(Boolean) as { role: string; tier: string; originalActor: string; newActor: string; cost: number; salaryConfirmed: boolean }[]
+      .filter(Boolean) as { role: string; tier: string; originalActor: string | null; newActor: string; cost: number; salaryConfirmed: boolean }[]
     const uncastRoles = roles.filter(r => !getSlots(r.role_name)[0]).map(r => r.role_name)
     try {
       const res = await fetch('/api/cast-review', {
@@ -700,28 +343,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     finally { setReviewLoading(false) }
   }
 
-  const currentMessages = chatMessages[activeRole] ?? []
-
-  async function handleDeepDive() {
-    if (!deepDiveQuery.trim()) return
-    setDeepDiveLoading(true)
-    const excludeNames = Array.from(assignedNames)
-    try {
-      const res = await fetch('/api/deep-dive', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: deepDiveQuery, excludeNames }),
-      })
-      const data = await res.json()
-      if (!res.ok) { alert(data.error ?? 'Deep dive failed'); return }
-      setDeepDiveActors(data.actors ?? [])
-      if (data.remaining != null) setDeepDiveRemaining(data.remaining)
-    } catch { alert('Deep dive failed. Try again.') }
-    finally { setDeepDiveLoading(false) }
-  }
-
   async function handleTopPicks() {
-    // Use cache if already fetched for this role
     if (topPicks[activeRole]) { setShowTopPicks(true); return }
     setTopPicksLoading(true)
     setShowTopPicks(true)
@@ -733,7 +355,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     finally { setTopPicksLoading(false) }
   }
 
-  // Filter blocked actors from visible grid
   const displayActors = visibleActors.filter(a => !blockedActors.has(a.name))
 
   return (
@@ -801,7 +422,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             onClick={() => {
               if (Object.keys(selections).length === 0) return
               if (!isDirector) { setShowUpgradeModal(true); return }
-              setShowMarloweFirst(true)
+              handleCastReview()
             }}
             disabled={Object.keys(selections).length === 0 || reviewLoading}
             style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
@@ -853,7 +474,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
-
       {/* Body */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0, overflow: 'hidden' }}>
 
@@ -900,7 +520,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-                  {/* Original actor — hidden for books (no original actor) */}
                   {role.original_actor && (
                     <>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
@@ -918,14 +537,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                           </div>
                         </div>
                       </div>
-                      {/* Arrow */}
                       <div style={{ color: '#94a3b8', fontSize: '20px', flexShrink: 0, paddingTop: '30px' }}>→</div>
                     </>
                   )}
 
-                  {/* Slots column */}
                   <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {/* Primary slot */}
                     <CastSlot
                       actor={primaryActor}
                       isDragOver={dragOverSlot?.role === role.role_name && dragOverSlot?.slot === 0}
@@ -964,7 +580,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                       onClear={() => clearSlot(role.role_name, 0)}
                     />
 
-                    {/* Possibles row (2nd and 3rd choice) */}
                     <div style={{ display: 'flex', gap: '5px' }}>
                       {[1, 2].map(slot => {
                         const name = slots[slot]
@@ -1055,7 +670,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           </div>
         </div>
 
-        {/* ── Centre: Marlowe chat ── */}
+        {/* ── Centre: Search + tools ── */}
         <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: '20px 18px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px', minHeight: 0 }}>
 
           {/* Role selector */}
@@ -1147,205 +762,60 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             )}
           </div>
 
-          {/* Search — top of chat */}
+          {/* Tag search */}
           <div>
-            {/* Counter + Sonnet toggle row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ fontSize: '13px', color: '#a1a1aa', lineHeight: 1.5 }}>
-                {chatLimitReached
-                  ? 'Marlowe is resting — search by name below.'
-                  : 'Look for a different actor here'}
-              </div>
-              {chatRemaining != null && !chatLimitReached && (
-                <div style={{ fontSize: '12px', color: chatRemaining <= 10 ? '#f59e0b' : '#52525b', flexShrink: 0, marginLeft: '8px' }}>
-                  {chatRemaining} left
-                </div>
+            <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '8px', lineHeight: 1.5 }}>
+              Search by name, type, or vibe
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                value={query}
+                onChange={e => handleTagSearch(e.target.value)}
+                placeholder='e.g. "funny british" or actor name…'
+                style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
+              />
+              {query && (
+                <button
+                  onClick={() => handleTagSearch('')}
+                  style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  Clear
+                </button>
               )}
             </div>
-
-            {/* Sonnet toggle — directors only */}
-            {isDirector && !chatLimitReached && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <button
-                  onClick={() => { setUseSonnet(v => !v); setSonnetLimitReached(false) }}
-                  style={{
-                    background: useSonnet ? 'rgba(139,92,246,0.15)' : '#1a1a22',
-                    border: `1px solid ${useSonnet ? '#7c3aed' : '#3f3f46'}`,
-                    borderRadius: '8px', padding: '5px 10px', fontSize: '12px', fontWeight: 600,
-                    color: useSonnet ? '#a78bfa' : '#71717a', cursor: 'pointer',
-                  }}
-                >
-                  {useSonnet ? 'Sonnet ON' : 'Sonnet'}
-                </button>
-                {sonnetLimitReached && (
-                  <span style={{ fontSize: '12px', color: '#f59e0b' }}>Sonnet limit hit — switched to Haiku</span>
-                )}
-              </div>
-            )}
-
-            {/* Normal Marlowe search (hidden when limit reached) */}
-            {!chatLimitReached && (
-              <>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    value={query}
-                    onChange={e => setQuery(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') handleSearch() }}
-                    placeholder='Actor search…'
-                    style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-                  />
-                  <button
-                    onClick={handleSearch}
-                    disabled={aiLoading || !query.trim()}
-                    style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '10px 16px', fontSize: '14px', fontWeight: 700, cursor: aiLoading || !query.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !query.trim() ? 0.5 : 1, flexShrink: 0 }}
-                  >
-                    Ask
-                  </button>
-                  {isFiltered && (
-                    <button
-                      onClick={() => { setVisibleActors([]); setIsFiltered(false); setQuery('') }}
-                      style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-
-              </>
-            )}
-
-            {/* Fail state: manual name search when limit reached */}
-            {chatLimitReached && (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input
-                  value={manualSearch}
-                  onChange={e => {
-                    const val = e.target.value
-                    setManualSearch(val)
-                    if (val.trim().length >= 2) {
-                      const q = val.toLowerCase()
-                      const matches = actors.filter(a => a.name.toLowerCase().includes(q) && !blockedActors.has(a.name))
-                      setVisibleActors(matches.slice(0, 20))
-                      setIsFiltered(true)
-                    } else if (!val.trim()) {
-                      setVisibleActors([])
-                      setIsFiltered(false)
-                    }
-                  }}
-                  placeholder='Search actor by name…'
-                  style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '10px', padding: '10px 13px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-                />
-                {isFiltered && (
-                  <button
-                    onClick={() => { setVisibleActors([]); setIsFiltered(false); setManualSearch('') }}
-                    style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '10px 12px', fontSize: '14px', cursor: 'pointer', flexShrink: 0 }}
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            )}
           </div>
-
-          {/* AI chat — hidden when limit reached */}
-          {!chatLimitReached && (
-          <div ref={chatContainerRef} style={{ background: '#16161e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, overflowY: 'auto' }}>
-            {marloweBusy && (
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', padding: '10px 12px', background: 'rgba(251,191,36,0.07)', border: '1px solid rgba(251,191,36,0.2)', borderRadius: '10px' }}>
-                <span style={{ fontSize: '14px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
-                  Marlowe
-                </span>
-                <span style={{ fontSize: '14px', color: '#fde68a', lineHeight: 1.6 }}>
-                  Taking a short break — come back in a few minutes.
-                </span>
-              </div>
-            )}
-            {!marloweBusy && aiLoading && currentMessages.length === 0 && !streamingText[activeRole] && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="marlowe-spinner" />
-                <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
-              </div>
-            )}
-            {currentMessages.map((msg, i) => {
-              const words = msg.text.split(' ')
-              const isLong = words.length > 25
-              const isExpanded = expandedMessages.has(i)
-              const displayText = isLong && !isExpanded ? words.slice(0, 25).join(' ') + '…' : msg.text
-              return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
-                      Marlowe
-                    </span>
-                    <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
-                      {displayText}
-                      {isLong && (
-                        <button
-                          onClick={() => setExpandedMessages(prev => { const next = new Set(prev); isExpanded ? next.delete(i) : next.add(i); return next })}
-                          style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '13px', cursor: 'pointer', marginLeft: '4px', padding: 0 }}
-                        >
-                          {isExpanded ? 'less' : 'more'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  {msg.suggestion && (
-                    <button
-                      onClick={() => { setQuery(msg.suggestion!); handleSearchWithQuery(msg.suggestion!) }}
-                      style={{ alignSelf: 'flex-start', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '7px 13px', fontSize: '14px', color: '#60a5fa', cursor: 'pointer', textAlign: 'left', lineHeight: 1.4 }}
-                    >
-                      💬 {msg.suggestion}
-                    </button>
-                  )}
-                </div>
-              )
-            })}
-            {streamingText[activeRole] !== undefined && (
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: '2px', flexShrink: 0 }}>
-                  Marlowe
-                </span>
-                <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.6 }}>
-                  {streamingText[activeRole]}
-                  <span className="marlowe-cursor" />
-                </div>
-              </div>
-            )}
-            {!marloweBusy && aiLoading && currentMessages.length > 0 && !streamingText[activeRole] && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div className="marlowe-spinner" />
-                <span style={{ fontSize: '14px', color: '#60a5fa', fontWeight: 600 }}>Marlowe is thinking…</span>
-              </div>
-            )}
-          </div>
-          )}
 
         </div>
 
         {/* ── Right: Actor headshots ── */}
         <div style={{ padding: '20px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 0 }}>
           <div>
-            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {aiLoading && <div className="marlowe-spinner" />}
-              {aiLoading ? 'Finding actors…' : displayActors.length === 0 ? 'Waiting for Marlowe…' : `Marlowe's picks · ${displayActors.length}`}
+            <div style={{ fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#a1a1aa', fontWeight: 600, marginBottom: '6px' }}>
+              {query.trim()
+                ? `Results · ${displayActors.length}`
+                : displayActors.length > 0 ? `Picks · ${displayActors.length}` : 'Picks'}
             </div>
-            {displayActors.length > 0 && !aiLoading && (
+            {displayActors.length > 0 && !query.trim() && (
               <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
-                These are suggestions — not your only options. Want someone younger? Cheaper? A wild card? Just ask Marlowe.
+                Search by name or describe what you&apos;re looking for — younger, funnier, British, a wild card.
               </div>
             )}
-            {displayActors.length === 0 && !aiLoading && (
+            {displayActors.length === 0 && !query.trim() && (
               <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
-                Marlowe will suggest actors when you select a role. Or describe what you're looking for — younger, cheaper, comedic, a wild card.
+                Select a role on the left, then search or browse picks here.
+              </div>
+            )}
+            {displayActors.length === 0 && query.trim() && (
+              <div style={{ fontSize: '14px', color: '#94a3b8', lineHeight: 1.6 }}>
+                No matches for &quot;{query}&quot; — try different terms.
               </div>
             )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: '8px' }}>
-            {displayActors.map((actor, i) => {
+            {displayActors.map(actor => {
               const isAssigned = assignedNames.has(actor.name)
               const isDragging = draggingActor === actor.name
-              const isAiPick = isFiltered && i < 8
 
               return (
                 <div
@@ -1371,10 +841,10 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                   }}
                   onDragEnd={() => setDraggingActor(null)}
                   style={{
-                    border: `1px solid ${isAiPick ? 'rgba(59,130,246,0.5)' : 'rgba(255,255,255,0.08)'}`,
+                    border: '1px solid rgba(255,255,255,0.08)',
                     borderRadius: '8px',
                     overflow: 'hidden',
-                    background: isAssigned ? '#0f0f14' : isAiPick ? 'rgba(15,26,48,1)' : '#18181b',
+                    background: isAssigned ? '#0f0f14' : '#18181b',
                     opacity: isAssigned ? 0.25 : isDragging ? 0.3 : 1,
                     cursor: isAssigned ? 'default' : 'grab',
                     transition: 'opacity 0.15s',
@@ -1417,7 +887,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                     </div>
                     {actor.keywords && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
-                        {actor.keywords.split(';').map((t: string) => t.trim()).filter(Boolean).slice(0, 3).map(tag => (
+                        {actor.keywords.split(',').map((t: string) => t.trim()).filter(Boolean).slice(0, 3).map(tag => (
                           <span key={tag} style={{ fontSize: '10px', background: '#18181b', border: '1px solid #27272a', borderRadius: '4px', padding: '1px 5px', color: '#71717a' }}>
                             {tag}
                           </span>
@@ -1430,7 +900,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             })}
           </div>
 
-          {/* Second look — bottom of right column */}
+          {/* Second look */}
           {(() => {
             const primaryName = getSlots(activeRole)[0]
             const passed = (suggestedPerRole[activeRole] ?? []).filter(a =>
@@ -1475,109 +945,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             )
           })()}
 
-          {/* Deep Dive — hidden for challenge casting (universe pool is the full search space) */}
-          {!challenge && (<div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px' }}>
-            {!showDeepDive ? (
-              <div
-                title={isMember ? undefined : 'Expand your search past the top 2,000 working actors.'}
-                style={{ position: 'relative', display: 'inline-block', width: '100%' }}
-              >
-                <button
-                  onClick={() => {
-                    if (!isMember) { setShowUpgradeModal(true); return }
-                    setShowDeepDive(true)
-                  }}
-                  style={{
-                    width: '100%',
-                    background: isMember ? 'rgba(59,130,246,0.08)' : '#18181b',
-                    border: `1px solid ${isMember ? 'rgba(59,130,246,0.3)' : '#27272a'}`,
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    color: isMember ? '#60a5fa' : '#52525b',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  {isMember ? null : <span style={{ fontSize: '14px' }}>🔒</span>}
-                  Deep Dive
-                  <span style={{ fontSize: '11px', color: isMember ? '#3b82f6' : '#3f3f46', fontWeight: 400, marginLeft: '2px' }}>
-                    beyond top 2,000
-                  </span>
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700 }}>
-                    Deep Dive
-                  </div>
-                  {deepDiveRemaining != null && (
-                    <div style={{ fontSize: '12px', color: '#52525b' }}>{deepDiveRemaining} left today</div>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <input
-                    value={deepDiveQuery}
-                    onChange={e => setDeepDiveQuery(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') handleDeepDive() }}
-                    placeholder='Search by name, role, genre…'
-                    style={{ flex: 1, background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '8px 10px', color: '#f8fafc', fontSize: '14px', outline: 'none' }}
-                  />
-                  <button
-                    onClick={handleDeepDive}
-                    disabled={deepDiveLoading || !deepDiveQuery.trim()}
-                    style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', fontWeight: 700, cursor: deepDiveLoading || !deepDiveQuery.trim() ? 'not-allowed' : 'pointer', opacity: deepDiveLoading || !deepDiveQuery.trim() ? 0.5 : 1, flexShrink: 0 }}
-                  >
-                    {deepDiveLoading ? '…' : 'Go'}
-                  </button>
-                </div>
-                {deepDiveActors.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <div style={{ fontSize: '13px', color: '#a1a1aa', marginBottom: '2px' }}>{deepDiveActors.length} found — drag to cast or click to add to pool</div>
-                    {deepDiveActors.map(a => (
-                      <button
-                        key={a.name}
-                        onClick={() => {
-                          // Add to extra actors pool so cost lookups work
-                          setExtraActors(prev => prev.find(p => p.name === a.name) ? prev : [a, ...prev])
-                          setVisibleActors(prev => {
-                            if (prev.find(p => p.name === a.name)) return prev
-                            return [a, ...prev]
-                          })
-                          setSuggestedPerRole(prev => {
-                            const existing = prev[activeRole] ?? []
-                            if (existing.find(p => p.name === a.name)) return prev
-                            return { ...prev, [activeRole]: [a, ...existing] }
-                          })
-                          setIsFiltered(true)
-                          setDeepDiveActors(prev => prev.filter(d => d.name !== a.name))
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#1a1a22', border: '1px solid #3f3f46', borderRadius: '8px', padding: '6px 10px', cursor: 'pointer', textAlign: 'left' }}
-                      >
-                        <div style={{ width: '32px', height: '44px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
-                          {a.image
-                            ? <img src={a.image} alt={a.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            : <div style={{ width: '100%', height: '100%', background: '#2a2a38' }} />
-                          }
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: '14px', fontWeight: 600, color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.name}</div>
-                          <div style={{ fontSize: '12px', color: '#94a3b8' }}>${a.cost}M</div>
-                        </div>
-                        <span style={{ fontSize: '12px', color: '#3b82f6', flexShrink: 0 }}>+ add</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          )}
-
         </div>
       </div>
 
@@ -1604,10 +971,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               const primaryActor = primaryName ? actors.find(a => a.name === primaryName) : undefined
               const possibles = slots.slice(1).filter(Boolean).map(n => actors.find(a => a.name === n)).filter(Boolean) as CastActor[]
               return (
-                <div
-                  key={role.role_name}
-                  style={{ padding: '10px 0', borderBottom: '1px solid #1c1c1e' }}
-                >
+                <div key={role.role_name} style={{ padding: '10px 0', borderBottom: '1px solid #1c1c1e' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '2px' }}>{role.role_name}</div>
@@ -1649,7 +1013,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
-      {/* Ban confirmation dialog */}
+      {/* Start over confirm */}
       {confirmStartOver && (
         <div
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}
@@ -1662,7 +1026,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             <div style={{ fontSize: '28px', marginBottom: '12px' }}>🎬</div>
             <div style={{ fontSize: '18px', fontWeight: 800, marginBottom: '8px', color: '#f8fafc' }}>Start over?</div>
             <div style={{ fontSize: '14px', color: '#71717a', marginBottom: '24px', lineHeight: 1.5 }}>
-              This will clear your entire cast for {title}. Can't be undone.
+              This will clear your entire cast for {title}. Can&apos;t be undone.
             </div>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
               <button
@@ -1702,7 +1066,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               Ban {confirmBan}?
             </div>
             <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '24px', lineHeight: 1.5 }}>
-              They won't appear in any suggestion grid. You can unban them any time from the banned actors list.
+              They won&apos;t appear in any suggestion grid. You can unban them any time from the banned actors list.
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
@@ -1737,7 +1101,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               <button onClick={() => setShowBlockedModal(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '18px', cursor: 'pointer' }}>×</button>
             </div>
             <div style={{ fontSize: '14px', color: '#94a3b8', marginBottom: '14px' }}>
-              These actors won't appear in any suggestion grid. Click to unblock.
+              These actors won&apos;t appear in any suggestion grid. Click to unblock.
             </div>
             {blockedActors.size === 0 ? (
               <div style={{ fontSize: '14px', color: '#94a3b8', fontStyle: 'italic' }}>No one blocked yet.</div>
@@ -1764,39 +1128,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
                 })}
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Marlowe-first prompt */}
-      {showMarloweFirst && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '24px' }}
-          onClick={() => setShowMarloweFirst(false)}
-        >
-          <div
-            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '18px', padding: '32px', width: '100%', maxWidth: '420px', textAlign: 'center' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎬</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '10px', color: '#f8fafc' }}>Don&apos;t you think Marlowe should have a look first?</div>
-            <div style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '28px' }}>
-              Marlowe has been doing this for 30 years. A second opinion before you walk into that room never hurt anyone.
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button
-                onClick={() => { setShowMarloweFirst(false) }}
-                style={{ background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: '10px', padding: '13px', fontSize: '15px', fontWeight: 700, color: '#60a5fa', cursor: 'pointer' }}
-              >
-                Good point — back to Marlowe
-              </button>
-              <button
-                onClick={() => { setShowMarloweFirst(false); handleCastReview() }}
-                style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '10px', padding: '13px', fontSize: '15px', fontWeight: 600, color: '#a78bfa', cursor: 'pointer' }}
-              >
-                I&apos;m ready — go to Production Meeting
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -1873,7 +1204,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
               {scoreResult.cached ? 'Cached score' : 'AI score'}
             </div>
             <div style={{ fontSize: '18px', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.4, marginBottom: '28px', fontStyle: 'italic' }}>
-              "{scoreResult.ai_summary}"
+              &quot;{scoreResult.ai_summary}&quot;
             </div>
             <div style={{ display: 'flex', gap: '20px', marginBottom: '28px' }}>
               {([
@@ -1921,7 +1252,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             style={{ background: '#111115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '480px' }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '12px' }}>Couldn't submit</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '12px' }}>Couldn&apos;t submit</div>
             <div style={{ fontSize: '14px', color: '#f87171', marginBottom: '24px' }}>{submitError}</div>
             <button
               onClick={() => setSubmitError(null)}
@@ -1944,7 +1275,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             onClick={e => e.stopPropagation()}
           >
             <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800, marginBottom: '10px' }}>
-              Production Meeting
+              Save Cast
             </div>
             <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', margin: '0 0 8px' }}>
               Want to add an elevator pitch?
@@ -1955,7 +1286,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             <textarea
               value={pitch}
               onChange={e => setPitch(e.target.value)}
-              placeholder="e.g. This is a grittier, street-level take. Instead of spectacle, we lean into character — every actor here disappears into the role. The budget tells studios we're serious without overcommitting..."
+              placeholder="e.g. This is a grittier, street-level take. Instead of spectacle, we lean into character — every actor here disappears into the role..."
               maxLength={600}
               rows={5}
               autoFocus
@@ -1999,7 +1330,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             onClick={e => e.stopPropagation()}
           >
             <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎬</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Members only</div>
+            <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Director tier only</div>
             <div style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '24px' }}>
               The Production Meeting — Director, Executive Producer, and Marketing VP in the same room — is a Director-tier feature. Upgrade to $10/month to run the full review.
             </div>
@@ -2034,7 +1365,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           color: '#f8fafc',
         }}
       >
-        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <div>
             <div style={{ fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 700, marginBottom: '4px' }}>Wilder League</div>
@@ -2057,14 +1387,12 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           )}
         </div>
 
-        {/* Marlowe verdict */}
         {scoreResult?.ai_summary && (
           <div style={{ fontSize: '13px', color: '#94a3b8', fontStyle: 'italic', marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-            "{scoreResult.ai_summary}"
+            &quot;{scoreResult.ai_summary}&quot;
           </div>
         )}
 
-        {/* Cast grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
           {roles.map(r => {
             const actorName = selections[r.role_name]?.[0]
@@ -2088,59 +1416,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           })}
         </div>
 
-        {/* Footer */}
         <div style={{ marginTop: '20px', fontSize: '11px', color: '#3f3f46', textAlign: 'right' }}>wilderleague.com</div>
       </div>
 
     </div>
   )
 
-  async function handleSearchWithQuery(q: string) {
-    if (!q.trim()) return
-    setVisibleActors([])
-    setAiLoading(true)
-    const role = roles.find(r => r.role_name === activeRole)
-    try {
-      const data = await streamRoleChat({
-        action: 'search',
-        role: activeRole,
-        movie: title,
-        movieSlug: slug,
-        originalActor: role?.original_actor ?? '',
-        roleTier: role?.tier,
-        budget,
-        query: q,
-        excludeActors: (suggestedPerRole[activeRole] ?? []).map(a => a.name),
-        useSonnet,
-      }, activeRole)
-      if (data.marloweBusy) { setMarloweBusy(true); return }
-      if (data.limitReached) { setChatLimitReached(true); return }
-      if (data.sonnetLimitReached) setSonnetLimitReached(true)
-      if (data.remaining != null) setChatRemaining(data.remaining)
-      if (data.reply) {
-        setChatMessages(prev => ({
-          ...prev,
-          [activeRole]: [...(prev[activeRole] ?? []), { text: data.reply, suggestion: data.suggestion }],
-        }))
-      }
-      if (data.actors?.length) {
-        const picks = (data.actors as string[])
-          .filter(name => !blockedActors.has(name))
-          .map(name => actors.find(a => a.name.toLowerCase() === name.toLowerCase()))
-          .filter((a): a is CastActor => Boolean(a))
-        setVisibleActors(uniqueByName(picks))
-        setIsFiltered(true)
-        setSuggestedPerRole(prev => {
-          const existing = prev[activeRole] ?? []
-          const existingNames = new Set(existing.map(a => a.name))
-          return { ...prev, [activeRole]: [...existing, ...picks.filter(a => !existingNames.has(a.name))] }
-        })
-      }
-    } catch {}
-    finally { setAiLoading(false) }
-  }
-
-  // ── Submit cast ──
+  // ── Save cast ──
   function handleSave() {
     if (saveLoading) return
     if (!isMember) { setShowUpgradeModal(true); return }
@@ -2175,6 +1457,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     finally { setSaveLoading(false) }
   }
 
+  // ── Submit cast ──
   async function handleSubmit() {
     if (!allRolesFilled || submitLoading) return
     setSubmitLoading(true)
@@ -2257,17 +1540,13 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     const bio = (actor.biography ?? '').slice(0, 220).trim()
     const bioSnippet = bio.length === 220 ? bio + '…' : bio
 
-    // Position: prefer left of card, fall back to right
     const popupWidth = 240
     const spaceRight = window.innerWidth - rect.right
     const left = spaceRight > popupWidth + 12
       ? rect.right + 8
       : rect.left - popupWidth - 8
 
-    const top = Math.min(
-      rect.top,
-      window.innerHeight - 340
-    )
+    const top = Math.min(rect.top, window.innerHeight - 340)
 
     return (
       <div
@@ -2277,9 +1556,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
           hoverTimeoutRef.current = setTimeout(() => setHoveredActor(null), 100)
         }}
         style={{
-          position: 'fixed',
-          left,
-          top,
+          position: 'fixed', left, top,
           width: `${popupWidth}px`,
           background: '#1a1a24',
           border: '1px solid rgba(255,255,255,0.12)',
@@ -2296,188 +1573,126 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
             from { opacity: 0; transform: scale(0.92) translateY(4px); }
             to   { opacity: 1; transform: scale(1) translateY(0); }
           }
-          @keyframes marloweBlink {
-            0%, 100% { opacity: 1 }
-            50% { opacity: 0 }
-          }
-          .marlowe-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 13px;
-            background: #3b82f6;
-            margin-left: 2px;
-            vertical-align: text-bottom;
-            animation: marloweBlink 0.9s step-end infinite;
-          }
-          @keyframes marloweSpinner {
-            to { transform: rotate(360deg); }
-          }
-          .marlowe-spinner {
-            width: 16px; height: 16px; border-radius: 50%;
-            border: 2px solid rgba(59,130,246,0.2);
-            border-top-color: #3b82f6;
-            animation: marloweSpinner 0.7s linear infinite;
-            flex-shrink: 0;
-          }
         `}</style>
 
         {actor.image && (
-          <div style={{ width: '100%', height: '200px', overflow: 'hidden' }}>
-            <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 15%', display: 'block' }} />
+          <div style={{ width: '100%', aspectRatio: '2/3', overflow: 'hidden', background: '#111' }}>
+            <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           </div>
         )}
 
-        <div style={{ padding: '14px' }}>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#f1f5f9', marginBottom: '2px' }}>{actor.name}</div>
-          <div style={{ fontSize: '12px', color: '#52525b', marginBottom: '10px', display: 'flex', gap: '6px' }}>
+        <div style={{ padding: '12px 14px 14px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', marginBottom: '2px' }}>{actor.name}</div>
+          <div style={{ fontSize: '12px', color: '#52525b', marginBottom: '8px', display: 'flex', gap: '8px' }}>
             {actor.gender && <span>{actor.gender}</span>}
-            {actor.birthYear && <span>b.{actor.birthYear}</span>}
-            <span style={{ color: '#4ade80', fontWeight: 700 }}>${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#52525b', fontWeight: 400 }}> est</span>}</span>
+            {actor.birthYear && <span>b. {actor.birthYear}</span>}
+            <span style={{ color: '#4ade80', fontWeight: 700 }}>${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#3f3f46', fontWeight: 400 }}> est</span>}</span>
           </div>
 
-          {actor.castingProfile && (
-            <div style={{ marginBottom: '12px', background: '#0d0f14', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
-              <div style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '5px' }}>Marlowe's assessment</div>
-              <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6 }}>{actor.castingProfile}</div>
-            </div>
-          )}
-
-          {bioSnippet && (
-            <div style={{ fontSize: '12px', color: '#71717a', lineHeight: 1.6, marginBottom: '10px' }}>{bioSnippet}</div>
-          )}
-
           {knownForItems.length > 0 && (
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#94a3b8', marginBottom: '6px' }}>Known for</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                {knownForItems.map(item => (
-                  <div key={item} style={{ fontSize: '14px', color: '#a1a1aa' }}>{item}</div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {(actor.universeTags ?? []).length > 0 && (
-            <div style={{ marginBottom: '10px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-              {(actor.universeTags ?? []).map(tag => (
-                <span key={tag} style={{
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  background: 'rgba(139,92,246,0.15)',
-                  border: '1px solid rgba(139,92,246,0.3)',
-                  color: '#a78bfa',
-                  borderRadius: '5px',
-                  padding: '2px 6px',
-                }}>
-                  {tag}
-                </span>
+            <div style={{ marginBottom: '8px' }}>
+              {knownForItems.map(item => (
+                <div key={item} style={{ fontSize: '12px', color: '#94a3b8', lineHeight: 1.4 }}>· {item}</div>
               ))}
             </div>
           )}
 
+          {bioSnippet && (
+            <div style={{ fontSize: '12px', color: '#71717a', lineHeight: 1.5 }}>{bioSnippet}</div>
+          )}
+
+          <button
+            onClick={() => { assignToSlot(activeRole, actor.name, 0); setHoveredActor(null) }}
+            disabled={assignedNames.has(actor.name)}
+            style={{
+              marginTop: '10px', width: '100%',
+              background: assignedNames.has(actor.name) ? '#18181b' : 'rgba(59,130,246,0.12)',
+              border: `1px solid ${assignedNames.has(actor.name) ? '#27272a' : 'rgba(59,130,246,0.3)'}`,
+              borderRadius: '8px', padding: '7px',
+              color: assignedNames.has(actor.name) ? '#3f3f46' : '#60a5fa',
+              fontSize: '13px', fontWeight: 600, cursor: assignedNames.has(actor.name) ? 'default' : 'pointer',
+            }}
+          >
+            {assignedNames.has(actor.name) ? 'Already cast' : `Cast as ${activeRole}`}
+          </button>
         </div>
       </div>
     )
   }
 }
 
-// ── CastSlot component ──
+// ── CastSlot component ──────────────────────────────────────────────────────
+
 type CastSlotProps = {
   actor: CastActor | undefined
   isDragOver: boolean
-  isPrimary: boolean
-  onDragOver: React.DragEventHandler
-  onDragLeave: React.DragEventHandler
-  onDrop: React.DragEventHandler
-  draggable: boolean
-  onSlotDragStart: React.DragEventHandler
-  onSlotDragEnd: React.DragEventHandler
-  onClear: () => void
+  isPrimary?: boolean
+  onDragOver: (e: React.DragEvent) => void
+  onDragLeave: (e: React.DragEvent) => void
+  onDrop: (e: React.DragEvent) => void
+  draggable?: boolean
+  onSlotDragStart?: (e: React.DragEvent) => void
+  onSlotDragEnd?: (e: React.DragEvent) => void
+  onClear?: () => void
 }
 
 function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDrop, draggable, onSlotDragStart, onSlotDragEnd, onClear }: CastSlotProps) {
-  if (actor) {
-    return (
-      <div
-        draggable={draggable}
-        onDragStart={onSlotDragStart}
-        onDragEnd={onSlotDragEnd}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          border: `1px solid ${isDragOver ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`,
-          borderRadius: '10px',
-          padding: '10px 12px',
-          background: isDragOver ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.02)',
-          cursor: draggable ? 'grab' : 'default',
-          transition: 'border-color 0.12s',
-        }}
-      >
-        <div style={{ width: '64px', height: '90px', borderRadius: '7px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
-          {actor.image
-            ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
-            : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '14px' }}>?</div>
-          }
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '15px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}>
-            ${actor.cost}M{!actor.salaryConfirmed && <span style={{ color: '#94a3b8', fontWeight: 400 }}> est</span>}
-          </div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {actor.name}
-          </div>
-          {isPrimary && (
-            <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>drag away to remove</div>
-          )}
-        </div>
-        <button
-          onClick={e => { e.stopPropagation(); onClear() }}
-          title="Remove"
-          style={{
-            background: 'rgba(239,68,68,0.12)',
-            border: '1px solid rgba(239,68,68,0.25)',
-            borderRadius: '6px',
-            color: '#f87171',
-            cursor: 'pointer',
-            fontSize: '14px',
-            lineHeight: 1,
-            padding: '4px 7px',
-            flexShrink: 0,
-            fontWeight: 700,
-          }}
-        >
-          ×
-        </button>
-      </div>
-    )
-  }
-
   return (
     <div
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
       style={{
-        height: '90px',
+        border: `2px ${isDragOver ? 'solid #6366f1' : actor ? 'solid rgba(59,130,246,0.4)' : 'dashed #2d2d3a'}`,
         borderRadius: '10px',
-        border: `1px dashed ${isDragOver ? '#3b82f6' : '#27272a'}`,
+        background: isDragOver ? 'rgba(99,102,241,0.1)' : actor ? 'rgba(15,23,42,0.8)' : 'transparent',
+        padding: actor ? '10px 12px' : '14px 12px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '14px',
-        color: isDragOver ? '#60a5fa' : '#3f3f46',
-        fontStyle: 'italic',
-        background: isDragOver ? 'rgba(59,130,246,0.06)' : 'transparent',
+        gap: '10px',
+        minHeight: '64px',
         transition: 'border-color 0.12s, background 0.12s',
+        cursor: actor && draggable ? 'grab' : 'default',
       }}
+      draggable={draggable && !!actor}
+      onDragStart={onSlotDragStart}
+      onDragEnd={onSlotDragEnd}
     >
-      {isDragOver ? 'drop here' : '1st choice — drag here'}
+      {actor ? (
+        <>
+          <div style={{ width: '44px', height: '58px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
+            {actor.image
+              ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
+              : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
+            }
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '16px', fontWeight: 800, color: '#f1f5f9', lineHeight: 1.2, marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {actor.name}
+            </div>
+            <div style={{ fontSize: '13px', color: '#4ade80', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+              ${actor.cost}M{!actor.salaryConfirmed && <span style={{ fontSize: '12px', fontWeight: 400, color: '#52525b' }}> est</span>}
+            </div>
+            {actor.knownFor && (
+              <div style={{ fontSize: '12px', color: '#52525b', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {actor.knownFor.split(';')[0]?.trim()}
+              </div>
+            )}
+          </div>
+          {onClear && (
+            <button
+              onClick={e => { e.stopPropagation(); onClear() }}
+              style={{ background: 'none', border: 'none', color: '#52525b', cursor: 'pointer', fontSize: '18px', lineHeight: 1, padding: '2px', flexShrink: 0 }}
+            >
+              ×
+            </button>
+          )}
+        </>
+      ) : (
+        <div style={{ fontSize: '14px', color: isDragOver ? '#a5b4fc' : '#3f3f46', fontStyle: 'italic', flex: 1, textAlign: 'center' }}>
+          {isDragOver ? 'Drop here' : isPrimary ? 'Drag an actor here' : 'Optional'}
+        </div>
+      )}
     </div>
   )
 }
