@@ -37,8 +37,6 @@ export interface Title {
   rt_score: number | null
   awards: string | null
   casting_brief: string | null
-  reboot_potential: number | null
-  reboot_notes: string | null
 }
 
 export interface MarloweCache {
@@ -68,7 +66,7 @@ const TITLE_COLUMNS = [
   'seasons', 'episodes', 'budget_per_episode', 'status', 'showrunner', 'network',
   'genre_tags', 'location_set', 'location_filmed', 'studio',
   'source_material', 'franchise', 'rt_score', 'awards',
-  'casting_brief', 'reboot_potential', 'reboot_notes', 'author',
+  'casting_brief', 'author',
 ].join(', ')
 
 async function fetchTitles(): Promise<Title[]> {
@@ -112,8 +110,6 @@ async function fetchTitles(): Promise<Title[]> {
     rt_score: r.rt_score ?? null,
     awards: r.awards ?? null,
     casting_brief: r.casting_brief ?? null,
-    reboot_potential: r.reboot_potential ?? null,
-    reboot_notes: r.reboot_notes ?? null,
     author: r.author ?? null,
   }))
 }

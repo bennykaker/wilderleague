@@ -115,8 +115,6 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       preloadedSuggestions={suggestions}
       isMember={isMember}
       isDirector={isDirector}
-      rebootPotential={title.reboot_potential ?? null}
-      rebootNotes={title.reboot_notes ?? null}
     />
   )
 }

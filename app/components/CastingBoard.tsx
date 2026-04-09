@@ -54,8 +54,6 @@ type Props = {
   challenge?: ChallengeInfo
   isMember?: boolean
   isDirector?: boolean
-  rebootPotential?: number | null
-  rebootNotes?: string | null
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -66,7 +64,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false, rebootPotential, rebootNotes }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -748,19 +746,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </a>
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</div>
-        {rebootPotential != null && (
-          <div
-            title={rebootNotes ?? undefined}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
-              background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)',
-              borderRadius: '8px', padding: '4px 10px', flexShrink: 0, cursor: rebootNotes ? 'help' : 'default',
-            }}
-          >
-            <span style={{ fontSize: '12px', color: '#fbbf24', fontWeight: 700 }}>Reboot Potential</span>
-            <span style={{ fontSize: '13px', fontWeight: 900, color: '#fde68a', fontVariantNumeric: 'tabular-nums' }}>{rebootPotential}/10</span>
-          </div>
-        )}
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
           Meet Marlowe
@@ -882,19 +867,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         </div>
       )}
 
-      {/* Reboot banner */}
-      {rebootPotential != null && rebootPotential >= 7 && (
-        <div style={{ padding: '10px 24px', background: 'rgba(251,191,36,0.06)', borderBottom: '1px solid rgba(251,191,36,0.15)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <span style={{ fontSize: '20px' }}>⭐</span>
-          <div>
-            <span style={{ fontSize: '11px', color: '#fbbf24', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginRight: '10px' }}>Top Reboot Pick</span>
-            <span style={{ fontSize: '14px', color: '#fde68a', fontWeight: 700 }}>{rebootPotential}/10</span>
-          </div>
-          {rebootNotes && (
-            <div style={{ fontSize: '13px', color: '#fcd34d', marginLeft: '4px', opacity: 0.8 }}>— {rebootNotes}</div>
-          )}
-        </div>
-      )}
 
       {/* Body */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', flex: 1, minHeight: 0, overflow: 'hidden' }}>
