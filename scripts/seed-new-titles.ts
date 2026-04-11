@@ -80,6 +80,15 @@ const NEW_TITLES = [
   { slug: 'memento',                  title: 'Memento',                       type: 'movie', year: 2000, budget: 30 },
   { slug: 'the-social-network',       title: 'The Social Network',            type: 'movie', year: 2010, budget: 55 },
   { slug: 'almost-famous',            title: 'Almost Famous',                 type: 'movie', year: 2000, budget: 40 },
+
+  // David Simon / SimonVerse
+  { slug: 'homicide-life-on-the-street', title: 'Homicide: Life on the Street', type: 'tv',   year: 1993, budget: 25 },
+  { slug: 'the-corner',                  title: 'The Corner',                   type: 'tv',   year: 2000, budget: 10 },
+  { slug: 'generation-kill',             title: 'Generation Kill',              type: 'tv',   year: 2008, budget: 30 },
+  { slug: 'treme',                       title: 'Treme',                        type: 'tv',   year: 2010, budget: 30 },
+  { slug: 'show-me-a-hero',             title: 'Show Me a Hero',               type: 'tv',   year: 2015, budget: 20 },
+  { slug: 'the-deuce',                   title: 'The Deuce',                    type: 'tv',   year: 2017, budget: 35 },
+  { slug: 'we-own-this-city',           title: 'We Own This City',             type: 'tv',   year: 2022, budget: 20 },
 ]
 
 async function main() {

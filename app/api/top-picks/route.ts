@@ -10,17 +10,17 @@ export async function GET(req: NextRequest) {
 
   const service = createServiceClient()
   const { data } = await service
-    .from('submissions')
-    .select('selections')
+    .from('cast_picks')
+    .select('actor_name')
     .eq('movie_slug', slug)
-    .limit(1000)
+    .eq('role_name', role)
+    .limit(500)
 
   if (!data?.length) return Response.json({ picks: [] })
 
   const counts: Record<string, number> = {}
   for (const row of data) {
-    const actor = row.selections?.[role]?.[0]
-    if (actor) counts[actor] = (counts[actor] ?? 0) + 1
+    counts[row.actor_name] = (counts[row.actor_name] ?? 0) + 1
   }
 
   const picks = Object.entries(counts)

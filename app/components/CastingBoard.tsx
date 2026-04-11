@@ -58,7 +58,6 @@ type Props = {
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
   isMember?: boolean
-  isDirector?: boolean
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -69,7 +68,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, isDirector = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -81,9 +80,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [showExportCard, setShowExportCard] = useState(false)
   const [showBlockedModal, setShowBlockedModal] = useState(false)
   const [confirmBan, setConfirmBan] = useState<string | null>(null)
-  const [showReview, setShowReview] = useState(false)
-  const [reviewLoading, setReviewLoading] = useState(false)
-  const [reviewData, setReviewData] = useState<{ director: { verdict: string; notes: string }; execProducer: { verdict: string; notes: string }; marketer: { verdict: string; notes: string } } | null>(null)
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
@@ -96,7 +92,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [scoreLoading, setScoreLoading] = useState(false)
   const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
   const [showAllPassed, setShowAllPassed] = useState(false)
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [copyingImage, setCopyingImage] = useState(false)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const [confirmStartOver, setConfirmStartOver] = useState(false)
@@ -336,31 +331,6 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
     }
   }
 
-  async function handleCastReview() {
-    setReviewLoading(true)
-    setShowReview(true)
-    setReviewData(null)
-    const cast = roles
-      .map(r => {
-        const name = getSlots(r.role_name)[0]
-        if (!name) return null
-        const actor = allActors.find(a => a.name === name)
-        return { role: r.role_name, tier: r.tier ?? 'supporting', originalActor: r.original_actor, newActor: name, cost: actor?.cost ?? 0, salaryConfirmed: actor?.salaryConfirmed ?? false }
-      })
-      .filter(Boolean) as { role: string; tier: string; originalActor: string | null; newActor: string; cost: number; salaryConfirmed: boolean }[]
-    const uncastRoles = roles.filter(r => !getSlots(r.role_name)[0]).map(r => r.role_name)
-    try {
-      const res = await fetch('/api/cast-review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movie: title, budget, spent, cast, uncastRoles }),
-      })
-      const data = await res.json()
-      setReviewData(data)
-    } catch { setReviewData(null) }
-    finally { setReviewLoading(false) }
-  }
-
   async function handleTopPicks() {
     if (topPicks[activeRole]) { setShowTopPicks(true); return }
     setTopPicksLoading(true)
@@ -497,10 +467,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
         </a>
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
         <div style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.01em' }}>{title}</div>
-        <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
-        <a href="/marlowe" style={{ color: '#3b82f6', fontSize: '14px', fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
-          Meet Marlowe
-        </a>
         {titleType === 'book' && (
           <>
             <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
@@ -547,17 +513,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
             style={{ background: allRolesFilled ? 'rgba(251,191,36,0.1)' : '#18181b', border: `1px solid ${allRolesFilled ? 'rgba(251,191,36,0.35)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: allRolesFilled ? '#fbbf24' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: allRolesFilled ? 'pointer' : 'not-allowed' }}
           >
             {scoreLoading ? 'Scoring…' : 'Score my cast'}
-          </button>
-          <button
-            onClick={() => {
-              if (Object.keys(selections).length === 0) return
-              if (!isDirector) { setShowUpgradeModal(true); return }
-              handleCastReview()
-            }}
-            disabled={Object.keys(selections).length === 0 || reviewLoading}
-            style={{ background: Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.15)' : '#18181b', border: `1px solid ${Object.keys(selections).length > 0 ? 'rgba(139,92,246,0.4)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: Object.keys(selections).length > 0 ? '#a78bfa' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
-          >
-            {reviewLoading ? 'Reading the room…' : isDirector ? 'Production Meeting' : '🔒 Production Meeting'}
           </button>
           <button
             onClick={handleSave}
@@ -1299,64 +1254,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
         </div>
       )}
 
-      {/* Cast review modal */}
-      {showReview && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
-          onClick={() => setShowReview(false)}
-        >
-          <div
-            style={{ background: '#111115', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '860px', maxHeight: '85vh', overflowY: 'auto' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
-              <div>
-                <div style={{ fontSize: '14px', color: '#94a3b8', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>Cast review</div>
-                <div style={{ fontSize: '22px', fontWeight: 800 }}>{title}</div>
-              </div>
-              <button onClick={() => setShowReview(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '24px', cursor: 'pointer', lineHeight: 1 }}>×</button>
-            </div>
-
-            {reviewLoading && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {['Director', 'Executive Producer', 'Marketing'].map(label => (
-                  <div key={label} style={{ background: '#18181b', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#27272a', flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '14px', color: '#a1a1aa', marginBottom: '8px' }}>{label}</div>
-                      <div style={{ height: '12px', background: '#27272a', borderRadius: '4px', width: '60%', marginBottom: '6px' }} />
-                      <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '90%', marginBottom: '4px' }} />
-                      <div style={{ height: '10px', background: '#1c1c1e', borderRadius: '4px', width: '75%' }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {reviewData && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {[
-                  { key: 'director', label: 'The Director', icon: '🎬', color: '#818cf8', bg: 'rgba(99,102,241,0.06)', border: 'rgba(99,102,241,0.2)', data: reviewData.director },
-                  { key: 'execProducer', label: 'The Executive Producer', icon: '💰', color: '#4ade80', bg: 'rgba(74,222,128,0.06)', border: 'rgba(74,222,128,0.2)', data: reviewData.execProducer },
-                  { key: 'marketer', label: 'The Marketing VP', icon: '📣', color: '#fb923c', bg: 'rgba(251,146,60,0.06)', border: 'rgba(251,146,60,0.2)', data: reviewData.marketer },
-                ].map(({ label, icon, color, bg, border, data }) => (
-                  <div key={label} style={{ background: bg, border: `1px solid ${border}`, borderRadius: '14px', padding: '22px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '22px' }}>{icon}</span>
-                      <div>
-                        <div style={{ fontSize: '14px', color, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</div>
-                        <div style={{ fontSize: '15px', fontWeight: 800, color: '#f8fafc', marginTop: '2px' }}>{data.verdict}</div>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: 1.65 }}>{data.notes}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Score result modal */}
       {scoreResult && (
         <div
@@ -1482,37 +1379,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                 Cancel
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Upgrade modal */}
-      {showUpgradeModal && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
-          onClick={() => setShowUpgradeModal(false)}
-        >
-          <div
-            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '420px', textAlign: 'center' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ fontSize: '36px', marginBottom: '16px' }}>🎬</div>
-            <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Director tier only</div>
-            <div style={{ fontSize: '15px', color: '#94a3b8', lineHeight: 1.6, marginBottom: '24px' }}>
-              The Production Meeting — Director, Executive Producer, and Marketing VP in the same room — is a Director-tier feature. Upgrade to $10/month to run the full review.
-            </div>
-            <a
-              href="/auth"
-              style={{ display: 'block', background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.4)', borderRadius: '10px', padding: '12px 20px', color: '#a78bfa', fontSize: '15px', fontWeight: 700, textDecoration: 'none', marginBottom: '10px' }}
-            >
-              Sign up for full access →
-            </a>
-            <button
-              onClick={() => setShowUpgradeModal(false)}
-              style={{ background: 'none', border: 'none', color: '#52525b', fontSize: '14px', cursor: 'pointer', padding: 0 }}
-            >
-              Maybe later
-            </button>
           </div>
         </div>
       )}
@@ -1895,7 +1761,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
   // ── Save cast ──
   function handleSave() {
     if (saveLoading) return
-    if (!isMember) { setShowUpgradeModal(true); return }
+    if (!isMember) return
     setPitch('')
     setShowPitchModal(true)
   }

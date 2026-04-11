@@ -243,6 +243,14 @@ export async function POST(req: NextRequest) {
         .eq('cast_key', key)
     }
 
+    // Save cast picks for community suggestions (fire-and-forget)
+    const picks = (cast as CastItem[]).map(c => ({
+      movie_slug,
+      role_name: c.role,
+      actor_name: c.actor,
+    }))
+    serviceSupabase.from('cast_picks').insert(picks).then(() => {})
+
     return NextResponse.json({ ai_summary: result.summary, green_light_score: result.green_light_score, quality_score: result.quality_score, hear_me_out_score: result.hear_me_out_score, award, cached: false })
   } catch (e) {
     console.error('Scoring error:', e)

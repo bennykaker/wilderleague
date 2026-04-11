@@ -8,7 +8,6 @@ type UserResult = {
   email: string
   username: string | null
   is_member: boolean
-  is_director: boolean
 }
 
 export default function AdminUsersPage() {
@@ -38,7 +37,7 @@ export default function AdminUsersPage() {
     }
   }
 
-  async function handleToggle(field: 'is_member' | 'is_director') {
+  async function handleToggle(field: 'is_member') {
     if (!user) return
     const newVal = !user[field]
     setSaving(true)
@@ -76,7 +75,7 @@ export default function AdminUsersPage() {
 
         <h1 style={{ fontSize: '28px', fontWeight: 900, margin: '0 0 8px' }}>User Access</h1>
         <p style={{ fontSize: '15px', color: '#71717a', margin: '0 0 36px' }}>
-          Look up a user by email and flip their member or director status.
+          Look up a user by email and flip their member status.
         </p>
 
         <form onSubmit={handleSearch} style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
@@ -117,8 +116,7 @@ export default function AdminUsersPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {([
-                { field: 'is_member' as const, label: 'Member', desc: '$3/mo — full access', color: '#22c55e' },
-                { field: 'is_director' as const, label: 'Director', desc: '$10/mo — admin access', color: '#f59e0b' },
+                { field: 'is_member' as const, label: 'Member', desc: '$3/mo', color: '#22c55e' },
               ]).map(({ field, label, desc, color }) => (
                 <div key={field} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',

@@ -39,8 +39,8 @@ export default async function MembersPage({
           </h1>
           <p style={{ fontSize: '16px', color: '#a1a1aa', margin: 0, lineHeight: 1.6 }}>
             {isMember
-              ? 'Sharper Marlowe is active. Unlimited submissions. Thanks for keeping this thing alive.'
-              : 'Upgrade to get the sharper Marlowe, unlimited submissions, and early access to new features.'}
+              ? 'More submissions, saved casts, early access. Thanks for keeping this thing alive.'
+              : 'Upgrade to get more submissions, saved casts, and early access to new features.'}
           </p>
         </div>
 

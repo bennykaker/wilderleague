@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { stripe, PRICE_ID, PRICE_ID_DIRECTOR } from '../../../../lib/stripe'
+import { stripe, PRICE_ID } from '../../../../lib/stripe'
 import { createClient } from '../../../../lib/supabase/server'
 import { createServiceClient } from '../../../../lib/supabase/service'
 
@@ -12,9 +12,6 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Not signed in' }, { status: 401 })
     }
 
-    const body = await request.json().catch(() => ({}))
-    const tier = body.tier === 'director' ? 'director' : 'member'
-    const priceId = tier === 'director' ? PRICE_ID_DIRECTOR : PRICE_ID
     const origin = request.headers.get('origin') ?? 'https://www.wilderleague.com'
     const service = createServiceClient()
 
@@ -40,10 +37,10 @@ export async function POST(request: NextRequest) {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: PRICE_ID, quantity: 1 }],
       success_url: `${origin}/members?success=1`,
       cancel_url: `${origin}/pricing`,
-      metadata: { supabase_user_id: user.id, tier },
+      metadata: { supabase_user_id: user.id },
     })
 
     return Response.json({ url: session.url })

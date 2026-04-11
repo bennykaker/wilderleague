@@ -3,28 +3,49 @@ import CastingBoard from '../components/CastingBoard'
 import { getEnrichedActors } from '../data/enrichedActors'
 import { getTitle, getRolesForTitle, getSuggestionsForTitle } from '../data/titles'
 import { createClient } from '../../lib/supabase/server'
+import { createServiceClient } from '../../lib/supabase/service'
 
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
 
   const supabase = await createClient()
 
-  const [title, roles, enriched, { data: { user } }] = await Promise.all([
+  const serviceSupabase = createServiceClient()
+  const [title, roles, enriched, { data: { user } }, communityPicksResult] = await Promise.all([
     getTitle(slug),
     getRolesForTitle(slug),
     getEnrichedActors(),
     supabase.auth.getUser(),
+    serviceSupabase
+      .from('cast_picks')
+      .select('role_name, actor_name')
+      .eq('movie_slug', slug)
+      .limit(2000),
   ])
+
+  // Aggregate community picks by role
+  const communityCountsByRole: Record<string, Record<string, number>> = {}
+  for (const row of communityPicksResult.data ?? []) {
+    if (!communityCountsByRole[row.role_name]) communityCountsByRole[row.role_name] = {}
+    communityCountsByRole[row.role_name][row.actor_name] =
+      (communityCountsByRole[row.role_name][row.actor_name] ?? 0) + 1
+  }
+  // Top community picks per role (only use when top actor has 3+ picks)
+  const communityTopByRole: Record<string, string[]> = {}
+  for (const [roleName, counts] of Object.entries(communityCountsByRole)) {
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1])
+    if ((sorted[0]?.[1] ?? 0) >= 3) {
+      communityTopByRole[roleName] = sorted.slice(0, 6).map(([name]) => name)
+    }
+  }
 
   if (!title) notFound()
   if (roles.length === 0) notFound()
 
   let isMember = false
-  let isDirector = false
   if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member, is_director').eq('id', user.id).single()
+    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
     isMember = profile?.is_member ?? false
-    isDirector = profile?.is_director ?? false
   }
 
   const rawSuggestions = getSuggestionsForTitle(slug)
@@ -36,6 +57,12 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   // - Otherwise, affordable actors only (cost < 8), padded to ~6 from marlowe caches
   const suggestions: Record<string, string[]> = {}
   for (const role of roles) {
+    // Community picks take priority when enough data exists
+    if (communityTopByRole[role.role_name]) {
+      suggestions[role.role_name] = communityTopByRole[role.role_name]
+      continue
+    }
+
     const originalRace = raceMap.get((role.original_actor ?? '').toLowerCase()) ?? ''
     const blackRole = originalRace.toLowerCase().includes('black')
 
@@ -114,7 +141,6 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       titleType={title.type}
       preloadedSuggestions={suggestions}
       isMember={isMember}
-      isDirector={isDirector}
     />
   )
 }
