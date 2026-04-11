@@ -55,9 +55,6 @@ export default async function HomePage() {
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '4px' }}>
               <NewHereModal />
-              <Link href="/marlowe" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
-                Meet Marlowe →
-              </Link>
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Browse actor pool →
               </Link>
