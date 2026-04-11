@@ -53,6 +53,7 @@ async function main() {
     const { data, error } = await sb
       .from('actors')
       .select('id, name, biography, known_for, casting_profile, keywords')
+      .is('keywords', null)
       .range(from, from + PAGE - 1)
 
     if (error) { console.error('Fetch error:', error.message); break }
