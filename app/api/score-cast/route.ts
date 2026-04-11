@@ -254,6 +254,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ai_summary: result.summary, green_light_score: result.green_light_score, quality_score: result.quality_score, hear_me_out_score: result.hear_me_out_score, award, cached: false })
   } catch (e) {
     console.error('Scoring error:', e)
-    return NextResponse.json({ error: 'Scoring failed' }, { status: 500 })
+    const msg = e instanceof Error ? e.message : String(e)
+    return NextResponse.json({ error: `Scoring failed: ${msg}` }, { status: 500 })
   }
 }
