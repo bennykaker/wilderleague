@@ -1500,6 +1500,9 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                 <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>Ask your AI</div>
                 <div style={{ fontSize: '20px', fontWeight: 800, color: '#f1f5f9' }}>Casting prompt — {activeRole}</div>
                 <div style={{ fontSize: '13px', color: '#52525b', marginTop: '4px' }}>Copy this prompt into any AI. Paste the response back below.</div>
+                <div style={{ fontSize: '13px', color: '#52525b', lineHeight: 1.6, marginTop: '12px', padding: '12px 14px', background: '#0d0d12', border: '1px solid #1c1c1e', borderRadius: '10px' }}>
+                  <span style={{ color: '#71717a', fontWeight: 600 }}>Between you and me:</span> We originally built an AI search right into this page. It cost too much — every time someone hit the button, we paid for it. This way, you take a prompt we write for you, drop it into an AI of your choice, and bring the results back here. Cost to us: zero. Not the greatest user experience in the history of the internet, but it keeps the lights on. You could technically play this whole game inside an AI — but it organizes a little better here.
+                </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
                   {[
                     { label: 'ChatGPT', href: 'https://chat.openai.com', note: 'free tier' },
