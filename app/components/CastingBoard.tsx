@@ -110,6 +110,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [rolePromptModal, setRolePromptModal] = useState<{ roleName: string } | null>(null)
   const [rolePromptExtra, setRolePromptExtra] = useState('')
   const [rolePromptCopied, setRolePromptCopied] = useState(false)
+  const [actorSubmissions, setActorSubmissions] = useState<Record<string, 'loading' | 'done' | 'error'>>({})
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropSucceededRef = useRef(false)
 
@@ -458,6 +459,21 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
     }
 
     setYourAIMatches(matches)
+  }
+
+  async function submitActorRequest(name: string) {
+    setActorSubmissions(prev => ({ ...prev, [name]: 'loading' }))
+    try {
+      const res = await fetch('/api/submit-actor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, notes: 'Suggested by AI casting assistant — not yet in database' }),
+      })
+      const data = await res.json()
+      setActorSubmissions(prev => ({ ...prev, [name]: data.ok ? 'done' : 'error' }))
+    } catch {
+      setActorSubmissions(prev => ({ ...prev, [name]: 'error' }))
+    }
   }
 
   async function copyAIPrompt() {
@@ -1731,6 +1747,25 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                           Cast →
                         </button>
                       )}
+                      {!m.inDatabase && !isAssigned && !isBlocked && (() => {
+                        const status = actorSubmissions[m.name]
+                        return (
+                          <button
+                            onClick={() => status !== 'done' && submitActorRequest(m.name)}
+                            disabled={status === 'loading' || status === 'done'}
+                            style={{
+                              background: status === 'done' ? 'rgba(16,185,129,0.1)' : 'rgba(59,130,246,0.1)',
+                              border: `1px solid ${status === 'done' ? 'rgba(16,185,129,0.3)' : 'rgba(59,130,246,0.3)'}`,
+                              borderRadius: '7px', padding: '5px 10px', fontSize: '12px', fontWeight: 700,
+                              color: status === 'done' ? '#34d399' : status === 'error' ? '#f87171' : '#60a5fa',
+                              cursor: status === 'loading' || status === 'done' ? 'default' : 'pointer',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {status === 'loading' ? 'Requesting…' : status === 'done' ? '✓ Requested' : status === 'error' ? 'Try again' : '+ Add to database'}
+                          </button>
+                        )
+                      })()}
                       {isAssigned && <span style={{ fontSize: '11px', color: '#52525b', flexShrink: 0 }}>Already cast</span>}
                       {isBlocked && <span style={{ fontSize: '11px', color: '#52525b', flexShrink: 0 }}>Banned</span>}
                     </div>
