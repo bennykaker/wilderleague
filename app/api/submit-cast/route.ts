@@ -133,16 +133,14 @@ export async function POST(req: NextRequest) {
   const today = new Date().toISOString().split('T')[0]
 
   let isMemberForLimit = false
-  let isDirectorForLimit = false
   let submitterUsername: string | null = null
   if (user) {
     const { data: profileCheck } = await supabase.from('profiles').select('is_member, is_director, username').eq('id', user.id).single()
-    isMemberForLimit = profileCheck?.is_member ?? false
-    isDirectorForLimit = profileCheck?.is_director ?? false
+    isMemberForLimit = (profileCheck?.is_member || profileCheck?.is_director) ?? false
     submitterUsername = profileCheck?.username ?? null
   }
 
-  const submitLimit = isDirectorForLimit ? 50 : isMemberForLimit ? 20 : user ? 3 : 3
+  const submitLimit = isMemberForLimit ? 50 : 5
   const submitKey = user ? user.id : ip
   const { data: submitUsage } = await supabase
     .from('review_usage')
@@ -153,7 +151,7 @@ export async function POST(req: NextRequest) {
     .single()
   const submitCount = submitUsage?.count ?? 0
   if (submitCount >= submitLimit) {
-    return NextResponse.json({ error: `${user ? (isMemberForLimit ? 'Member' : 'Free account') : 'Guest'} limit reached (${submitLimit} submissions/day).${!user ? ' Sign in for more.' : ''}`, status: 429 }, { status: 429 })
+    return NextResponse.json({ error: `Limit reached (${submitLimit} submissions/day).${!isMemberForLimit ? ' Upgrade to member for 50/day.' : ''}`, status: 429 }, { status: 429 })
   }
   await supabase.from('review_usage').upsert(
     { ip: submitKey, date: today, type: 'submit', count: submitCount + 1 },
@@ -162,8 +160,7 @@ export async function POST(req: NextRequest) {
 
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
-  // Members get Sonnet (richer scoring), guests get Haiku
-  const scoringModel = (isMemberForLimit || isDirectorForLimit) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001'
+  const scoringModel = 'claude-haiku-4-5-20251001'
 
   // Generate scores
   let summary = 'An interesting cast.'

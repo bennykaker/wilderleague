@@ -76,7 +76,7 @@ export default function PricingClient({
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 'Recast any film or show',
-                '3 cast submissions/day',
+                '5 cast submissions/day',
                 'Vote on community casts',
                 'Weekly challenges',
               ].map(f => (
@@ -101,9 +101,9 @@ export default function PricingClient({
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
                 'Everything in Free',
-                '20 cast submissions/day',
+                '50 cast submissions/day',
                 'Save your casts',
-                'Early access to new features',
+                'Members-only leaderboard',
                 'Supports independent development',
               ].map(f => (
                 <li key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', color: '#f1f5f9' }}>

@@ -58,6 +58,7 @@ type Props = {
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
   isMember?: boolean
+  serverSearch?: boolean
 }
 
 // Per role: [primary, 2nd choice, 3rd choice]
@@ -68,7 +69,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, serverSearch = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -107,6 +108,7 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [rolePromptCopied, setRolePromptCopied] = useState(false)
   const [actorSubmissions, setActorSubmissions] = useState<Record<string, 'loading' | 'done' | 'error'>>({})
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropSucceededRef = useRef(false)
 
   // Load blocklist + selections from localStorage
@@ -246,6 +248,19 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
         setVisibleActors([])
         setIsFiltered(false)
       }
+      return
+    }
+    if (serverSearch) {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+      searchDebounceRef.current = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/actors/search?q=${encodeURIComponent(q)}`)
+          const { actors: results } = await res.json() as { actors: CastActor[] }
+          const filtered = results.filter(a => !blockedActors.has(a.name))
+          setVisibleActors(filtered)
+          setIsFiltered(true)
+        } catch { /* silent */ }
+      }, 300)
       return
     }
     const terms = q.toLowerCase().split(/\s+/).filter(Boolean)
@@ -717,7 +732,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                                 >
                                   <div style={{ width: '28px', height: '38px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
                                     {actor.image
-                                      ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
+                                      ? <img src={actor.image} alt={actor.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
                                       : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
                                     }
                                   </div>
@@ -978,6 +993,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                       <img
                         src={actor.image}
                         alt={actor.name}
+                        loading="lazy"
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
                         draggable={false}
                       />
@@ -1047,7 +1063,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                     >
                       <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0, background: '#27272a' }}>
                         {actor.image
-                          ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          ? <img src={actor.image} alt={actor.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                           : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '9px' }}>?</div>
                         }
                       </div>
@@ -1235,7 +1251,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                     <div key={name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px', background: '#18181b', borderRadius: '8px' }}>
                       {actor?.image && (
                         <div style={{ width: '28px', height: '28px', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
-                          <img src={actor.image} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          <img src={actor.image} alt={name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         </div>
                       )}
                       <span style={{ flex: 1, fontSize: '14px', color: '#94a3b8' }}>{name}</span>
@@ -1590,7 +1606,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                       {m.actor && (
                         <div style={{ width: '36px', height: '50px', borderRadius: '5px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
                           {m.actor.image
-                            ? <img src={m.actor.image} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ? <img src={m.actor.image} alt={m.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
                           }
                         </div>
@@ -2001,7 +2017,7 @@ function CastSlot({ actor, isDragOver, isPrimary, onDragOver, onDragLeave, onDro
         <>
           <div style={{ width: '44px', height: '58px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0, background: '#1c1c1e' }}>
             {actor.image
-              ? <img src={actor.image} alt={actor.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
+              ? <img src={actor.image} alt={actor.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }} draggable={false} />
               : <div style={{ width: '100%', height: '100%', background: '#27272a' }} />
             }
           </div>

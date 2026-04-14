@@ -64,6 +64,11 @@ export default async function HomePage() {
               <Link href="/submit/actor" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Did we miss an actor? →
               </Link>
+              {isMember && (
+                <Link href="/leaderboard" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
+                  Leaderboard →
+                </Link>
+              )}
               <Link href="/pricing" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
                 Membership →
               </Link>

@@ -1,9 +1,14 @@
 import { notFound } from 'next/navigation'
 import CastingBoard from '../components/CastingBoard'
 import { getEnrichedActors } from '../data/enrichedActors'
-import { getTitle, getRolesForTitle, getSuggestionsForTitle } from '../data/titles'
+import { getTitle, getTitles, getRolesForTitle, getSuggestionsForTitle } from '../data/titles'
 import { createClient } from '../../lib/supabase/server'
 import { createServiceClient } from '../../lib/supabase/service'
+
+export async function generateStaticParams() {
+  const titles = await getTitles()
+  return titles.map(t => ({ movie: t.slug }))
+}
 
 export default async function MoviePage({ params }: { params: Promise<{ movie: string }> }) {
   const { movie: slug } = await params
@@ -115,12 +120,10 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
     cost: a.cost,
     salaryConfirmed: a.salary_confirmed,
     knownFor: a.known_for || '',
-    biography: a.biography || '',
     universeTags: a.universe_tags ?? [],
     gender: a.gender || '',
     birthYear: a.birth_year || '',
-    keywords: a.keywords || '',
-    castingProfile: a.casting_profile || '',
+    // biography, keywords, castingProfile omitted — fetched on demand via /api/actors/search
   }))
 
 
@@ -141,6 +144,7 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       titleType={title.type}
       preloadedSuggestions={suggestions}
       isMember={isMember}
+      serverSearch={true}
     />
   )
 }
