@@ -538,13 +538,16 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
 
       {/* Challenge banner */}
       {challenge && (
-        <div style={{ padding: '10px 24px', background: 'rgba(139,92,246,0.07)', borderBottom: '1px solid rgba(139,92,246,0.18)', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-          <span style={{ fontSize: '20px' }}>{challenge.badge}</span>
-          <div>
-            <span style={{ fontSize: '11px', color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginRight: '10px' }}>{challenge.label}</span>
-            <span style={{ fontSize: '14px', color: '#ede9fe', fontWeight: 700 }}>{challenge.headline}</span>
+        <div style={{ padding: '20px 24px 18px', background: 'rgba(139,92,246,0.07)', borderBottom: '1px solid rgba(139,92,246,0.18)', flexShrink: 0 }}>
+          <div style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '6px' }}>
+            {challenge.badge} {challenge.label}
           </div>
-          <div style={{ fontSize: '13px', color: '#a78bfa', marginLeft: '4px', opacity: 0.8 }}>— {challenge.description}</div>
+          <div style={{ fontSize: '32px', fontWeight: 900, color: '#f1f5f9', lineHeight: 1.1, marginBottom: '6px' }}>
+            {challenge.headline}
+          </div>
+          <div style={{ fontSize: '15px', color: '#a78bfa', lineHeight: 1.5 }}>
+            {challenge.description}
+          </div>
         </div>
       )}
 
