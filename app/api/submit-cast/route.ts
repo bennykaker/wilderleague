@@ -129,34 +129,11 @@ export async function POST(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Rate limit: 3/day guests, 20/day members
-  const today = new Date().toISOString().split('T')[0]
-
-  let isMemberForLimit = false
   let submitterUsername: string | null = null
   if (user) {
-    const { data: profileCheck } = await supabase.from('profiles').select('is_member, is_director, username').eq('id', user.id).single()
-    isMemberForLimit = (profileCheck?.is_member || profileCheck?.is_director) ?? false
+    const { data: profileCheck } = await supabase.from('profiles').select('username').eq('id', user.id).single()
     submitterUsername = profileCheck?.username ?? null
   }
-
-  const submitLimit = isMemberForLimit ? 50 : 5
-  const submitKey = user ? user.id : ip
-  const { data: submitUsage } = await supabase
-    .from('review_usage')
-    .select('count')
-    .eq('ip', submitKey)
-    .eq('date', today)
-    .eq('type', 'submit')
-    .single()
-  const submitCount = submitUsage?.count ?? 0
-  if (submitCount >= submitLimit) {
-    return NextResponse.json({ error: `Limit reached (${submitLimit} submissions/day).${!isMemberForLimit ? ' Upgrade to member for 50/day.' : ''}`, status: 429 }, { status: 429 })
-  }
-  await supabase.from('review_usage').upsert(
-    { ip: submitKey, date: today, type: 'submit', count: submitCount + 1 },
-    { onConflict: 'ip,date,type' }
-  )
 
   const spent = (cast as CastItem[]).reduce((sum: number, c: CastItem) => sum + (c.cost ?? 0), 0)
 
