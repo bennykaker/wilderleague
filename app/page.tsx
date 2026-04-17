@@ -50,9 +50,6 @@ export default async function HomePage() {
             <h1 style={{ fontSize: '42px', fontWeight: 900, lineHeight: 1.05, margin: '0 0 14px' }}>
               Recast movies.<br />Make them better.
             </h1>
-            <p style={{ fontSize: '18px', color: '#a1a1aa', maxWidth: '520px', lineHeight: 1.6, margin: '0 0 20px' }}>
-              Pick a film or show. Drag actors into iconic roles. Work within the budget. Share your cast.
-            </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '4px' }}>
               <NewHereModal />
               <Link href="/actors" style={{ fontSize: '15px', color: '#a1a1aa', textDecoration: 'none', borderBottom: '1px solid #52525b', paddingBottom: '2px' }}>
