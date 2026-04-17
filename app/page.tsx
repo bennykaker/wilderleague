@@ -83,7 +83,7 @@ export default async function HomePage() {
               <div style={{ fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#7c3aed', marginBottom: '18px', fontWeight: 600 }}>
                 Casting Challenges
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                 {featuredChallenges.map(c => {
                   const t = titleMap.get(c.movie_slug)
                   return (
@@ -116,17 +116,17 @@ export default async function HomePage() {
                             position: 'absolute', top: '10px', left: '10px',
                             background: 'rgba(109,40,217,0.92)', backdropFilter: 'blur(4px)',
                             borderRadius: '6px', padding: '3px 8px',
-                            fontSize: '12px', fontWeight: 800, color: '#ede9fe',
+                            fontSize: '10px', fontWeight: 800, color: '#ede9fe',
                             letterSpacing: '0.1em', textTransform: 'uppercase',
                           }}>
                             {c.badge} Challenge Cast
                           </div>
                         </div>
-                        <div style={{ padding: '18px 20px 20px' }}>
-                          <div style={{ fontSize: '18px', fontWeight: 700, color: '#f1f5f9', marginBottom: '8px', lineHeight: 1.3 }}>
+                        <div style={{ padding: '12px 14px 14px' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 700, color: '#f1f5f9', marginBottom: '4px', lineHeight: 1.3 }}>
                             {c.teaser.split('\n')[0]}
                           </div>
-                          <div style={{ fontSize: '15px', color: '#a78bfa', lineHeight: 1.5 }}>
+                          <div style={{ fontSize: '11px', color: '#a78bfa', lineHeight: 1.4 }}>
                             {c.teaser.split('\n')[1]}
                           </div>
                         </div>
