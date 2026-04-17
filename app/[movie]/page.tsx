@@ -47,12 +47,6 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
   if (!title) notFound()
   if (roles.length === 0) notFound()
 
-  let isMember = false
-  if (user) {
-    const { data: profile } = await supabase.from('profiles').select('is_member').eq('id', user.id).single()
-    isMember = profile?.is_member ?? false
-  }
-
   const rawSuggestions = getSuggestionsForTitle(slug)
   const costMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.cost]))
   const raceMap = new Map(enriched.map(a => [a.name.toLowerCase(), a.race_ethnicity ?? '']))
@@ -143,7 +137,6 @@ export default async function MoviePage({ params }: { params: Promise<{ movie: s
       budget={title.budget}
       titleType={title.type}
       preloadedSuggestions={suggestions}
-      isMember={isMember}
       serverSearch={true}
     />
   )

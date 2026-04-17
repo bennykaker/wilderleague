@@ -57,7 +57,6 @@ type Props = {
   titleType?: string
   preloadedSuggestions?: Record<string, string[]>
   challenge?: ChallengeInfo
-  isMember?: boolean
   serverSearch?: boolean
 }
 
@@ -69,7 +68,7 @@ function uniqueByName(arr: CastActor[]): CastActor[] {
   return arr.filter(a => { if (seen.has(a.name)) return false; seen.add(a.name); return true })
 }
 
-export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, isMember = false, serverSearch = false }: Props) {
+export default function CastingBoard({ actors, roles, title, slug, budget, titleType, preloadedSuggestions = {}, challenge, serverSearch = false }: Props) {
   const [selections, setSelections] = useState<Selections>({})
   const [activeRole, setActiveRole] = useState(roles[0]?.role_name ?? '')
   const [dragOverSlot, setDragOverSlot] = useState<{ role: string; slot: number } | null>(null)
@@ -81,14 +80,11 @@ export default function CastingBoard({ actors, roles, title, slug, budget, title
   const [showExportCard, setShowExportCard] = useState(false)
   const [showBlockedModal, setShowBlockedModal] = useState(false)
   const [confirmBan, setConfirmBan] = useState<string | null>(null)
+
   const [suggestedPerRole, setSuggestedPerRole] = useState<Record<string, CastActor[]>>({})
   const [blockedActors, setBlockedActors] = useState<Set<string>>(new Set())
   const [hoveredActor, setHoveredActor] = useState<{ actor: CastActor; rect: DOMRect } | null>(null)
   const [submitLoading, setSubmitLoading] = useState(false)
-  const [saveLoading, setSaveLoading] = useState(false)
-  const [savedId, setSavedId] = useState<string | null>(null)
-  const [showPitchModal, setShowPitchModal] = useState(false)
-  const [pitch, setPitch] = useState('')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [scoreLoading, setScoreLoading] = useState(false)
   const [scoreResult, setScoreResult] = useState<{ ai_summary: string; green_light_score: number; quality_score: number; hear_me_out_score: number; award: string | null; cached: boolean } | null>(null)
@@ -530,26 +526,12 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
             {scoreLoading ? 'Scoring…' : 'Score my cast'}
           </button>
           <button
-            onClick={handleSave}
-            disabled={saveLoading || Object.keys(selections).length === 0}
-            title={!isMember ? 'Members can save casts' : Object.keys(selections).length === 0 ? 'Cast some roles first' : savedId ? 'Saved!' : 'Save cast'}
-            style={{ background: savedId ? 'rgba(251,191,36,0.12)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.08)' : '#18181b', border: `1px solid ${savedId ? 'rgba(251,191,36,0.5)' : Object.keys(selections).length > 0 ? 'rgba(251,191,36,0.25)' : '#27272a'}`, borderRadius: '8px', padding: '7px 13px', color: savedId ? '#fbbf24' : Object.keys(selections).length > 0 ? '#a16207' : '#52525b', fontSize: '14px', fontWeight: 600, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed' }}
-          >
-            {saveLoading ? 'Saving…' : savedId ? '🏆 Saved' : isMember ? '🏆 Save cast' : '🔒 Save cast'}
-          </button>
-          <button
             onClick={() => setShowExportCard(true)}
-            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '7px 13px', color: '#a1a1aa', fontSize: '14px', cursor: 'pointer' }}
+            disabled={Object.keys(selections).length === 0}
+            title={Object.keys(selections).length === 0 ? 'Cast some roles first' : 'Share your cast'}
+            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: Object.keys(selections).length > 0 ? 'pointer' : 'not-allowed', opacity: Object.keys(selections).length > 0 ? 1 : 0.4 }}
           >
-            Export card
-          </button>
-          <button
-            onClick={copyAsImage}
-            disabled={copyingImage || !allRolesFilled}
-            title={allRolesFilled ? 'Copy cast image to clipboard' : 'Fill all roles first'}
-            style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '7px 13px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: allRolesFilled ? 'pointer' : 'not-allowed', opacity: allRolesFilled ? 1 : 0.4 }}
-          >
-            {copyingImage ? 'Generating…' : 'Share ↗'}
+            Share ↗
           </button>
         </div>
       </div>
@@ -1134,18 +1116,28 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
               )
             })}
 
-            <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ marginTop: '16px' }}>
               {!challenge && (
-                <div style={{ fontSize: '14px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: overBudget ? '#f87171' : '#4ade80', fontVariantNumeric: 'tabular-nums', marginBottom: '12px' }}>
                   ${spent}M / ${budget}M
                 </div>
               )}
-              <button
-                onClick={copyShareLink}
-                style={{ background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}
-              >
-                Copy share link ↗
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={copyShareLink}
+                  style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '8px 14px', color: '#a1a1aa', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Copy link
+                </button>
+                <button
+                  onClick={() => { setShowExportCard(false); copyAsImage() }}
+                  disabled={copyingImage || !allRolesFilled}
+                  title={allRolesFilled ? 'Copy cast as image' : 'Fill all roles first'}
+                  style={{ flex: 1, background: '#f8fafc', border: 'none', borderRadius: '8px', padding: '8px 14px', color: '#09090b', fontSize: '14px', fontWeight: 700, cursor: allRolesFilled ? 'pointer' : 'not-allowed', opacity: allRolesFilled ? 1 : 0.5 }}
+                >
+                  {copyingImage ? 'Generating…' : 'Copy image ↗'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1176,7 +1168,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
               <button
                 onClick={() => {
                   setSelections({})
-                  setSavedId(null)
                   setScoreResult(null)
                   localStorage.removeItem(`wl_cast_${slug}`)
                   setConfirmStartOver(false)
@@ -1340,61 +1331,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
             >
               Close
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Pitch modal */}
-      {showPitchModal && (
-        <div
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '24px' }}
-          onClick={() => setShowPitchModal(false)}
-        >
-          <div
-            style={{ background: '#111115', border: '1px solid rgba(139,92,246,0.3)', borderRadius: '20px', padding: '32px', width: '100%', maxWidth: '480px' }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7c3aed', fontWeight: 800, marginBottom: '10px' }}>
-              Save Cast
-            </div>
-            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#f8fafc', margin: '0 0 8px' }}>
-              Want to add an elevator pitch?
-            </h2>
-            <p style={{ fontSize: '14px', color: '#71717a', margin: '0 0 20px', lineHeight: 1.6 }}>
-              Why does this cast work? Why now? Sell it in a few sentences.
-            </p>
-            <textarea
-              value={pitch}
-              onChange={e => setPitch(e.target.value)}
-              placeholder="e.g. This is a grittier, street-level take. Instead of spectacle, we lean into character — every actor here disappears into the role..."
-              maxLength={600}
-              rows={5}
-              autoFocus
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                background: '#0e0e12', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '10px', padding: '12px 14px',
-                fontSize: '14px', color: '#e2e8f0', lineHeight: 1.6,
-                resize: 'vertical', outline: 'none', fontFamily: 'inherit',
-              }}
-            />
-            <div style={{ fontSize: '12px', color: '#3f3f46', textAlign: 'right', marginTop: '4px', marginBottom: '20px' }}>
-              {pitch.length}/600
-            </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => handleSaveWithPitch(pitch)}
-                style={{ flex: 1, background: '#7c3aed', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 700, color: '#fff', cursor: 'pointer' }}
-              >
-                {pitch.trim() ? '🏆 Save with pitch' : '🏆 Save cast'}
-              </button>
-              <button
-                onClick={() => setShowPitchModal(false)}
-                style={{ background: 'none', border: '1px solid #27272a', borderRadius: '10px', padding: '12px 18px', fontSize: '14px', color: '#71717a', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
       )}
@@ -1776,41 +1712,6 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
 
     </div>
   )
-
-  // ── Save cast ──
-  function handleSave() {
-    if (saveLoading) return
-    if (!isMember) return
-    setPitch('')
-    setShowPitchModal(true)
-  }
-
-  async function handleSaveWithPitch(pitchText: string) {
-    setShowPitchModal(false)
-    setSaveLoading(true)
-    try {
-      const primarySelections: Record<string, string> = {}
-      for (const [role, slots] of Object.entries(selections)) {
-        if (slots[0]) primarySelections[role] = slots[0]
-      }
-      const res = await fetch('/api/save-cast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title_slug: slug,
-          title_name: title,
-          poster_path: null,
-          selections: primarySelections,
-          total_cost: spent,
-          budget,
-          pitch: pitchText || null,
-        }),
-      })
-      const data = await res.json()
-      if (data.id) setSavedId(data.id)
-    } catch {}
-    finally { setSaveLoading(false) }
-  }
 
   // ── Submit cast ──
   async function handleSubmit() {
