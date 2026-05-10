@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { extractJson } from '../../../lib/extractJson'
+import { createServiceClient } from '../../../lib/supabase/service'
 
 const client = new Anthropic()
 
@@ -51,9 +52,11 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await supabase.from('profiles').select('is_director').eq('id', user.id).single()
   if (!profile?.is_director) return NextResponse.json({ error: 'Director tier required' }, { status: 403 })
 
-  // Rate limit: 20 production meetings/day
+  // Rate limit: 20 production meetings/day. Use service client so users can't
+  // tamper with their own usage row to dodge the limit.
+  const service = createServiceClient()
   const today = new Date().toISOString().split('T')[0]
-  const { data: usage } = await supabase
+  const { data: usage } = await service
     .from('review_usage')
     .select('count')
     .eq('ip', user.id)
@@ -64,7 +67,7 @@ export async function POST(req: NextRequest) {
   if (count >= 20) {
     return NextResponse.json({ error: 'Production Meeting limit reached (20/day).' }, { status: 429 })
   }
-  await supabase.from('review_usage').upsert(
+  await service.from('review_usage').upsert(
     { ip: user.id, date: today, type: 'cast_review', count: count + 1 },
     { onConflict: 'ip,date,type' }
   )

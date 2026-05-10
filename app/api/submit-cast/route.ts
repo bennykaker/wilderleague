@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { extractJson } from '../../../lib/extractJson'
+import { createServiceClient } from '../../../lib/supabase/service'
 
 function getKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -159,8 +160,10 @@ export async function POST(req: NextRequest) {
     console.error('AI scoring failed:', e)
   }
 
-  // Insert submission
-  const { data, error } = await supabase.from('submissions').insert({
+  // Insert via service client: the API route is the only valid write path
+  // (RLS blocks direct anon REST inserts).
+  const service = createServiceClient()
+  const { data, error } = await service.from('submissions').insert({
     user_id: user?.id ?? null,
     username: submitterUsername,
     movie_slug,

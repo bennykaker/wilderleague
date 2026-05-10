@@ -39,7 +39,10 @@ export async function POST(req: NextRequest) {
   const trackingKey = user.id
   const today = new Date().toISOString().split('T')[0]
 
-  const { data: usage } = await supabase
+  // Use service client for rate-limit reads/writes so users can't tamper.
+  const service = createServiceClient()
+
+  const { data: usage } = await service
     .from('review_usage')
     .select('count')
     .eq('ip', trackingKey)
@@ -52,13 +55,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Deep dive limit reached (${dailyLimit}/day).` }, { status: 429 })
   }
 
-  await supabase.from('review_usage').upsert(
+  await service.from('review_usage').upsert(
     { ip: trackingKey, date: today, type: 'deep_dive', count: count + 1 },
     { onConflict: 'ip,date,type' }
   )
 
   // Search full actor DB beyond top 2000
-  const service = createServiceClient()
   const excludeSet = new Set((excludeNames as string[]).map((n: string) => n.toLowerCase()))
 
   // Split on commas into individual terms, build one OR condition per term per field

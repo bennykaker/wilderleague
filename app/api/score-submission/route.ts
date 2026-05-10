@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { getTitle, getRolesForTitle } from '../../data/titles'
 import { extractJson } from '../../../lib/extractJson'
+import { createServiceClient } from '../../../lib/supabase/service'
 
 function getKey(): string {
   if (process.env.ANTHROPIC_API_KEY) return process.env.ANTHROPIC_API_KEY
@@ -170,7 +171,9 @@ export async function POST(req: NextRequest) {
     const result = await generateScores(title?.title ?? submission.movie_slug, budget, spent, cast, scoringModel)
     const award = computeAward(result.green_light_score, result.quality_score, result.hear_me_out_score)
 
-    await supabase.from('submissions').update({
+    // AI-generated scores: write via service client (system action, not user write).
+    const service = createServiceClient()
+    await service.from('submissions').update({
       ai_summary: result.summary,
       green_light_score: result.green_light_score,
       quality_score: result.quality_score,

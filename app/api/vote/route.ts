@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
+import { createServiceClient } from '../../../lib/supabase/service'
 
 export async function POST(req: NextRequest) {
   const { submission_id, value } = await req.json()
@@ -28,8 +29,10 @@ export async function POST(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Upsert vote (update if already voted)
-  const { error } = await supabase.from('votes').upsert(
+  // Upsert via service client: anon votes (user_id null) wouldn't satisfy
+  // an auth.uid()-based policy, and the API route is the only valid path.
+  const service = createServiceClient()
+  const { error } = await service.from('votes').upsert(
     {
       submission_id,
       user_id: user?.id ?? null,

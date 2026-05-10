@@ -5,6 +5,7 @@ import path from 'path'
 import { getEnrichedActors, type EnrichedActor } from '../../data/enrichedActors'
 import { getTitle } from '../../data/titles'
 import { createClient } from '../../../lib/supabase/server'
+import { createServiceClient } from '../../../lib/supabase/service'
 import { extractJson } from '../../../lib/extractJson'
 
 function getApiKey(): string {
@@ -232,10 +233,12 @@ export async function POST(request: NextRequest) {
   const trackingKey = user ? user.id : (request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown')
   const userTierLabel = isDirector ? 'Director' : isMember ? 'Member' : 'Guest'
 
-  // Rolling 3-day window: sum counts for today and the past 2 days
+  // Rolling 3-day window: sum counts for today and the past 2 days.
+  // Use service client for review_usage so users can't tamper.
+  const service = createServiceClient()
   const today = new Date().toISOString().split('T')[0]
   const twoDaysAgo = new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0]
-  const { data: recentUsage } = await supabase
+  const { data: recentUsage } = await service
     .from('review_usage')
     .select('count')
     .eq('ip', trackingKey)
@@ -256,7 +259,7 @@ export async function POST(request: NextRequest) {
   const wantsSonnet = useSonnet && isDirector
   const SONNET_DAILY_LIMIT = 50
   if (wantsSonnet) {
-    const { data: sonnetUsage } = await supabase
+    const { data: sonnetUsage } = await service
       .from('review_usage')
       .select('count')
       .eq('ip', trackingKey)
@@ -271,14 +274,14 @@ export async function POST(request: NextRequest) {
         remaining: rollingLimit - rollingCount,
       }, { status: 429 })
     }
-    await supabase.from('review_usage').upsert(
+    await service.from('review_usage').upsert(
       { ip: trackingKey, date: today, type: 'chat_sonnet', count: sonnetCount + 1 },
       { onConflict: 'ip,date,type' }
     )
   }
 
   // Record haiku chat usage
-  const { data: todayUsage } = await supabase
+  const { data: todayUsage } = await service
     .from('review_usage')
     .select('count')
     .eq('ip', trackingKey)
@@ -286,7 +289,7 @@ export async function POST(request: NextRequest) {
     .eq('type', 'chat')
     .single()
   const todayCount = todayUsage?.count ?? 0
-  await supabase.from('review_usage').upsert(
+  await service.from('review_usage').upsert(
     { ip: trackingKey, date: today, type: 'chat', count: todayCount + 1 },
     { onConflict: 'ip,date,type' }
   )
