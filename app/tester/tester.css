@@ -8,3 +8,7 @@
 .tester .actors .actor-birth{display:block;font-size:11px;padding:3px 10px 0;opacity:.75}
 
 .tester .casting-feedback{margin:24px 0;padding:20px;border:1px solid #bbc9ba;border-radius:12px;background:#f4f6ed;text-align:left}.tester .casting-feedback h2{margin-top:0}.tester .casting-feedback h3{font-size:1rem;margin-bottom:6px}
+/* Keep legacy dark-page defaults out of the light casting interface. */
+.tester h1,.tester h2,.tester a{color:var(--ink)}
+.tester select option{background:var(--paper);color:var(--ink)}
+body:has(>.tester){margin:0;background:#f6f5ed}
