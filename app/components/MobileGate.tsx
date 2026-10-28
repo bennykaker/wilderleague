@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 export default function MobileGate() {
+  const pathname = usePathname()
   const [isMobile, setIsMobile] = useState(false)
   const [dismissed, setDismissed] = useState(false)
 
@@ -13,7 +15,7 @@ export default function MobileGate() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
-  if (!isMobile || dismissed) return null
+  if (pathname === '/' || pathname === '/quick-cast' || pathname === '/tester' || !isMobile || dismissed) return null
 
   return (
     <div style={{

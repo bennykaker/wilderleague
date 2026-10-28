@@ -1,0 +1,9 @@
+work
+.preview-data
+.env*
+.next
+.next-check
+node_modules
+outputs
+*.xlsx
+*.tsbuildinfo

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import MobileGate from "./components/MobileGate";
 import ProgressBar from "./components/ProgressBar";
 import "./globals.css";
@@ -19,6 +20,7 @@ export default function RootLayout({
         <ProgressBar />
         <MobileGate />
         {children}
+        {process.env.WILDERLEAGUE_PREVIEW !== '1' && <Analytics />}
       </body>
     </html>
   );

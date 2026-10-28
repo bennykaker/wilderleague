@@ -41,3 +41,9 @@ yarn-error.log*
 next-env.d.ts
 /logs
 *.rtf
+
+# Isolated tester accounts and sessions; never publish this database.
+/.preview-data/
+
+/.next-check/
+/work/
