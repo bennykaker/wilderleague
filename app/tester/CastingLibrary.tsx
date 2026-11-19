@@ -1,5 +1,6 @@
 'use client'
 import {useMemo, useRef, useState} from 'react'
+import ActorPortrait, {featuredActors} from './ActorPortrait'
 import type {LibraryTitle} from '../../lib/tester/model'
 
 const formats = {
@@ -96,6 +97,12 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,load
           <button disabled={start+pageSize>=matches.length} onClick={()=>onChange({...selection,page:page+1})}>Next titles</button>
         </div>}
       </>}
+    {!showingResults&&<section className="featured-actors" aria-labelledby="featured-actors-heading">
+      <h2 id="featured-actors-heading">Actors you can cast</h2>
+      <div>{featuredActors.map(name=><figure key={name}>
+        <ActorPortrait name={name} className="featured-headshot" eager/><figcaption>{name}</figcaption>
+      </figure>)}</div>
+    </section>}
     <div className="other-formats" role="group" aria-label="More casting formats">
       {(['tv','universe','all'] as const).map(key=><button className="text-link" key={key} aria-pressed={format===key} onClick={()=>changeFormat(key)}>{formats[key].label}</button>)}
     </div>

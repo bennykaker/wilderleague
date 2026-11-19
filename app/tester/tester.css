@@ -70,3 +70,18 @@ body:has(>.tester){margin:0;background:#09090b}
 @media(max-width:1000px){.tester .landing-idea-grid{gap:25px 20px;padding-inline:10px}.tester .landing-idea:nth-child(n+4){margin-top:8px}}
 @media(max-width:600px){.tester .landing-idea-grid{gap:22px 16px;padding:15px 8px 25px}.tester .landing-idea:nth-child(odd){transform:rotate(-2deg);margin-top:0}.tester .landing-idea:nth-child(even){transform:rotate(2deg);margin-top:20px}}
 @media(prefers-reduced-motion:reduce){.tester .landing-idea{transition:none}}
+
+.tester .role-headshot,.tester .role-pick-photo,.tester .credit-photo {
+  display:block; object-fit:cover; object-position:center 22%; border-radius:6px; flex:none;
+}
+.tester .role-headshot { width:64px; height:82px; }
+.tester .role-pick-photo { width:36px; height:46px; margin-left:auto; }
+.tester .credit-photo { width:44px; height:56px; }
+.tester .role-performers { display:flex; flex-wrap:wrap; column-gap:24px; row-gap:8px; }
+.tester .role-performers>div { display:flex; gap:9px; align-items:center; margin-top:7px; }
+.tester .role-performers small,.tester .role-performers strong { display:block; line-height:1.4; }
+.tester .role-performers small { color:var(--muted); font-size:13px; }
+.tester .cast-summary .cast-credit { display:flex; gap:10px; align-items:center; }
+.tester .photo-unavailable { display:grid; place-items:center; background:var(--panel-alt); color:var(--muted); font-weight:600; }
+.tester .actors .candidate-photo { display:block; width:100%; height:clamp(150px,18vw,230px); object-fit:cover; object-position:center 22%; }
+.tester .actors .candidate-photo.photo-unavailable { display:grid; font-size:26px; }

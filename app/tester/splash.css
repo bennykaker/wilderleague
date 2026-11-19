@@ -81,3 +81,14 @@ body:has(.tester), body:has(.splash-boot) { margin:0; background:#09090b; }
   .suggested-titles .title-info strong { font-size:14px; }
   .suggested-titles .title-info small { font-size:12px; }
 }
+.tester .featured-actors { margin-top:22px; }
+.tester .featured-actors h2 { margin:0 0 9px; font-size:17px; }
+.featured-actors>div { display:flex; gap:clamp(12px,3vw,32px); flex-wrap:wrap; }
+.featured-actors figure { display:flex; gap:10px; align-items:center; margin:0; }
+.featured-actors figcaption { font-size:15px; line-height:1.25; font-weight:600; }
+.featured-headshot { display:block; width:54px; height:68px; object-fit:cover; object-position:center 22%; border-radius:6px; }
+@media(max-width:550px) {
+  .featured-actors>div { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+  .featured-actors figure { flex-direction:column; align-items:flex-start; gap:5px; }
+  .featured-actors figcaption { font-size:13px; }
+}

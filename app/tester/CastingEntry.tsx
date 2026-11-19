@@ -17,7 +17,7 @@ const lessons = [
   {title:'Make your case.', text:'Add a line about your choices. Sign in to save a private cast or share a link. A book or universe cast can start with a single role.', label:'Your pitch', example:'“I want a Gandalf who seems delighted by hobbits.”'},
 ]
 
-export default function CastingEntry({publicMode}:{publicMode:boolean}) {
+export default function CastingEntry({publicMode,preferBundledPhotos=false}:{publicMode:boolean;preferBundledPhotos?:boolean}) {
   const [screen,setScreen] = useState<Screen>('starting')
   const [hideSplash,setHideSplash] = useState(false)
   const [lesson,setLesson] = useState(0)
@@ -117,7 +117,7 @@ export default function CastingEntry({publicMode}:{publicMode:boolean}) {
     </main>
   </div>
 
-  if (screen==='room' && data) return <TesterApp data={data} publicMode={publicMode} initialMode={mode} initialTitle={initialTitle}
+  if (screen==='room' && data) return <TesterApp data={data} publicMode={publicMode} initialMode={mode} initialTitle={initialTitle} preferBundledPhotos={preferBundledPhotos}
     picker={{selection,onChange:setSelection}} onTutorial={howTo} onRoomChange={setMode}/>
   return <div className="tester book-entry">
     <header><button className="brand plain" onClick={()=>{setError('');setScreen('welcome')}}>WilderLeague</button>{screen==='tutorial'&&<button className="plain" onClick={()=>enter('library')}>Skip tutorial</button>}</header>
