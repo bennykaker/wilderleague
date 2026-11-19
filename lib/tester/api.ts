@@ -3,7 +3,7 @@ import {HostedStore} from './hosted-store'
 import {hostedFeedback,readHostedFeedback} from './hosted-ai'
 import {aiSearch} from './ai-search'
 import {readFeedback,requestFeedback} from './feedback'
-import {customChallenge,withChallenge,fetchLibraryChallenge} from './library'
+import {customChallenge,withChallenge,fetchLibraryChallenge,getLibraryIndex} from './library'
 import type {Catalogue} from './model'
 import {makeSnapshot,validateCast} from './model'
 import {StoreError,type TesterStore} from './store'
@@ -13,7 +13,9 @@ function token(req:Request){return req.headers.get('cookie')?.split(';').map(x=>
 function json(body:unknown,status=200,headers:Record<string,string>={}){return Response.json(body,{status,headers:{'Cache-Control':'no-store',...headers}})}
 export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Promise<Catalogue>,resolveTitle=fetchLibraryChallenge){return async(req:Request)=>{
  try{
-  const url=new URL(req.url),action=url.pathname.split('/api/preview/')[1]||'',user=await store.user(token(req))
+  const url=new URL(req.url),action=url.pathname.split('/api/preview/')[1]||''
+  if(req.method==='GET'&&action==='titles')return json({titles:await getLibraryIndex()})
+  const user=await store.user(token(req))
   const requireUser=()=>{if(!user)throw new StoreError('Sign in to save, submit or vote.',401);return user}
   if(req.method==='GET'){
    if(action==='title'){try{return json({challenge:await resolveTitle(url.searchParams.get('slug')||'')})}catch(e){throw new StoreError((e as Error).message,404)}}

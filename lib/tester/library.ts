@@ -1,6 +1,7 @@
 import {createServiceClient} from '../supabase/service'
 import type {LibraryTitle,Challenge,TesterRole} from './model'
-import {literaryChallenge} from './books'
+import {literaryChallenge,mergeLibrary} from './books'
+import {unstable_cache} from 'next/cache'
 export type {LibraryTitle} from './model'
 export const featuredSpecs=[
  {id:'snl-brooklyn-99',slug:'brooklyn-nine-nine',pool:'snl',rule:'SNL cast members only.'},
@@ -17,6 +18,10 @@ export async function fetchLibraryTitles():Promise<LibraryTitle[]>{
  const db=createServiceClient(),titles:LibraryTitle[]=[]
  for(let from=0;;from+=1000){const {data,error}=await db.from('titles').select('slug,title,type,year').order('title').range(from,from+999);if(error)throw new Error('Could not load titles.');titles.push(...data);if(data.length<1000)break}
  return titles
+}
+const getTitles=unstable_cache(fetchLibraryTitles,['tester-title-list-v1'],{revalidate:3600})
+export async function getLibraryIndex(cached=true) {
+ return mergeLibrary(await (cached?getTitles:fetchLibraryTitles)())
 }
 export async function fetchLibraryChallenge(slug:string):Promise<Challenge>{
  if(!/^[a-z0-9-]{1,150}$/.test(slug))throw new Error('Unknown title.')
