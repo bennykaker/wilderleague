@@ -1,0 +1,68 @@
+body:has(.wl-splash), body:has(.splash-boot) { margin: 0; background: #070708; }
+.splash-boot, .wl-splash { min-height: 100vh; min-height: 100svh; background: #070708; }
+.wl-splash {
+  --flare: #ff5835;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(32px, 7vmin, 96px) 20px;
+  color: #fffaf4;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+  background:
+    radial-gradient(ellipse at 80% 0%, #43201855, transparent 48%),
+    #070708;
+}
+.wl-splash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(118deg, transparent 67%, #da40200c 67.15%, transparent 77%, #f44a2617 77.1%, transparent 81%);
+}
+.splash-content { width: min(100%, 34rem); text-align: center; }
+.wl-splash h1 {
+  color: inherit;
+  font: italic 950 clamp(4.8rem, min(19vw, 17.5svh), 10rem)/.78 "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -.085em;
+  text-transform: uppercase;
+  margin: 0 0 clamp(2.5rem, 7svh, 5rem);
+}
+.wl-splash h1 span { display: block; }
+.wl-splash h1 span:last-child { color: var(--flare); margin-top: .06em; }
+.splash-choices { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.splash-choices button {
+  cursor: pointer;
+  padding: 1.08rem .6rem;
+  border: 1px solid transparent;
+  border-radius: .3rem;
+  font: 800 clamp(1.15rem, 2.5vw, 1.55rem)/1.15 "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -.025em;
+}
+.splash-choices small { display: block; font-size: .875rem; line-height: 1.4; font-weight: 500; letter-spacing: 0; margin-top: .3rem; }
+.splash-new { color: #100b09; background: var(--flare); }
+.splash-new:hover { background: #ff795b; }
+.splash-choices .splash-expert { color: #fffaf4; background: #141416; border-color: #706c68; }
+.splash-expert:hover { background: #242326; }
+.splash-expert small { color: #d4ccc7; }
+.splash-preference {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  min-height: 44px;
+  margin-top: 1.05rem;
+  color: #d4ccc7;
+  cursor: pointer;
+  font-size: .95rem;
+}
+.splash-preference input { accent-color: var(--flare); width: 1.12rem; height: 1.12rem; margin: 0; cursor: inherit; }
+.wl-splash :focus-visible { outline: 3px solid #fffaf4; outline-offset: 5px; }
+@media (max-width: 360px) {
+  .splash-choices { grid-template-columns: 1fr; }
+  .splash-choices button { padding: .8rem; }
+}
