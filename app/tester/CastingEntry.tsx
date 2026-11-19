@@ -1,8 +1,11 @@
 'use client'
-import {useEffect, useRef, useState} from 'react'
-import type {Catalogue,LibraryTitle} from '../../lib/tester/model'
+import {useEffect, useMemo, useRef, useState} from 'react'
+import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
+import {literaryTitles} from '../../lib/tester/books'
+import {starterCatalogue} from '../../lib/tester/starter-catalogue'
+import {useCastingResource} from './useCastingResource'
 import './tester.css'
 import './bookshelf.css'
 import './splash.css'
@@ -17,17 +20,43 @@ const lessons = [
   {title:'Make your case.', text:'Add a line about your choices. Sign in to save a private cast or share a link. A book or universe cast can start with a single role.', label:'Your pitch', example:'“I want a Gandalf who seems delighted by hobbits.”'},
 ]
 
-export default function CastingEntry({publicMode,preferBundledPhotos=false}:{publicMode:boolean;preferBundledPhotos?:boolean}) {
+function readDirectory(body:unknown) {
+  const directory=body as Catalogue
+  if (!directory?.actors?.length || !directory.challenges?.length || !directory.pools) throw new Error()
+  return directory
+}
+function readTitles(body:unknown):LibraryTitle[] {
+  const data=body as {titles:LibraryTitle[]}
+  if (!Array.isArray(data?.titles)) throw new Error()
+  return data.titles
+}
+function readRosters(body:unknown):Challenge[] {
+  const data=body as {challenges:Challenge[]}
+  if (!Array.isArray(data?.challenges) || !data.challenges.length) throw new Error()
+  return data.challenges
+}
+
+export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:boolean;embeddedCatalogue?:Catalogue}) {
   const [screen,setScreen] = useState<Screen>('starting')
   const [hideSplash,setHideSplash] = useState(false)
   const [lesson,setLesson] = useState(0)
   const [mode,setMode] = useState<Room>('library')
   const [selection,setSelection] = useState(initialPicker)
   const [initialTitle,setInitialTitle] = useState('')
-  const [titles,setTitles] = useState<LibraryTitle[]|null>(null)
-  const [data,setData] = useState<Catalogue|null>(null)
-  const [error,setError] = useState('')
-  const [attempt,setAttempt] = useState(0)
+  const titleIndex=useCastingResource('/api/preview/titles',!embeddedCatalogue && (screen==='welcome'||screen==='room'),readTitles)
+  const directory=useCastingResource('/api/preview/actor-directory',!embeddedCatalogue && screen==='room',readDirectory)
+  const features=useCastingResource('/api/preview/challenge-rosters',!embeddedCatalogue && screen==='room' && !!directory.value,readRosters)
+  const partial=!embeddedCatalogue && !directory.value
+  const data=useMemo(()=>{
+    if (embeddedCatalogue) return embeddedCatalogue
+    const base=directory.value || starterCatalogue
+    const challenges=features.value?.filter(c=>base.challenges.some(core=>core.id===c.id)||(base.pools[c.id]?.length??0)>=c.roles.length) || base.challenges
+    return {...base,challenges,titles:titleIndex.value || literaryTitles}
+  },[embeddedCatalogue,directory.value,features.value,titleIndex.value])
+  const localShelf=selection.format==='book'||selection.format==='universe'||selection.format==='all'
+  const waitingForTitles=!embeddedCatalogue && !titleIndex.value && !localShelf
+  const picker={selection,onChange:setSelection,loading:waitingForTitles && !titleIndex.failed,
+    error:waitingForTitles && titleIndex.failed?'The screen titles could not load. You can still cast a book or universe.':'',retry:titleIndex.retry}
   const lessonTitle = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -47,41 +76,18 @@ export default function CastingEntry({publicMode,preferBundledPhotos=false}:{pub
   },[])
 
   useEffect(() => {
-    if (screen!=='welcome' || titles || data) return
-    const controller = new AbortController()
-    fetch('/api/preview/titles',{signal:controller.signal}).then(async res=>{
-      if (!res.ok) throw new Error()
-      const index = await res.json()
-      if (!Array.isArray(index.titles)) throw new Error()
-      if (!controller.signal.aborted) setTitles(index.titles)
-    }).catch(()=>{if (!controller.signal.aborted) setError('The titles could not load.')})
-    return ()=>controller.abort()
-  },[screen,titles,data,attempt])
-
-  useEffect(() => {
     if (screen==='tutorial') lessonTitle.current?.focus({preventScroll:true})
-    if (screen!=='room' || data) return
-    const controller = new AbortController()
-    fetch('/api/preview/catalogue',{signal:controller.signal}).then(async res => {
-      if (!res.ok) throw new Error()
-      const catalogue:Catalogue = await res.json()
-      if (!catalogue.challenges?.length || !catalogue.actors?.length) throw new Error()
-      if (!controller.signal.aborted) setData(catalogue)
-    }).catch(()=>{if(!controller.signal.aborted)setError('The casting room could not load. Please try again.')})
-    return () => controller.abort()
-  },[screen,data,attempt])
+  },[screen,lesson])
 
   function enter(room:Room,slug='') {
     setInitialTitle(slug)
     setMode(room)
-    setError('')
     setScreen('room')
     window.scrollTo(0,0)
   }
 
   function howTo() {
     setInitialTitle('')
-    setError('')
     if (location.search) history.replaceState(null,'',location.pathname)
     setLesson(0)
     setScreen('tutorial')
@@ -104,9 +110,7 @@ export default function CastingEntry({publicMode,preferBundledPhotos=false}:{pub
   if (screen==='welcome') return <div className="tester wl-splash">
     <main className="splash-layout">
       <p className="classic-brand">WilderLeague</p>
-      <CastingLibrary titles={data?.titles || titles || []} busy={false} loading={!data && !titles && !error} error={error}
-        retry={()=>{setError('');setAttempt(n=>n+1)}} open={slug=>selectPath('expert',slug)}
-        selection={selection} onChange={setSelection}/>
+      <CastingLibrary {...picker} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
       <aside className="splash-paths" aria-label="Welcome options">
         <div className="splash-choices">
           <button className="splash-new" onClick={()=>selectPath('new')}>New here<small>Take the quick tutorial</small></button>
@@ -117,10 +121,12 @@ export default function CastingEntry({publicMode,preferBundledPhotos=false}:{pub
     </main>
   </div>
 
-  if (screen==='room' && data) return <TesterApp data={data} publicMode={publicMode} initialMode={mode} initialTitle={initialTitle} preferBundledPhotos={preferBundledPhotos}
-    picker={{selection,onChange:setSelection}} onTutorial={howTo} onRoomChange={setMode}/>
+  if (screen==='room' && (mode==='library'||!partial)) return <TesterApp data={data} publicMode={publicMode}
+    initialMode={mode} initialTitle={initialTitle} preferBundledPhotos={!!embeddedCatalogue} partialCatalogue={partial}
+    directoryFailed={directory.failed} retryDirectory={directory.retry} picker={picker} onTutorial={howTo} onRoomChange={setMode}
+    retryFeatures={features.failed?features.retry:undefined}/>
   return <div className="tester book-entry">
-    <header><button className="brand plain" onClick={()=>{setError('');setScreen('welcome')}}>WilderLeague</button>{screen==='tutorial'&&<button className="plain" onClick={()=>enter('library')}>Skip tutorial</button>}</header>
+    <header><button className="brand plain" onClick={()=>setScreen('welcome')}>WilderLeague</button>{screen==='tutorial'&&<button className="plain" onClick={()=>enter('library')}>Skip tutorial</button>}</header>
     <main>{screen==='tutorial'?<section className="quick-lesson" aria-labelledby="lesson-heading">
       <div className="lesson-progress" aria-hidden="true">{lessons.map((step,i)=><span key={step.title} className={i<=lesson?'done':''}/>)}</div>
       <p className="lesson-count">Quick tutorial · {lesson+1} of {lessons.length}</p>
@@ -131,8 +137,8 @@ export default function CastingEntry({publicMode,preferBundledPhotos=false}:{pub
         <button onClick={()=>lesson?setLesson(lesson-1):setScreen('welcome')}>Back</button>
         {lesson<2?<button className="primary" onClick={()=>setLesson(lesson+1)}>Next</button>:<><button className="primary" onClick={()=>enter('library')}>Start casting</button><button onClick={()=>enter('guided')}>Try a guided challenge</button></>}
       </div>
-    </section>:<section className="quick-lesson" aria-live="polite"><h1>The casting room</h1><p>{error||'Opening the actor and title catalogues…'}</p>
-      {error&&<button className="primary" onClick={()=>{setError('');setAttempt(n=>n+1)}}>Try again</button>} <button className="plain" onClick={()=>{setError('');setScreen('welcome')}}>Back to welcome</button>
+    </section>:<section className="quick-lesson" aria-live="polite"><h1>Guided casting</h1><p>{directory.failed?'The full actor list could not load.':'Loading actors for your guided challenge…'}</p>
+      {directory.failed&&<button className="primary" onClick={directory.retry}>Try again</button>} <button onClick={()=>enter('library')}>Open the casting room</button> <button className="plain" onClick={()=>setScreen('welcome')}>Back to welcome</button>
     </section>}</main>
   </div>
 }

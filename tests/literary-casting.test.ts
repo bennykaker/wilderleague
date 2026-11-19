@@ -1,4 +1,7 @@
 import {test} from 'node:test'
+import {starterCatalogue} from '../lib/tester/starter-catalogue'
+import {eligibleForReboot} from '../lib/tester/reboot'
+import life from '../lib/tester/life-status.json'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import {literaryChallenge,literaryTitles,mergeLibrary} from '../lib/tester/books'
@@ -101,4 +104,26 @@ test('reader corrections and original artwork reach private review with title co
    assert.equal(JSON.parse(String(row.details)).title,'Harry Potter')
    assert.deepEqual(Buffer.from(row.artwork as Uint8Array),bytes)
  } finally {store.close()}
+})
+
+test('a book can be cast and saved when the general catalogue is unavailable',async()=>{
+ const records:Record<string,Parameters<typeof eligibleForReboot>[0]>=life.entries
+ for(const actor of starterCatalogue.actors){
+  assert.ok(eligibleForReboot(records[actor.id.slice(5)],life.checkedAt),actor.name)
+ }
+ const store=new TesterStore(':memory:')
+ try{
+  const unavailable=async():Promise<Catalogue>=>{throw new Error('Unrelated catalogue unavailable')}
+  const api=createTesterApi(store,unavailable,resolve,async()=>starterCatalogue)
+  const read=await api(new Request('http://release.test/api/preview/actor-directory'))
+  assert.equal(read.status,200)
+  assert.equal((await read.json()).actors.length,starterCatalogue.actors.length)
+  const book=literaryChallenge('book-rebecca-yarros-fourth-wing')!
+  const user=await store.register('bookreader','reader password example')
+  const response=await api(new Request('http://release.test/api/preview/save',{method:'POST',headers:{
+   origin:'http://release.test','content-type':'application/json',cookie:'wl_tester_session='+store.session(user)
+  },body:JSON.stringify({challengeId:book.id,picks:[starterCatalogue.actors[0].id],roleIds:[book.roles[0].id],pitch:'',publish:false})}))
+  assert.equal(response.status,200)
+  assert.equal((await response.json()).cast.snapshot.challenge.roles[0].name,book.roles[0].name)
+ }finally{store.db.close()}
 })

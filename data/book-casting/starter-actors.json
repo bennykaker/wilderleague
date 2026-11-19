@@ -1,0 +1,1030 @@
+[
+ {
+  "id": "tmdb:1620",
+  "name": "Michelle Yeoh",
+  "image": "https://image.tmdb.org/t/p/w500/i6fHvGt7Rb8oVyjjdQVV6vEHB94.jpg",
+  "knownFor": "Wicked: For Good; Wicked; Guardians of the Galaxy Vol. 2; Everything Everywhere All at Once; Shang-Chi and the Legend of the Ten Rings",
+  "nationality": "Malaysian",
+  "gender": "female",
+  "birthYear": 1962,
+  "descriptionTags": [
+   "commanding",
+   "powerful",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:76788",
+  "name": "Dev Patel",
+  "image": "https://image.tmdb.org/t/p/w500/1g07SUVwZHvKgM1Z7H4RYIEOXcm.jpg",
+  "knownFor": "Slumdog Millionaire; Lion; Chappie",
+  "gender": "male",
+  "birthYear": 1990,
+  "descriptionTags": [
+   "empathetic",
+   "charismatic",
+   "dramatic",
+   "drama",
+   "romance",
+   "crime"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1253360",
+  "name": "Pedro Pascal",
+  "image": "https://image.tmdb.org/t/p/w500/oKcMbVn0NJTNzQt0ClKKvVXkm60.jpg",
+  "knownFor": "Avengers: Doomsday; The Fantastic 4: First Steps; The Wild Robot; Gladiator II; Eddington; Game of Thrones",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1975,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:25072",
+  "name": "Oscar Isaac",
+  "image": "https://image.tmdb.org/t/p/w500/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg",
+  "knownFor": "The Daily Show; The Tonight Show Starring Jimmy Fallon; The Tonight Show Starring Jimmy Fallon; Late Night with Seth Meyers; The Late Show with Stephen Colbert; The Late Show with Stephen Colbert",
+  "gender": "male",
+  "birthYear": 1979,
+  "descriptionTags": [
+   "intensity",
+   "subtle",
+   "charisma"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1373737",
+  "name": "Florence Pugh",
+  "image": "https://image.tmdb.org/t/p/w500/6Sjz9teWjrMY9lF2o9FCo4XmoRh.jpg",
+  "knownFor": "King Lear",
+  "nationality": "British",
+  "gender": "female",
+  "birthYear": 1996,
+  "descriptionTags": [
+   "intensity",
+   "gravitas",
+   "restrained",
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:25540",
+  "name": "Sandra Oh",
+  "image": "https://image.tmdb.org/t/p/w500/zU8vjebHxcP60ESEL5Ok68KWZvj.jpg",
+  "knownFor": "Turning Red; Smurfs; Raya and the Last Dragon; The Princess Diaries; Good Fortune; Six Feet Under",
+  "nationality": "Canada",
+  "gender": "female",
+  "birthYear": 1971,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "romance",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:206919",
+  "name": "Daniel Kaluuya",
+  "image": "https://image.tmdb.org/t/p/w500/jj2kZqJobjom36wlhlYhc38nTwN.jpg",
+  "knownFor": "Spider-Man: Across the Spider-Verse; Black Panther; Get Out; Sicario; Nope",
+  "nationality": "British",
+  "gender": "male",
+  "birthYear": 1989,
+  "descriptionTags": [
+   "drama",
+   "action",
+   "crime"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:17605",
+  "name": "Idris Elba",
+  "image": "https://image.tmdb.org/t/p/w500/be1bVF7qGX91a6c5WeRPs5pKXln.jpg",
+  "knownFor": "Zootopia 2; Avengers: Infinity War; Zootopia; Sonic the Hedgehog 3; Avengers: Age of Ultron; The Office; The Wire",
+  "nationality": "British",
+  "gender": "male",
+  "birthYear": 1972,
+  "descriptionTags": [
+   "dramatic",
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:6384",
+  "name": "Keanu Reeves",
+  "image": "https://image.tmdb.org/t/p/w500/8RZLOyYGsoRe9p44q3xin9QkMHv.jpg",
+  "knownFor": "The Matrix; Bill & Ted's Excellent Adventure; Louis Theroux: Inside the Manosphere; Sonic the Hedgehog 3; The Devil's Advocate",
+  "nationality": "Canada",
+  "gender": "male",
+  "birthYear": 1964,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:776",
+  "name": "Eddie Murphy",
+  "image": "https://image.tmdb.org/t/p/w500/qgjMfefsKwSYsyCaIX46uyOXIpy.jpg",
+  "knownFor": "Shrek; Shrek 2; Shrek Forever After; Mulan; Norbit",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1961,
+  "descriptionTags": [
+   "comedy",
+   "comic"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3223",
+  "name": "Robert Downey Jr.",
+  "image": "https://image.tmdb.org/t/p/w500/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg",
+  "knownFor": "Saturday Night Live",
+  "birthYear": 1965,
+  "descriptionTags": [
+   "intense",
+   "comedy",
+   "comedic",
+   "humor",
+   "witty",
+   "wit",
+   "gravitas",
+   "charismatic",
+   "charisma",
+   "dramatic",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:19292",
+  "name": "Adam Sandler",
+  "image": "https://image.tmdb.org/t/p/w500/gLkLCsQdwDDPabRhKPB25nGtKwS.jpg",
+  "knownFor": "Pixels; Grown Ups; That's My Boy; Hotel Transylvania; Grown Ups 2; Brooklyn Nine-Nine",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1966,
+  "descriptionTags": [
+   "comedy",
+   "dramatic",
+   "drama",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:134531",
+  "name": "Anna Gunn",
+  "image": "https://image.tmdb.org/t/p/w500/adppyeu1a4REN3khtgmXusrapFi.jpg",
+  "knownFor": "Breaking Bad; Sully; Enemy of the State; ER; Deadwood; Seinfeld; Six Feet Under",
+  "gender": "female",
+  "birthYear": 1968,
+  "descriptionTags": [
+   "dramatic",
+   "drama",
+   "crime"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:17419",
+  "name": "Bryan Cranston",
+  "image": "https://image.tmdb.org/t/p/w500/7Jahy5LZX2Fo8fGJltMreAI49hC.jpg",
+  "knownFor": "Kung Fu Panda 4; Saving Private Ryan; Drive; Kung Fu Panda 3; Godzilla; Curb Your Enthusiasm; 30 Rock; It's Always Sunny in Philadelphia; Seinfeld; Breaking Bad",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1956,
+  "descriptionTags": [
+   "intensity",
+   "comedy",
+   "gravitas",
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3910",
+  "name": "Frances McDormand",
+  "image": "https://image.tmdb.org/t/p/w500/r0A7hZsM1zuavTr0jN7bwmBcliR.jpg",
+  "knownFor": "Fargo; Three Billboards Outside Ebbing, Missouri; The Good Dinosaur; Madagascar 3: Europe's Most Wanted; Primal Fear; Almost Famous",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1957,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "crime"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:4784",
+  "name": "Laura Dern",
+  "image": "https://image.tmdb.org/t/p/w500/gB9PnGEvxKg33OSlcqptQwTBwPE.jpg",
+  "knownFor": "Star Wars: The Last Jedi; Jurassic World Dominion; Is This Thing On?; Little Women; Jurassic Park; Frasier; Twin Peaks; The West Wing",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1967,
+  "descriptionTags": [
+   "comedy",
+   "commanding",
+   "authority",
+   "drama",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:5293",
+  "name": "Willem Dafoe",
+  "image": "https://image.tmdb.org/t/p/w500/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg",
+  "knownFor": "Spider-Man: No Way Home; Spider-Man; Spider-Man 3; Born on the Fourth of July; Finding Nemo; Fun Home",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1955,
+  "descriptionTags": [
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:9780",
+  "name": "Angela Bassett",
+  "image": "https://image.tmdb.org/t/p/w500/tKnuviliyeKNGlo26IU5gIrJAtd.jpg",
+  "knownFor": "Avengers: Endgame; Mission: Impossible - The Final Reckoning; Black Panther; Black Panther: Wakanda Forever; Soul; ER",
+  "nationality": "American,Florida",
+  "gender": "female",
+  "birthYear": 1958,
+  "descriptionTags": [
+   "comedy",
+   "authority",
+   "gravitas",
+   "powerful",
+   "dramatic",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:38334",
+  "name": "Jennifer Coolidge",
+  "image": "https://image.tmdb.org/t/p/w500/hcpbV0dY4ZJxmZi1WcAWe8euqV2.jpg",
+  "knownFor": "A Minecraft Movie; American Pie; Legally Blonde; The Emoji Movie; Robots; Friends; Frasier; Seinfeld",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1961,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "warmth",
+   "romantic",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:21702",
+  "name": "Ming-Na Wen",
+  "image": "https://image.tmdb.org/t/p/w500/eqCzFF83It56cUdjpskzvg8jgq.jpg",
+  "knownFor": "Karate Kid: Legends; Mulan; Mulan; Ralph Breaks the Internet; Young Sheldon; ER",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1963,
+  "descriptionTags": [
+   "commanding",
+   "gravitas",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:5064",
+  "name": "Meryl Streep",
+  "image": "https://image.tmdb.org/t/p/w500/emAAzyK1rJ6aiMi0wsWYp51EC3h.jpg",
+  "knownFor": "Project Hail Mary; Hoppers; The Giver; The Devil Wears Prada; Don't Look Up; August: Osage County; Into the Woods",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1949,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:62861",
+  "name": "Andy Samberg",
+  "image": "https://image.tmdb.org/t/p/w500/jMXU5oG3i93SH1yhkpbBGskFiJl.jpg",
+  "knownFor": "Zootopia 2; Spider-Man: Across the Spider-Verse; The Naked Gun; That's My Boy; Hotel Transylvania; Arrested Development; 30 Rock; Brooklyn Nine-Nine; Parks and Recreation",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1978,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "charm"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:2632",
+  "name": "Chris Rock",
+  "image": "https://image.tmdb.org/t/p/w500/cqI8yQ00GNDV3PAAz5UeLj7vOX0.jpg",
+  "knownFor": "Madagascar; Madagascar: Escape 2 Africa; Madagascar 3: Europe's Most Wanted",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1965,
+  "descriptionTags": [
+   "funny",
+   "charisma"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:15886",
+  "name": "Julia Louis-Dreyfus",
+  "image": "https://image.tmdb.org/t/p/w500/iEfHQNrVbVFesDPjdySom9nqsFg.jpg",
+  "knownFor": "A Bug's Life; Onward; Thunderbolts*; Arrested Development; Curb Your Enthusiasm; 30 Rock; Seinfeld; Veep",
+  "gender": "female",
+  "birthYear": 1961,
+  "descriptionTags": [
+   "comic",
+   "wit",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:23659",
+  "name": "Will Ferrell",
+  "image": "https://image.tmdb.org/t/p/w500/yjGbyQzVjpQl8xFkFGa7JxKZWQb.jpg",
+  "knownFor": "Megamind; Anchorman: The Legend of Ron Burgundy; The Other Guys; 30 Rock; The Office",
+  "gender": "male",
+  "birthYear": 1967,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "warmth",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:41091",
+  "name": "Kristen Wiig",
+  "image": "https://image.tmdb.org/t/p/w500/oddvykQHx71hEZlvKinCzB3Vcfh.jpg",
+  "knownFor": "The Martian; Ghostbusters; Despicable Me 2; Arrested Development; 30 Rock",
+  "gender": "female",
+  "birthYear": 1973,
+  "descriptionTags": [
+   "comedy",
+   "wit",
+   "quiet",
+   "dramatic",
+   "drama"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:12073",
+  "name": "Mike Myers",
+  "image": "https://image.tmdb.org/t/p/w500/gjfDl52Kk02MPgUYFjs9bOy33OY.jpg",
+  "knownFor": "Shrek; Shrek 2; Shrek the Third",
+  "nationality": "Canada",
+  "gender": "male",
+  "birthYear": 1963,
+  "descriptionTags": [
+   "comedy",
+   "comedic"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:60949",
+  "name": "Rob Schneider",
+  "image": "https://image.tmdb.org/t/p/w500/kVHNFDOGDrC3LjDyYf5RaCd6auK.jpg",
+  "knownFor": "The Daily Show; Seinfeld; Saturday Night Live; Saturday Night Live; Saturday Night Live; Saturday Night Live",
+  "gender": "male",
+  "birthYear": 1963,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "humor"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:519",
+  "name": "Martin Short",
+  "image": "https://image.tmdb.org/t/p/w500/vWoZIOk7K8TSKu1IN90akswsWjZ.jpg",
+  "knownFor": "The Prince of Egypt; Aquaman and the Lost Kingdom; Madagascar 3: Europe's Most Wanted; Treasure Planet; The Simpsons",
+  "nationality": "Canada",
+  "gender": "male",
+  "birthYear": 1950,
+  "descriptionTags": [
+   "comedy",
+   "humor"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:7904",
+  "name": "Billy Crystal",
+  "image": "https://image.tmdb.org/t/p/w500/jfcCceTnP7rrHz1pSjCxiqRosw3.jpg",
+  "knownFor": "Monsters University; Monsters, Inc.; When Harry Met Sally...; Friends; Frasier; Hamlet; The Princess Bride",
+  "gender": "male",
+  "birthYear": 1948,
+  "descriptionTags": [
+   "comedy",
+   "comedic"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:56323",
+  "name": "Tina Fey",
+  "image": "https://image.tmdb.org/t/p/w500/yPTAi1iucXf85UpiFPtyiTSM6do.jpg",
+  "knownFor": "Soul; Megamind; Date Night; 30 Rock",
+  "gender": "female",
+  "birthYear": 1970,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "humor",
+   "wit",
+   "warmth",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1427948",
+  "name": "Pete Davidson",
+  "image": "https://image.tmdb.org/t/p/w500/f3kubnZu3KgMniExcq9nJy8RwjW.jpg",
+  "knownFor": "The King of Staten Island; Transformers: Rise of the Beasts; The Suicide Squad; Brooklyn Nine-Nine",
+  "gender": "male",
+  "birthYear": 1993,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "humor",
+   "quiet",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1532",
+  "name": "Bill Murray",
+  "image": "https://image.tmdb.org/t/p/w500/nnCsJc9x3ZiG3AFyiyc3FPehppy.jpg",
+  "knownFor": "Ghostbusters; Groundhog Day; Lost in Translation; Parks and Recreation; The Royal Tenenbaums",
+  "gender": "male",
+  "birthYear": 1950,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "quiet",
+   "romantic",
+   "romance"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:19278",
+  "name": "Bill Hader",
+  "image": "https://image.tmdb.org/t/p/w500/qyT50vQ9PQIEctE1IxDTEsBKstU.jpg",
+  "knownFor": "Barry; Superbad; The Office; Brooklyn Nine-Nine; Silicon Valley",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1978,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "humor",
+   "understated",
+   "charisma",
+   "dramatic",
+   "drama"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:54812",
+  "name": "Chevy Chase",
+  "image": "https://image.tmdb.org/t/p/w500/mwXT82i0Fo54sRfQn2i0qOftnpC.jpg",
+  "knownFor": "National Lampoon's Christmas Vacation; National Lampoon's Vacation; Caddyshack; Community",
+  "gender": "male",
+  "birthYear": 1943,
+  "descriptionTags": [
+   "comedy"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1240487",
+  "name": "Kate McKinnon",
+  "image": "https://image.tmdb.org/t/p/w500/2cNetzianFcxPQbyOQnkAIkKUZE.jpg",
+  "knownFor": "Ghostbusters; Barbie; Ferdinand",
+  "gender": "female",
+  "birthYear": 1984,
+  "descriptionTags": [
+   "comedy",
+   "comedic",
+   "warmth",
+   "action"
+  ],
+  "nationality": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1136406",
+  "name": "Tom Holland",
+  "image": "https://image.tmdb.org/t/p/w500/1d67to0U8bx5jhWTanVx37k6Nd0.jpg",
+  "knownFor": "Spider-Man: Brand New Day; Spider-Man: No Way Home; Avengers: Infinity War; Spider-Man: Homecoming; Spider-Man: Far From Home; Fun Home",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1996,
+  "descriptionTags": [
+   "warmth",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:976",
+  "name": "Jason Statham",
+  "image": "https://image.tmdb.org/t/p/w500/pXGSq2UpcDE2NMF8LR56QZf5U1q.jpg",
+  "knownFor": "Shelter; A Working Man; Fast X; The Beekeeper; Wrath of Man",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1967,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "romantic",
+   "action",
+   "thriller",
+   "crime"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1397778",
+  "name": "Anya Taylor-Joy",
+  "image": "https://image.tmdb.org/t/p/w500/jxAbDJWvz4p1hoFpJYG5vY2dQmq.jpg",
+  "knownFor": "The Super Mario Bros. Movie; The Super Mario Galaxy Movie; Dune: Part Three; Dune: Part Two; The Gorge; Peaky Blinders",
+  "nationality": "British",
+  "gender": "female",
+  "birthYear": 1996,
+  "descriptionTags": [
+   "comedy",
+   "warmth",
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:2524",
+  "name": "Tom Hardy",
+  "image": "https://image.tmdb.org/t/p/w500/d81K0RH8UX7tZj49tZaQhZ9ewH.jpg",
+  "knownFor": "Spider-Man: No Way Home; Inception; Dunkirk; Venom: The Last Dance; The Dark Knight Rises; Fun Home; Mad Max: Fury Road; Peaky Blinders",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1977,
+  "descriptionTags": [
+   "drama",
+   "action",
+   "thriller",
+   "crime"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1356210",
+  "name": "Millie Bobby Brown",
+  "image": "https://image.tmdb.org/t/p/w500/k9KGzGDVhXKfOGpoN62MNuXL28q.jpg",
+  "knownFor": "Godzilla: King of the Monsters; Godzilla vs. Kong; Damsel; The Electric State; Enola Holmes",
+  "nationality": "British",
+  "gender": "female",
+  "birthYear": 2004,
+  "descriptionTags": [
+   "wit",
+   "authority",
+   "charm",
+   "action",
+   "crime"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3986656",
+  "name": "Holly Cattle",
+  "image": "https://image.tmdb.org/t/p/w500/36K45CHuO7KHx2id8RFT4XPYGlw.jpg",
+  "nationality": "English",
+  "gender": "female",
+  "birthYear": 1997,
+  "descriptionTags": [
+   "drama"
+  ],
+  "knownFor": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3327515",
+  "name": "Charithra Chandran",
+  "image": "https://image.tmdb.org/t/p/w500/xLFgJmfXjd2Nnbjx3ZtavReGwjK.jpg",
+  "knownFor": "Eternals",
+  "nationality": "British",
+  "gender": "female",
+  "birthYear": 1997,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3210444",
+  "name": "Noah Fearnley",
+  "image": "https://image.tmdb.org/t/p/w500/cJDTFKsgQoc7LM6IHFmAP1t9vDz.jpg",
+  "knownFor": "Mercy",
+  "nationality": "British",
+  "gender": "male",
+  "birthYear": 1999,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "romantic",
+   "romance",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:14061",
+  "name": "Jacqueline Bisset",
+  "image": "https://image.tmdb.org/t/p/w500/2O5ZiHvn4vppqNasUVvHFEfwl21.jpg",
+  "knownFor": "Murder on the Orient Express; Casino Royale; Class",
+  "nationality": "English",
+  "gender": "female",
+  "birthYear": 1944,
+  "descriptionTags": [
+   "comedy",
+   "gravitas",
+   "drama",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1675188",
+  "name": "Adam Pearson",
+  "image": "https://image.tmdb.org/t/p/w500/xRDaT60nU48yBDD20A2hSmSALZX.jpg",
+  "knownFor": "Under the Skin",
+  "nationality": "British",
+  "gender": "male",
+  "birthYear": 1985,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1223786",
+  "name": "Emilia Clarke",
+  "image": "https://image.tmdb.org/t/p/w500/wb8VfDPGpyqcFltnRcJR1Wj3h4Z.jpg",
+  "knownFor": "Terminator Genisys; Me Before You; Solo: A Star Wars Story; The Twits; Game of Thrones",
+  "nationality": "English",
+  "gender": "female",
+  "birthYear": 1986,
+  "descriptionTags": [
+   "comedy",
+   "dramatic",
+   "drama",
+   "romantic"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:85065",
+  "name": "Jack O'Connell",
+  "image": "https://image.tmdb.org/t/p/w500/9RrqnB1BRaWWHEjlWVVAna0sdBB.jpg",
+  "knownFor": "Sinners; 28 Years Later: The Bone Temple; '71; 28 Years Later; 300: Rise of an Empire",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1990,
+  "descriptionTags": [
+   "dramatic",
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:10990",
+  "name": "Emma Watson",
+  "image": "https://image.tmdb.org/t/p/w500/mf0OANvWYSzU1d8yggrhyw8IbIz.jpg",
+  "knownFor": "Harry Potter and the Philosopher's Stone; Harry Potter and the Chamber of Secrets; Harry Potter and the Goblet of Fire; Harry Potter and the Prisoner of Azkaban; Harry Potter and the Half-Blood Prince",
+  "nationality": "English",
+  "gender": "female",
+  "birthYear": 1990,
+  "descriptionTags": [
+   "intensity",
+   "drama"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:9642",
+  "name": "Jude Law",
+  "image": "https://image.tmdb.org/t/p/w500/nBGVXLHsNzlG7ouoh4bDggaGKN1.jpg",
+  "knownFor": "Sherlock Holmes; Closer; Captain Marvel; The Grand Budapest Hotel; Fantastic Beasts: The Secrets of Dumbledore",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1972,
+  "descriptionTags": [
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:37625",
+  "name": "Andrew Garfield",
+  "image": "https://image.tmdb.org/t/p/w500/beO5YvbTjrr5yy8hW26KVDMSr35.jpg",
+  "knownFor": "Spider-Man: No Way Home; The Amazing Spider-Man; The Amazing Spider-Man 2; Hacksaw Ridge; The Social Network; Fun Home",
+  "nationality": "British",
+  "gender": "male",
+  "birthYear": 1983,
+  "descriptionTags": [
+   "dramatic",
+   "drama"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:3292",
+  "name": "Nicholas Hoult",
+  "image": "https://image.tmdb.org/t/p/w500/xesAPMRC5HmPm4D3Stme7rNoNJ7.jpg",
+  "knownFor": "Superman; Mad Max: Fury Road; Deadpool 2; X-Men: Days of Future Past; Dark Phoenix",
+  "nationality": "English",
+  "gender": "male",
+  "birthYear": 1989,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:82809",
+  "name": "Annabelle Wallis",
+  "image": "https://image.tmdb.org/t/p/w500/b6PltW1e18BdmRz3nKZ7ID9uZ24.jpg",
+  "knownFor": "Mercy; King Arthur: Legend of the Sword; Annabelle: Creation; Annabelle; Peaky Blinders",
+  "nationality": "English",
+  "gender": "female",
+  "birthYear": 1984,
+  "descriptionTags": [
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:10882",
+  "name": "Rosamund Pike",
+  "image": "https://image.tmdb.org/t/p/w500/8ObNklHDi2hjdz0ayzJFB9jtqzm.jpg",
+  "knownFor": "Now You See Me: Now You Don't; Hallow Road; Gone Girl; Pride & Prejudice; Jack Reacher",
+  "nationality": "British",
+  "gender": "female",
+  "birthYear": 1979,
+  "descriptionTags": [
+   "comedy",
+   "menace",
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1373074",
+  "name": "Alissa Yagi",
+  "image": "https://image.tmdb.org/t/p/w500/uBOkNey4zXSqvdcn7DcWWQ6jss4.jpg",
+  "nationality": "Japanese",
+  "gender": "female",
+  "birthYear": 1995,
+  "descriptionTags": [
+   "comedy",
+   "warmth",
+   "charismatic",
+   "drama",
+   "romantic",
+   "romance",
+   "thriller"
+  ],
+  "knownFor": "",
+  "biography": ""
+ },
+ {
+  "id": "tmdb:15761",
+  "name": "Grey DeLisle",
+  "image": "https://image.tmdb.org/t/p/w500/vrUHaXe1pG56yZkgH7Hs3LGRLTT.jpg",
+  "knownFor": "The SpongeBob Movie: Search for SquarePants; We Bare Bears: The Movie; Frozen II; Diary of a Wimpy Kid: The Last Straw; Gabby's Dollhouse: The Movie",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1973,
+  "descriptionTags": [
+   "comedy",
+   "warmth",
+   "menacing"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1734",
+  "name": "Annette O'Toole",
+  "image": "https://image.tmdb.org/t/p/w500/mCTEEzuNXlCdyl9uM4ot688IfVz.jpg",
+  "knownFor": "48 Hrs.; Halt and Catch Fire",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1952,
+  "descriptionTags": [
+   "comedy",
+   "authority",
+   "powerful",
+   "understated",
+   "drama",
+   "romance",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:65717",
+  "name": "Jon Hamm",
+  "image": "https://image.tmdb.org/t/p/w500/mrXE5fZbEDPc7BEE5G21J6qrwzi.jpg",
+  "knownFor": "Hoppers; Top Gun: Maverick; Shrek Forever After; Baby Driver; Transformers One; Curb Your Enthusiasm; 30 Rock; Barry; Mad Men; Parks and Recreation",
+  "nationality": "American",
+  "gender": "male",
+  "birthYear": 1971,
+  "descriptionTags": [
+   "comedy",
+   "authority",
+   "understated",
+   "drama",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:229932",
+  "name": "Golshifteh Farahani",
+  "image": "https://image.tmdb.org/t/p/w500/s5NCZZ6RXwcln6seJsEsiQRlcTf.jpg",
+  "knownFor": "Alpha; Pirates of the Caribbean: Dead Men Tell No Tales; Extraction 2; Extraction; Exodus: Gods and Kings",
+  "nationality": "Iranian",
+  "gender": "female",
+  "birthYear": 1983,
+  "descriptionTags": [
+   "comedy",
+   "gravitas",
+   "dramatic",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:150899",
+  "name": "AngelaBaby",
+  "image": "https://image.tmdb.org/t/p/w500/gbnjGrNhlvGu1sXhcm0J2IW0orD.jpg",
+  "knownFor": "Independence Day: Resurgence",
+  "nationality": "Chinese",
+  "gender": "female",
+  "birthYear": 1989,
+  "descriptionTags": [
+   "comedy",
+   "drama",
+   "romantic",
+   "romance",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:12052",
+  "name": "Gwyneth Paltrow",
+  "image": "https://image.tmdb.org/t/p/w500/8x3jpWD7DEvyMXO1FOjwNdd1UZT.jpg",
+  "knownFor": "The Avengers; Marty Supreme; Avengers: Infinity War; Spider-Man: Homecoming; Avengers: Endgame; Se7en; The Royal Tenenbaums",
+  "nationality": "American",
+  "gender": "female",
+  "birthYear": 1972,
+  "descriptionTags": [
+   "comedy",
+   "wit",
+   "authority",
+   "subtle",
+   "restraint",
+   "drama",
+   "romantic",
+   "romance"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:921",
+  "name": "Brigitte Nielsen",
+  "image": "https://image.tmdb.org/t/p/w500/lkP0qKkDOvVk0ETZX0bx3Qmufkm.jpg",
+  "knownFor": "Creed II; Rocky IV",
+  "nationality": "Danish",
+  "gender": "female",
+  "birthYear": 1963,
+  "descriptionTags": [
+   "comedy",
+   "menace",
+   "charismatic",
+   "drama",
+   "action"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:137905",
+  "name": "Bill Skarsgård",
+  "image": "https://image.tmdb.org/t/p/w500/xBXLx1m0uzhXIbY3wN8lmPGeUHl.jpg",
+  "knownFor": "It; John Wick: Chapter 4; Deadpool 2; It Chapter Two; Nosferatu",
+  "nationality": "Swedish",
+  "gender": "male",
+  "birthYear": 1990,
+  "descriptionTags": [
+   "unsettling",
+   "menace",
+   "drama",
+   "action",
+   "thriller"
+  ],
+  "biography": ""
+ },
+ {
+  "id": "tmdb:1267240",
+  "name": "Nicola Coughlan",
+  "image": "https://image.tmdb.org/t/p/w500/shSN86O3qckxcO7YXVtaNy9ksSU.jpg",
+  "knownFor": "GOAT; Barbie; The Magic Faraway Tree",
+  "nationality": "Irish",
+  "gender": "female",
+  "birthYear": 1987,
+  "descriptionTags": [
+   "comedy",
+   "warmth",
+   "drama",
+   "romantic"
+  ],
+  "biography": ""
+ }
+]

@@ -43,7 +43,7 @@ const getActorCount=unstable_cache(fetchActorCount,['tester-actor-count-v1'],{re
 const getActorPage=unstable_cache(fetchActorPage,['tester-actor-page-v1'],{revalidate:3600})
 const getFeatured=unstable_cache(fetchFeatured,['tester-featured-v3'],{revalidate:3600})
 
-async function loadCatalogue(cached:boolean):Promise<Catalogue>{
+async function loadCastingDirectory(cached:boolean):Promise<Catalogue>{
  const count=await (cached?getActorCount:fetchActorCount)()
  const pages:ActorPageEntry[][]=[]
  // Bounded batches keep a cold cache from flooding the database.
@@ -62,19 +62,32 @@ async function loadCatalogue(cached:boolean):Promise<Catalogue>{
   if(snlMembers.has(actor.name.toLowerCase()))snl.push(actor.id)
   if(isBritish(actor.nationality))british.push(actor.id)
  }
- const [titles,featured,portraits]=await Promise.all([getLibraryIndex(cached),Promise.all(featuredSpecs.map(spec=>(cached?getFeatured:fetchFeatured)(spec))),(cached?getOriginalPortraits:fetchOriginalPortraits)()])
  const all=actors.map(a=>a.id),pools:Record<string,string[]>={}
- for(const c of [...challenges,...featured]){
+ for(const c of [...challenges,...featuredSpecs]){
   pools[c.id]=c.pool==='snl'?snl:c.pool==='british'?british:c.pool==='all'?all:tags[c.pool]||[]
-  if(pools[c.id].length<c.roles.length)throw new Error(`Not enough eligible actors for ${c.title}.`)
  }
- const nameKey=(name:string)=>name.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()
- const images=new Map(pages.flat().map(({actor:a})=>[nameKey(a.name),a.image]))
- for(const r of portraits)images.set(nameKey(r.original_actor),r.original_actor_image)
- const picturedChallenges=[...challenges,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(nameKey(r.originalActor))||''}))}))
- return {actors,challenges:picturedChallenges,pools,titles}
+ return {actors,challenges,pools}
 }
-// The assembled catalogue may exceed Next's 2 MB per-entry limit. Cache only
-// the independent chunks above; React cache deduplicates assembly per render.
+
+async function loadChallengeRosters(cached:boolean) {
+ const [features,portraits]=await Promise.all([
+  Promise.allSettled(featuredSpecs.map(spec=>(cached?getFeatured:fetchFeatured)(spec))),
+  (cached?getOriginalPortraits:fetchOriginalPortraits)().catch(()=>[]),
+ ])
+ const images=new Map(portraits.map(r=>[r.original_actor,r.original_actor_image]))
+ const featured=features.flatMap(result=>result.status==='fulfilled'?[result.value]:[])
+ return [...challenges,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(r.originalActor)||''}))}))
+}
+
+export const getCastingDirectory=cache(()=>loadCastingDirectory(true))
+export const getChallengeRosters=cache(()=>loadChallengeRosters(true))
+async function loadCatalogue(cached:boolean):Promise<Catalogue>{
+ const [directory,rosters,titles]=await Promise.all([
+  cached?getCastingDirectory():loadCastingDirectory(false),
+  cached?getChallengeRosters():loadChallengeRosters(false),
+  getLibraryIndex(cached),
+ ])
+ return {...directory,challenges:rosters.filter(c=>challenges.some(core=>core.id===c.id)||(directory.pools[c.id]?.length??0)>=c.roles.length),titles}
+}
 export const getTesterCatalogue=cache(()=>loadCatalogue(true))
 export const fetchTesterCatalogue=()=>loadCatalogue(false)

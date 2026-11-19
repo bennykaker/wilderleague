@@ -4,17 +4,19 @@ import {hostedFeedback,readHostedFeedback} from './hosted-ai'
 import {aiSearch} from './ai-search'
 import {readFeedback,requestFeedback} from './feedback'
 import {customChallenge,withChallenge,fetchLibraryChallenge,getLibraryIndex} from './library'
-import type {Catalogue} from './model'
+import type {Catalogue,Challenge} from './model'
 import {makeSnapshot,validateCast} from './model'
 import {StoreError,type TesterStore} from './store'
 import {analysisPack,castImage} from './exports'
 const COOKIE='wl_tester_session'
 function token(req:Request){return req.headers.get('cookie')?.split(';').map(x=>x.trim()).find(x=>x.startsWith(COOKIE+'='))?.slice(COOKIE.length+1)}
 function json(body:unknown,status=200,headers:Record<string,string>={}){return Response.json(body,{status,headers:{'Cache-Control':'no-store',...headers}})}
-export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Promise<Catalogue>,resolveTitle=fetchLibraryChallenge){return async(req:Request)=>{
+export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Promise<Catalogue>,resolveTitle=fetchLibraryChallenge,directory=catalogue,rosters:()=>Promise<Challenge[]>=async()=>(await catalogue()).challenges){return async(req:Request)=>{
  try{
   const url=new URL(req.url),action=url.pathname.split('/api/preview/')[1]||''
   if(req.method==='GET'&&action==='titles')return json({titles:await getLibraryIndex()})
+  if(req.method==='GET'&&action==='actor-directory')return json(await directory())
+  if(req.method==='GET'&&action==='challenge-rosters')return json({challenges:await rosters()})
   const user=await store.user(token(req))
   const requireUser=()=>{if(!user)throw new StoreError('Sign in to save, submit or vote.',401);return user}
   if(req.method==='GET'){
@@ -48,7 +50,8 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   }
   if(action==='logout'){await store.logout(token(req));return json({user:null},200,{'Set-Cookie':cookie('',0)})}
   async function castCatalogue(candidate:Record<string,unknown>=body){
-   let cat=await catalogue()
+   const freeCast=typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:')
+   let cat=await (freeCast||candidate.challengeId==='custom'?directory:catalogue)()
    try{if(candidate.challengeId==='custom')cat=withChallenge(cat,customChallenge(candidate.custom));else if(typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:'))cat=withChallenge(cat,selectedLiteraryRoles(await resolveTitle(candidate.challengeId.slice(5)),candidate.roleIds))}catch(e){throw new StoreError((e as Error).message)}
    return cat
   }
