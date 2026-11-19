@@ -24,7 +24,7 @@ export class HostedStore{
  async session(user:User){const token=randomBytes(32).toString('hex');await this.rpc('session',{token:hash(token),user:user.id});return token}
  async user(token:string|undefined):Promise<User|null>{return token?await this.rpc('user',{token:hash(token)}):null}
  async logout(token:string|undefined){if(token)await this.rpc('logout',{token:hash(token)})}
- async save(user:User,snapshot:CastSnapshot,publish:boolean):Promise<CastRecord>{const fingerprint=hash(JSON.stringify({actors:snapshot.actors.map(a=>a.id),pitch:snapshot.pitch,...(snapshot.challenge.id==='custom'?{custom:snapshot.challenge}: {})}));const id=await this.rpc('save',{id:randomUUID(),user:user.id,challenge:snapshot.challenge.id,snapshot,fingerprint,publish});return (await this.cast(id,user.id))!}
+ async save(user:User,snapshot:CastSnapshot,publish:boolean):Promise<CastRecord>{const fingerprint=hash(JSON.stringify({actors:snapshot.actors.map(a=>a.id),...(snapshot.challenge.literary?{roles:snapshot.challenge.roles.map(r=>r.id)}:{}),pitch:snapshot.pitch,...(snapshot.challenge.id==='custom'?{custom:snapshot.challenge}: {})}));const id=await this.rpc('save',{id:randomUUID(),user:user.id,challenge:snapshot.challenge.id,snapshot,fingerprint,publish});return (await this.cast(id,user.id))!}
  async cast(id:string,viewer=''):Promise<CastRecord|null>{return await this.rpc('cast',{id,viewer})}
  async mine(user:User):Promise<CastRecord[]>{return await this.rpc('mine',{viewer:user.id})}
  async board(challengeId:string,category:'best'|'hear',viewer=''):Promise<CastRecord[]>{return await this.rpc('board',{challenge:challengeId,category,viewer})}

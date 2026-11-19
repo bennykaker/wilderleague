@@ -45,7 +45,7 @@ export class TesterStore{
  user(token:string|undefined):User|null{if(!token)return null;const row=this.db.prepare('SELECT u.id,u.username FROM sessions s JOIN users u ON u.id=s.user_id WHERE token_hash=? AND expires>?').get(hash(token),Date.now());return row?{id:String(row.id),username:String(row.username)}:null}
  logout(token:string|undefined){if(token)this.db.prepare('DELETE FROM sessions WHERE token_hash=?').run(hash(token))}
  save(user:User,snapshot:CastSnapshot,publish:boolean){
-  const fingerprint=hash(JSON.stringify({actors:snapshot.actors.map(a=>a.id),pitch:snapshot.pitch,...(snapshot.challenge.id==='custom'?{custom:snapshot.challenge}: {})})),id=randomUUID()
+  const fingerprint=hash(JSON.stringify({actors:snapshot.actors.map(a=>a.id),...(snapshot.challenge.literary?{roles:snapshot.challenge.roles.map(r=>r.id)}:{}),pitch:snapshot.pitch,...(snapshot.challenge.id==='custom'?{custom:snapshot.challenge}: {})})),id=randomUUID()
   this.db.prepare('INSERT INTO casts VALUES(?,?,?,?,?,?,?) ON CONFLICT(user_id,challenge_id,fingerprint) DO UPDATE SET published=MAX(published,excluded.published)').run(id,user.id,snapshot.challenge.id,JSON.stringify(snapshot),fingerprint,publish?1:0,new Date().toISOString())
   const row=this.db.prepare('SELECT id FROM casts WHERE user_id=? AND challenge_id=? AND fingerprint=?').get(user.id,snapshot.challenge.id,fingerprint)!
   return this.cast(String(row.id),user.id)!

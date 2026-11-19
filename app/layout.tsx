@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "WilderLeague",
-  description: "Fantasy movie casting leagues",
+  description: "Fan-cast books, films, shows and entire fictional universes. Choose your actors, save your lineup and share your cast.",
 };
 
 export default function RootLayout({

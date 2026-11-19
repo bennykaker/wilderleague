@@ -1,0 +1,1399 @@
+[
+  {
+    "title": "Pride and Prejudice",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Elizabeth Bennet",
+      "Fitzwilliam Darcy",
+      "Jane Bennet",
+      "Charles Bingley",
+      "George Wickham",
+      "Lydia Bennet",
+      "Mrs. Bennet"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Pride_and_Prejudice"
+  },
+  {
+    "title": "Sense and Sensibility",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Elinor Dashwood",
+      "Marianne Dashwood",
+      "Edward Ferrars",
+      "Colonel Brandon",
+      "John Willoughby",
+      "Lucy Steele"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Sense_and_Sensibility"
+  },
+  {
+    "title": "Emma",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Emma Woodhouse",
+      "George Knightley",
+      "Harriet Smith",
+      "Frank Churchill",
+      "Jane Fairfax",
+      "Philip Elton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Emma_(novel)"
+  },
+  {
+    "title": "Persuasion",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Anne Elliot",
+      "Frederick Wentworth",
+      "Sir Walter Elliot",
+      "William Elliot",
+      "Louisa Musgrove",
+      "Lady Russell"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Persuasion_(novel)"
+  },
+  {
+    "title": "Mansfield Park",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Fanny Price",
+      "Edmund Bertram",
+      "Mary Crawford",
+      "Henry Crawford",
+      "Sir Thomas Bertram",
+      "Maria Bertram"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Mansfield_Park"
+  },
+  {
+    "title": "Northanger Abbey",
+    "author": "Jane Austen",
+    "shelf": "Classics",
+    "characters": [
+      "Catherine Morland",
+      "Henry Tilney",
+      "Isabella Thorpe",
+      "John Thorpe",
+      "Eleanor Tilney",
+      "General Tilney"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Northanger_Abbey"
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "shelf": "Classics",
+    "characters": [
+      "Jane Eyre",
+      "Edward Rochester",
+      "St. John Rivers",
+      "Bertha Mason",
+      "Helen Burns",
+      "Adèle Varens"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Jane_Eyre"
+  },
+  {
+    "title": "Villette",
+    "author": "Charlotte Brontë",
+    "shelf": "Classics",
+    "characters": [
+      "Lucy Snowe",
+      "Paul Emanuel",
+      "Ginevra Fanshawe",
+      "John Graham Bretton",
+      "Paulina Home",
+      "Madame Beck"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Villette_(novel)"
+  },
+  {
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "shelf": "Classics",
+    "characters": [
+      "Heathcliff",
+      "Catherine Earnshaw",
+      "Edgar Linton",
+      "Cathy Linton",
+      "Hareton Earnshaw",
+      "Nelly Dean",
+      "Isabella Linton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Wuthering_Heights"
+  },
+  {
+    "title": "The Tenant of Wildfell Hall",
+    "author": "Anne Brontë",
+    "shelf": "Classics",
+    "characters": [
+      "Helen Graham",
+      "Gilbert Markham",
+      "Arthur Huntingdon",
+      "Frederick Lawrence",
+      "Annabella Wilmot"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Tenant_of_Wildfell_Hall"
+  },
+  {
+    "title": "Great Expectations",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "Pip",
+      "Estella Havisham",
+      "Abel Magwitch",
+      "Miss Havisham",
+      "Joe Gargery",
+      "Herbert Pocket",
+      "Jaggers"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Great_Expectations"
+  },
+  {
+    "title": "A Tale of Two Cities",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "Sydney Carton",
+      "Charles Darnay",
+      "Lucie Manette",
+      "Alexandre Manette",
+      "Madame Defarge",
+      "Jarvis Lorry"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Tale_of_Two_Cities"
+  },
+  {
+    "title": "Oliver Twist",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "Oliver Twist",
+      "Fagin",
+      "Nancy",
+      "Bill Sikes",
+      "Jack Dawkins",
+      "Mr. Brownlow",
+      "Monks"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Oliver_Twist"
+  },
+  {
+    "title": "David Copperfield",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "David Copperfield",
+      "Agnes Wickfield",
+      "Uriah Heep",
+      "Wilkins Micawber",
+      "Betsey Trotwood",
+      "James Steerforth",
+      "Dora Spenlow"
+    ],
+    "source": "https://en.wikipedia.org/wiki/David_Copperfield"
+  },
+  {
+    "title": "Bleak House",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "Esther Summerson",
+      "John Jarndyce",
+      "Lady Dedlock",
+      "Mr. Tulkinghorn",
+      "Richard Carstone",
+      "Ada Clare",
+      "Inspector Bucket"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Bleak_House"
+  },
+  {
+    "title": "A Christmas Carol",
+    "author": "Charles Dickens",
+    "shelf": "Classics",
+    "characters": [
+      "Ebenezer Scrooge",
+      "Bob Cratchit",
+      "Jacob Marley",
+      "Tiny Tim",
+      "Ghost of Christmas Past",
+      "Ghost of Christmas Present",
+      "Ghost of Christmas Yet to Come"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Christmas_Carol"
+  },
+  {
+    "title": "Middlemarch",
+    "author": "George Eliot",
+    "shelf": "Classics",
+    "characters": [
+      "Dorothea Brooke",
+      "Tertius Lydgate",
+      "Rosamond Vincy",
+      "Will Ladislaw",
+      "Edward Casaubon",
+      "Fred Vincy",
+      "Mary Garth"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Middlemarch"
+  },
+  {
+    "title": "The Mill on the Floss",
+    "author": "George Eliot",
+    "shelf": "Classics",
+    "characters": [
+      "Maggie Tulliver",
+      "Tom Tulliver",
+      "Philip Wakem",
+      "Stephen Guest",
+      "Lucy Deane"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Mill_on_the_Floss"
+  },
+  {
+    "title": "Silas Marner",
+    "author": "George Eliot",
+    "shelf": "Classics",
+    "characters": [
+      "Silas Marner",
+      "Eppie",
+      "Godfrey Cass",
+      "Dunstan Cass",
+      "Nancy Lammeter",
+      "Dolly Winthrop"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Silas_Marner"
+  },
+  {
+    "title": "North and South",
+    "author": "Elizabeth Gaskell",
+    "shelf": "Classics",
+    "characters": [
+      "Margaret Hale",
+      "John Thornton",
+      "Richard Hale",
+      "Nicholas Higgins",
+      "Bessy Higgins",
+      "Hannah Thornton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/North_and_South_(Gaskell_novel)"
+  },
+  {
+    "title": "Tess of the d’Urbervilles",
+    "author": "Thomas Hardy",
+    "shelf": "Classics",
+    "characters": [
+      "Tess Durbeyfield",
+      "Angel Clare",
+      "Alec d’Urberville",
+      "Joan Durbeyfield",
+      "John Durbeyfield"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Tess_of_the_d%27Urbervilles"
+  },
+  {
+    "title": "Far from the Madding Crowd",
+    "author": "Thomas Hardy",
+    "shelf": "Classics",
+    "characters": [
+      "Bathsheba Everdene",
+      "Gabriel Oak",
+      "William Boldwood",
+      "Frank Troy",
+      "Fanny Robin"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Far_from_the_Madding_Crowd"
+  },
+  {
+    "title": "The Mayor of Casterbridge",
+    "author": "Thomas Hardy",
+    "shelf": "Classics",
+    "characters": [
+      "Michael Henchard",
+      "Donald Farfrae",
+      "Elizabeth-Jane Newson",
+      "Lucetta Templeman",
+      "Susan Henchard"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Mayor_of_Casterbridge"
+  },
+  {
+    "title": "The Woman in White",
+    "author": "Wilkie Collins",
+    "shelf": "Classics",
+    "characters": [
+      "Walter Hartright",
+      "Marian Halcombe",
+      "Laura Fairlie",
+      "Anne Catherick",
+      "Count Fosco",
+      "Sir Percival Glyde"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Woman_in_White_(novel)"
+  },
+  {
+    "title": "The Moonstone",
+    "author": "Wilkie Collins",
+    "shelf": "Classics",
+    "characters": [
+      "Rachel Verinder",
+      "Franklin Blake",
+      "Sergeant Cuff",
+      "Gabriel Betteredge",
+      "Rosanna Spearman",
+      "Godfrey Ablewhite",
+      "Ezra Jennings"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Moonstone"
+  },
+  {
+    "title": "Treasure Island",
+    "author": "Robert Louis Stevenson",
+    "shelf": "Classics",
+    "characters": [
+      "Jim Hawkins",
+      "Long John Silver",
+      "Doctor Livesey",
+      "Captain Smollett",
+      "Squire Trelawney",
+      "Ben Gunn",
+      "Billy Bones"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Treasure_Island"
+  },
+  {
+    "title": "Strange Case of Dr Jekyll and Mr Hyde",
+    "author": "Robert Louis Stevenson",
+    "shelf": "Classics",
+    "characters": [
+      "Henry Jekyll / Edward Hyde",
+      "Gabriel John Utterson",
+      "Hastie Lanyon",
+      "Richard Enfield",
+      "Mr. Poole"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Strange_Case_of_Dr_Jekyll_and_Mr_Hyde"
+  },
+  {
+    "title": "Dracula",
+    "author": "Bram Stoker",
+    "shelf": "Classics",
+    "characters": [
+      "Count Dracula",
+      "Mina Harker",
+      "Jonathan Harker",
+      "Abraham Van Helsing",
+      "Lucy Westenra",
+      "John Seward",
+      "Renfield"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Dracula"
+  },
+  {
+    "title": "Frankenstein",
+    "author": "Mary Shelley",
+    "shelf": "Classics",
+    "characters": [
+      "Victor Frankenstein",
+      "Frankenstein’s creature",
+      "Elizabeth Lavenza",
+      "Henry Clerval",
+      "Robert Walton",
+      "Justine Moritz"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Frankenstein"
+  },
+  {
+    "title": "The Picture of Dorian Gray",
+    "author": "Oscar Wilde",
+    "shelf": "Classics",
+    "characters": [
+      "Dorian Gray",
+      "Lord Henry Wotton",
+      "Basil Hallward",
+      "Sibyl Vane",
+      "James Vane"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Picture_of_Dorian_Gray"
+  },
+  {
+    "title": "A Room with a View",
+    "author": "E. M. Forster",
+    "shelf": "Classics",
+    "characters": [
+      "Lucy Honeychurch",
+      "George Emerson",
+      "Charlotte Bartlett",
+      "Cecil Vyse",
+      "Mr. Emerson",
+      "Mr. Beebe"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Room_with_a_View"
+  },
+  {
+    "title": "Howards End",
+    "author": "E. M. Forster",
+    "shelf": "Classics",
+    "characters": [
+      "Margaret Schlegel",
+      "Helen Schlegel",
+      "Henry Wilcox",
+      "Leonard Bast",
+      "Ruth Wilcox",
+      "Jacky Bast"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Howards_End"
+  },
+  {
+    "title": "A Passage to India",
+    "author": "E. M. Forster",
+    "shelf": "Classics",
+    "characters": [
+      "Dr. Aziz",
+      "Cyril Fielding",
+      "Adela Quested",
+      "Mrs. Moore",
+      "Ronny Heaslop",
+      "Professor Godbole"
+    ],
+    "source": "https://www.sparknotes.com/lit/passage/characters/"
+  },
+  {
+    "title": "Mrs Dalloway",
+    "author": "Virginia Woolf",
+    "shelf": "Classics",
+    "characters": [
+      "Clarissa Dalloway",
+      "Septimus Warren Smith",
+      "Peter Walsh",
+      "Lucrezia Smith",
+      "Sally Seton",
+      "Richard Dalloway"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Mrs_Dalloway"
+  },
+  {
+    "title": "To the Lighthouse",
+    "author": "Virginia Woolf",
+    "shelf": "Classics",
+    "characters": [
+      "Mrs. Ramsay",
+      "Mr. Ramsay",
+      "Lily Briscoe",
+      "James Ramsay",
+      "Charles Tansley",
+      "William Bankes"
+    ],
+    "source": "https://en.wikipedia.org/wiki/To_the_Lighthouse"
+  },
+  {
+    "title": "Rebecca",
+    "author": "Daphne du Maurier",
+    "shelf": "Classics",
+    "characters": [
+      "The second Mrs. de Winter",
+      "Maxim de Winter",
+      "Mrs. Danvers",
+      "Jack Favell",
+      "Frank Crawley",
+      "Beatrice Lacy"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Rebecca_(novel)"
+  },
+  {
+    "title": "Jamaica Inn",
+    "author": "Daphne du Maurier",
+    "shelf": "Classics",
+    "characters": [
+      "Mary Yellan",
+      "Joss Merlyn",
+      "Jem Merlyn",
+      "Patience Merlyn",
+      "Francis Davey"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Jamaica_Inn_(novel)"
+  },
+  {
+    "title": "Nineteen Eighty-Four",
+    "author": "George Orwell",
+    "shelf": "Classics",
+    "characters": [
+      "Winston Smith",
+      "Julia",
+      "O’Brien",
+      "Mr. Charrington",
+      "Tom Parsons",
+      "Syme"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Nineteen_Eighty-Four"
+  },
+  {
+    "title": "Animal Farm",
+    "author": "George Orwell",
+    "shelf": "Classics",
+    "characters": [
+      "Napoleon",
+      "Snowball",
+      "Boxer",
+      "Squealer",
+      "Clover",
+      "Benjamin",
+      "Old Major"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Animal_Farm"
+  },
+  {
+    "title": "Lord of the Flies",
+    "author": "William Golding",
+    "shelf": "Classics",
+    "characters": [
+      "Ralph",
+      "Jack Merridew",
+      "Piggy",
+      "Simon",
+      "Roger",
+      "Sam",
+      "Eric"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Lord_of_the_Flies"
+  },
+  {
+    "title": "Brave New World",
+    "author": "Aldous Huxley",
+    "shelf": "Classics",
+    "characters": [
+      "Bernard Marx",
+      "Lenina Crowne",
+      "John",
+      "Helmholtz Watson",
+      "Mustapha Mond",
+      "Linda"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Brave_New_World"
+  },
+  {
+    "title": "The Hound of the Baskervilles",
+    "author": "Arthur Conan Doyle",
+    "shelf": "Classics",
+    "universe": "Sherlock Holmes",
+    "characters": [
+      "Sherlock Holmes",
+      "John Watson",
+      "Sir Henry Baskerville",
+      "Jack Stapleton",
+      "Beryl Stapleton",
+      "James Mortimer"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Hound_of_the_Baskervilles"
+  },
+  {
+    "title": "A Study in Scarlet",
+    "author": "Arthur Conan Doyle",
+    "shelf": "Classics",
+    "universe": "Sherlock Holmes",
+    "characters": [
+      "Sherlock Holmes",
+      "John Watson",
+      "Jefferson Hope",
+      "John Ferrier",
+      "Lucy Ferrier",
+      "Inspector Lestrade"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Study_in_Scarlet"
+  },
+  {
+    "title": "The Sign of the Four",
+    "author": "Arthur Conan Doyle",
+    "shelf": "Classics",
+    "universe": "Sherlock Holmes",
+    "characters": [
+      "Sherlock Holmes",
+      "John Watson",
+      "Mary Morstan",
+      "Jonathan Small",
+      "Thaddeus Sholto",
+      "Tonga"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Sign_of_the_Four"
+  },
+  {
+    "title": "Little Women",
+    "author": "Louisa May Alcott",
+    "shelf": "Classics",
+    "universe": "Little Women",
+    "characters": [
+      "Jo March",
+      "Meg March",
+      "Beth March",
+      "Amy March",
+      "Theodore “Laurie” Laurence",
+      "Marmee March",
+      "Friedrich Bhaer"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Little_Women"
+  },
+  {
+    "title": "Little Men",
+    "author": "Louisa May Alcott",
+    "shelf": "Classics",
+    "universe": "Little Women",
+    "characters": [
+      "Jo March",
+      "Friedrich Bhaer",
+      "Nat Blake",
+      "Dan Kean",
+      "Nan Harding",
+      "Daisy Brooke",
+      "Tommy Bangs"
+    ],
+    "source": "https://www.simonandschuster.ca/books/Little-Men/Louisa-May-Alcott/The-Little-Women-Collection/9781534462236"
+  },
+  {
+    "title": "Adventures of Huckleberry Finn",
+    "author": "Mark Twain",
+    "shelf": "Classics",
+    "universe": "Tom Sawyer",
+    "characters": [
+      "Huckleberry Finn",
+      "Jim",
+      "Tom Sawyer",
+      "Pap Finn",
+      "The Duke",
+      "The King"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Adventures_of_Huckleberry_Finn"
+  },
+  {
+    "title": "The Adventures of Tom Sawyer",
+    "author": "Mark Twain",
+    "shelf": "Classics",
+    "universe": "Tom Sawyer",
+    "characters": [
+      "Tom Sawyer",
+      "Huckleberry Finn",
+      "Becky Thatcher",
+      "Aunt Polly",
+      "Injun Joe",
+      "Muff Potter"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Adventures_of_Tom_Sawyer"
+  },
+  {
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "shelf": "Classics",
+    "characters": [
+      "Jay Gatsby",
+      "Nick Carraway",
+      "Daisy Buchanan",
+      "Tom Buchanan",
+      "Jordan Baker",
+      "Myrtle Wilson",
+      "George Wilson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Great_Gatsby"
+  },
+  {
+    "title": "The Grapes of Wrath",
+    "author": "John Steinbeck",
+    "shelf": "Classics",
+    "characters": [
+      "Tom Joad",
+      "Ma Joad",
+      "Jim Casy",
+      "Rose of Sharon Joad",
+      "Pa Joad",
+      "Al Joad"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Grapes_of_Wrath"
+  },
+  {
+    "title": "Of Mice and Men",
+    "author": "John Steinbeck",
+    "shelf": "Classics",
+    "characters": [
+      "George Milton",
+      "Lennie Small",
+      "Candy",
+      "Curley",
+      "Curley’s wife",
+      "Crooks",
+      "Slim"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Of_Mice_and_Men"
+  },
+  {
+    "title": "East of Eden",
+    "author": "John Steinbeck",
+    "shelf": "Classics",
+    "characters": [
+      "Adam Trask",
+      "Caleb Trask",
+      "Aron Trask",
+      "Cathy Ames",
+      "Lee",
+      "Samuel Hamilton",
+      "Abra Bacon"
+    ],
+    "source": "https://en.wikipedia.org/wiki/East_of_Eden_(novel)"
+  },
+  {
+    "title": "Their Eyes Were Watching God",
+    "author": "Zora Neale Hurston",
+    "shelf": "Classics",
+    "characters": [
+      "Janie Crawford",
+      "Vergible “Tea Cake” Woods",
+      "Joe Starks",
+      "Logan Killicks",
+      "Pheoby Watson",
+      "Nanny Crawford"
+    ],
+    "source": "https://www.cliffsnotes.com/literature/t/their-eyes-were-watching-god/character-list"
+  },
+  {
+    "title": "Passing",
+    "author": "Nella Larsen",
+    "shelf": "Classics",
+    "characters": [
+      "Irene Redfield",
+      "Clare Kendry",
+      "Brian Redfield",
+      "John Bellew",
+      "Hugh Wentworth"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Passing_(novel)"
+  },
+  {
+    "title": "Invisible Man",
+    "author": "Ralph Ellison",
+    "shelf": "Classics",
+    "characters": [
+      "The unnamed narrator",
+      "Brother Jack",
+      "Ras the Exhorter",
+      "Dr. Bledsoe",
+      "Tod Clifton",
+      "Mary Rambo"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Invisible_Man"
+  },
+  {
+    "title": "Native Son",
+    "author": "Richard Wright",
+    "shelf": "Classics",
+    "characters": [
+      "Bigger Thomas",
+      "Mary Dalton",
+      "Bessie Mears",
+      "Jan Erlone",
+      "Boris Max",
+      "Henry Dalton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Native_Son"
+  },
+  {
+    "title": "Go Tell It on the Mountain",
+    "author": "James Baldwin",
+    "shelf": "Classics",
+    "characters": [
+      "John Grimes",
+      "Gabriel Grimes",
+      "Elizabeth Grimes",
+      "Florence Grimes",
+      "Elisha"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Go_Tell_It_on_the_Mountain_(novel)"
+  },
+  {
+    "title": "Giovanni’s Room",
+    "author": "James Baldwin",
+    "shelf": "Classics",
+    "characters": [
+      "David",
+      "Giovanni",
+      "Hella",
+      "Jacques",
+      "Guillaume"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Giovanni%27s_Room"
+  },
+  {
+    "title": "The Scarlet Letter",
+    "author": "Nathaniel Hawthorne",
+    "shelf": "Classics",
+    "characters": [
+      "Hester Prynne",
+      "Arthur Dimmesdale",
+      "Roger Chillingworth",
+      "Pearl"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Scarlet_Letter"
+  },
+  {
+    "title": "Moby-Dick",
+    "author": "Herman Melville",
+    "shelf": "Classics",
+    "characters": [
+      "Ishmael",
+      "Captain Ahab",
+      "Queequeg",
+      "Starbuck",
+      "Stubb",
+      "Pip",
+      "Fedallah"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Moby-Dick"
+  },
+  {
+    "title": "The Awakening",
+    "author": "Kate Chopin",
+    "shelf": "Classics",
+    "characters": [
+      "Edna Pontellier",
+      "Léonce Pontellier",
+      "Robert Lebrun",
+      "Adèle Ratignolle",
+      "Mademoiselle Reisz",
+      "Alcée Arobin"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Awakening_(Chopin_novel)"
+  },
+  {
+    "title": "The Age of Innocence",
+    "author": "Edith Wharton",
+    "shelf": "Classics",
+    "characters": [
+      "Newland Archer",
+      "Ellen Olenska",
+      "May Welland",
+      "Mrs. Mingott"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Age_of_Innocence"
+  },
+  {
+    "title": "The House of Mirth",
+    "author": "Edith Wharton",
+    "shelf": "Classics",
+    "characters": [
+      "Lily Bart",
+      "Lawrence Selden",
+      "Bertha Dorset",
+      "Simon Rosedale",
+      "Judy Trenor",
+      "Gerty Farish"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_House_of_Mirth"
+  },
+  {
+    "title": "My Ántonia",
+    "author": "Willa Cather",
+    "shelf": "Classics",
+    "characters": [
+      "Jim Burden",
+      "Ántonia Shimerda",
+      "Lena Lingard",
+      "Mr. Shimerda",
+      "Tiny Soderball"
+    ],
+    "source": "https://images.penguinrandomhouse.com/promo_image/9780451466266_5130.pdf"
+  },
+  {
+    "title": "The Haunting of Hill House",
+    "author": "Shirley Jackson",
+    "shelf": "Classics",
+    "characters": [
+      "Eleanor Vance",
+      "Theodora",
+      "Luke Sanderson",
+      "John Montague",
+      "Mrs. Montague"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Haunting_of_Hill_House"
+  },
+  {
+    "title": "The Catcher in the Rye",
+    "author": "J. D. Salinger",
+    "shelf": "Classics",
+    "characters": [
+      "Holden Caulfield",
+      "Phoebe Caulfield",
+      "Ward Stradlater",
+      "Robert Ackley",
+      "Mr. Antolini",
+      "Sally Hayes"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Catcher_in_the_Rye"
+  },
+  {
+    "title": "Fahrenheit 451",
+    "author": "Ray Bradbury",
+    "shelf": "Classics",
+    "characters": [
+      "Guy Montag",
+      "Captain Beatty",
+      "Clarisse McClellan",
+      "Mildred Montag",
+      "Faber",
+      "Granger"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Fahrenheit_451"
+  },
+  {
+    "title": "The Maltese Falcon",
+    "author": "Dashiell Hammett",
+    "shelf": "Classics",
+    "characters": [
+      "Sam Spade",
+      "Brigid O’Shaughnessy",
+      "Joel Cairo",
+      "Casper Gutman",
+      "Wilmer Cook",
+      "Effie Perine"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Maltese_Falcon_(novel)"
+  },
+  {
+    "title": "The Big Sleep",
+    "author": "Raymond Chandler",
+    "shelf": "Classics",
+    "characters": [
+      "Philip Marlowe",
+      "Vivian Regan",
+      "Carmen Sternwood",
+      "General Sternwood",
+      "Eddie Mars"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Big_Sleep"
+  },
+  {
+    "title": "Anne of Green Gables",
+    "author": "L. M. Montgomery",
+    "shelf": "Classics",
+    "universe": "Avonlea",
+    "characters": [
+      "Anne Shirley",
+      "Marilla Cuthbert",
+      "Matthew Cuthbert",
+      "Diana Barry",
+      "Gilbert Blythe",
+      "Rachel Lynde"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Anne_of_Green_Gables"
+  },
+  {
+    "title": "Anne of Avonlea",
+    "author": "L. M. Montgomery",
+    "shelf": "Classics",
+    "universe": "Avonlea",
+    "characters": [
+      "Anne Shirley",
+      "Marilla Cuthbert",
+      "Gilbert Blythe",
+      "Diana Barry",
+      "Paul Irving",
+      "Miss Lavendar Lewis",
+      "Davy Keith"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Anne_of_Avonlea"
+  },
+  {
+    "title": "Things Fall Apart",
+    "author": "Chinua Achebe",
+    "shelf": "Classics",
+    "characters": [
+      "Okonkwo",
+      "Nwoye",
+      "Ezinma",
+      "Ekwefi",
+      "Obierika",
+      "Ikemefuna"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Things_Fall_Apart"
+  },
+  {
+    "title": "Cry, the Beloved Country",
+    "author": "Alan Paton",
+    "shelf": "Classics",
+    "characters": [
+      "Stephen Kumalo",
+      "James Jarvis",
+      "Absalom Kumalo",
+      "John Kumalo",
+      "Theophilus Msimangu",
+      "Gertrude Kumalo"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Cry,_the_Beloved_Country"
+  },
+  {
+    "title": "Palace Walk",
+    "author": "Naguib Mahfouz",
+    "shelf": "Classics",
+    "characters": [
+      "Ahmad Abd al-Jawad",
+      "Amina",
+      "Yasin",
+      "Fahmy",
+      "Kamal",
+      "Khadija",
+      "Aisha"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Palace_Walk"
+  },
+  {
+    "title": "The Home and the World",
+    "author": "Rabindranath Tagore",
+    "shelf": "Classics",
+    "characters": [
+      "Bimala",
+      "Nikhil",
+      "Sandip",
+      "Amulya"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Home_and_the_World"
+  },
+  {
+    "title": "The Good Earth",
+    "author": "Pearl S. Buck",
+    "shelf": "Classics",
+    "characters": [
+      "Wang Lung",
+      "O-lan",
+      "Lotus",
+      "Cuckoo",
+      "Ching"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Good_Earth"
+  },
+  {
+    "title": "Dream of the Red Chamber",
+    "author": "Cao Xueqin",
+    "shelf": "Classics",
+    "characters": [
+      "Jia Baoyu",
+      "Lin Daiyu",
+      "Xue Baochai",
+      "Wang Xifeng",
+      "Grandmother Jia"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Dream_of_the_Red_Chamber"
+  },
+  {
+    "title": "Journey to the West",
+    "author": "Wu Cheng’en",
+    "shelf": "Classics",
+    "characters": [
+      "Sun Wukong",
+      "Tang Sanzang",
+      "Zhu Bajie",
+      "Sha Wujing",
+      "Guanyin",
+      "White Dragon Horse"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Journey_to_the_West"
+  },
+  {
+    "title": "Snow Country",
+    "author": "Yasunari Kawabata",
+    "shelf": "Classics",
+    "characters": [
+      "Shimamura",
+      "Komako",
+      "Yoko"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Snow_Country"
+  },
+  {
+    "title": "The Makioka Sisters",
+    "author": "Jun’ichirō Tanizaki",
+    "shelf": "Classics",
+    "characters": [
+      "Tsuruko Makioka",
+      "Sachiko Makioka",
+      "Yukiko Makioka",
+      "Taeko Makioka",
+      "Teinosuke Makioka"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Makioka_Sisters"
+  },
+  {
+    "title": "Don Quixote",
+    "author": "Miguel de Cervantes",
+    "shelf": "Classics",
+    "characters": [
+      "Don Quixote",
+      "Sancho Panza",
+      "Dulcinea del Toboso",
+      "Sansón Carrasco",
+      "Teresa Panza"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Don_Quixote"
+  },
+  {
+    "title": "The Three Musketeers",
+    "author": "Alexandre Dumas",
+    "shelf": "Classics",
+    "characters": [
+      "D’Artagnan",
+      "Athos",
+      "Porthos",
+      "Aramis",
+      "Milady de Winter",
+      "Cardinal Richelieu",
+      "Constance Bonacieux"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Three_Musketeers"
+  },
+  {
+    "title": "The Count of Monte Cristo",
+    "author": "Alexandre Dumas",
+    "shelf": "Classics",
+    "characters": [
+      "Edmond Dantès",
+      "Mercédès",
+      "Fernand Mondego",
+      "Gérard de Villefort",
+      "Baron Danglars",
+      "Abbé Faria",
+      "Haydée"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Count_of_Monte_Cristo"
+  },
+  {
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "shelf": "Classics",
+    "characters": [
+      "Jean Valjean",
+      "Javert",
+      "Fantine",
+      "Cosette",
+      "Marius Pontmercy",
+      "Éponine",
+      "Thénardier"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Les_Mis%C3%A9rables"
+  },
+  {
+    "title": "The Hunchback of Notre-Dame",
+    "author": "Victor Hugo",
+    "shelf": "Classics",
+    "characters": [
+      "Quasimodo",
+      "Esmeralda",
+      "Claude Frollo",
+      "Phoebus de Châteaupers",
+      "Pierre Gringoire"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Hunchback_of_Notre-Dame"
+  },
+  {
+    "title": "Madame Bovary",
+    "author": "Gustave Flaubert",
+    "shelf": "Classics",
+    "characters": [
+      "Emma Bovary",
+      "Charles Bovary",
+      "Rodolphe Boulanger",
+      "Léon Dupuis",
+      "Monsieur Homais",
+      "Monsieur Lheureux"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Madame_Bovary"
+  },
+  {
+    "title": "The Red and the Black",
+    "author": "Stendhal",
+    "shelf": "Classics",
+    "characters": [
+      "Julien Sorel",
+      "Madame de Rênal",
+      "Mathilde de La Mole",
+      "Marquis de La Mole",
+      "Monsieur de Rênal"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Red_and_the_Black"
+  },
+  {
+    "title": "The Phantom of the Opera",
+    "author": "Gaston Leroux",
+    "shelf": "Classics",
+    "characters": [
+      "Erik",
+      "Christine Daaé",
+      "Raoul de Chagny",
+      "The Persian",
+      "Philippe de Chagny"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Phantom_of_the_Opera_(novel)"
+  },
+  {
+    "title": "Around the World in Eighty Days",
+    "author": "Jules Verne",
+    "shelf": "Classics",
+    "characters": [
+      "Phileas Fogg",
+      "Jean Passepartout",
+      "Detective Fix",
+      "Aouda"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Around_the_World_in_Eighty_Days"
+  },
+  {
+    "title": "Twenty Thousand Leagues Under the Seas",
+    "author": "Jules Verne",
+    "shelf": "Classics",
+    "characters": [
+      "Pierre Aronnax",
+      "Captain Nemo",
+      "Conseil",
+      "Ned Land"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Seas"
+  },
+  {
+    "title": "Anna Karenina",
+    "author": "Leo Tolstoy",
+    "shelf": "Classics",
+    "characters": [
+      "Anna Karenina",
+      "Konstantin Levin",
+      "Alexei Vronsky",
+      "Alexei Karenin",
+      "Kitty Shcherbatskaya",
+      "Stiva Oblonsky",
+      "Dolly Oblonskaya"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Anna_Karenina"
+  },
+  {
+    "title": "War and Peace",
+    "author": "Leo Tolstoy",
+    "shelf": "Classics",
+    "characters": [
+      "Pierre Bezukhov",
+      "Andrei Bolkonsky",
+      "Natasha Rostova",
+      "Marya Bolkonskaya",
+      "Nikolai Rostov",
+      "Hélène Kuragina",
+      "Sonya Rostova"
+    ],
+    "source": "https://en.wikipedia.org/wiki/War_and_Peace"
+  },
+  {
+    "title": "Crime and Punishment",
+    "author": "Fyodor Dostoevsky",
+    "shelf": "Classics",
+    "characters": [
+      "Rodion Raskolnikov",
+      "Sofya Marmeladova",
+      "Porfiry Petrovich",
+      "Avdotya Raskolnikova",
+      "Dmitri Razumikhin",
+      "Arkady Svidrigailov"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Crime_and_Punishment"
+  },
+  {
+    "title": "The Brothers Karamazov",
+    "author": "Fyodor Dostoevsky",
+    "shelf": "Classics",
+    "characters": [
+      "Alyosha Karamazov",
+      "Ivan Karamazov",
+      "Dmitri Karamazov",
+      "Fyodor Karamazov",
+      "Pavel Smerdyakov",
+      "Grushenka",
+      "Katerina Ivanovna"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Brothers_Karamazov"
+  },
+  {
+    "title": "Fathers and Sons",
+    "author": "Ivan Turgenev",
+    "shelf": "Classics",
+    "characters": [
+      "Yevgeny Bazarov",
+      "Arkady Kirsanov",
+      "Nikolai Kirsanov",
+      "Pavel Kirsanov",
+      "Anna Odintsova"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Fathers_and_Sons_(novel)"
+  },
+  {
+    "title": "The Metamorphosis",
+    "author": "Franz Kafka",
+    "shelf": "Classics",
+    "characters": [
+      "Gregor Samsa",
+      "Grete Samsa",
+      "Mr. Samsa",
+      "Mrs. Samsa"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Metamorphosis"
+  },
+  {
+    "title": "The Trial",
+    "author": "Franz Kafka",
+    "shelf": "Classics",
+    "characters": [
+      "Josef K.",
+      "Fräulein Bürstner",
+      "Leni",
+      "Advocate Huld",
+      "Titorelli"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Trial"
+  },
+  {
+    "title": "The Magic Mountain",
+    "author": "Thomas Mann",
+    "shelf": "Classics",
+    "characters": [
+      "Hans Castorp",
+      "Joachim Ziemssen",
+      "Lodovico Settembrini",
+      "Leo Naphta",
+      "Clavdia Chauchat",
+      "Mynheer Peeperkorn"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Magic_Mountain"
+  },
+  {
+    "title": "The Leopard",
+    "author": "Giuseppe Tomasi di Lampedusa",
+    "shelf": "Classics",
+    "characters": [
+      "Fabrizio Corbera",
+      "Tancredi Falconeri",
+      "Angelica Sedàra",
+      "Don Calogero Sedàra",
+      "Concetta Corbera"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Leopard"
+  },
+  {
+    "title": "Pedro Páramo",
+    "author": "Juan Rulfo",
+    "shelf": "Classics",
+    "characters": [
+      "Juan Preciado",
+      "Pedro Páramo",
+      "Susana San Juan",
+      "Abundio Martínez",
+      "Father Rentería",
+      "Dorotea"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Pedro_P%C3%A1ramo"
+  }
+]

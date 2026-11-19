@@ -1,0 +1,312 @@
+[
+  {
+    "author": "Anthony Doerr",
+    "title": "All the Light We Cannot See",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Marie-Laure LeBlanc",
+      "Werner Pfennig",
+      "Daniel LeBlanc",
+      "Étienne LeBlanc",
+      "Reinhold von Rumpel",
+      "Jutta Pfennig",
+      "Frank Volkheimer",
+      "Madame Manec"
+    ],
+    "source": "https://www.anthonydoerr.com/books/all-the-light-we-cannot-see"
+  },
+  {
+    "author": "R. F. Kuang",
+    "title": "Babel",
+    "shelf": "BookTok",
+    "characters": [
+      "Robin Swift",
+      "Ramy Mirza",
+      "Victoire Desgraves",
+      "Letty Price",
+      "Richard Lovell",
+      "Griffin Lovell"
+    ],
+    "source": "https://www.sparknotes.com/lit/babel/characters/"
+  },
+  {
+    "author": "Jennifer L. Armentrout",
+    "title": "From Blood and Ash",
+    "shelf": "Romantasy",
+    "universe": "Blood and Ash",
+    "characters": [
+      "Penellaphe Balfour (Poppy)",
+      "Casteel Da’Neer (Hawke)",
+      "Vikter Wardwell",
+      "Tawny Lyon",
+      "Dorian Teerman",
+      "Kieran Contou"
+    ],
+    "source": "https://jenniferlarmentrout.com/books/from-blood-and-ash/"
+  },
+  {
+    "author": "Bonnie Garmus",
+    "title": "Lessons in Chemistry",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Elizabeth Zott",
+      "Calvin Evans",
+      "Madeline Zott",
+      "Harriet Sloane",
+      "Walter Pine",
+      "Six-Thirty",
+      "Don Donatti"
+    ],
+    "source": "https://www.penguinrandomhouse.ca/books/677234/lessons-in-chemistry-by-bonnie-garmus/9780593862407"
+  },
+  {
+    "author": "Sally Rooney",
+    "title": "Normal People",
+    "shelf": "BookTok",
+    "characters": [
+      "Marianne Sheridan",
+      "Connell Waldron",
+      "Lorraine Waldron",
+      "Alan Sheridan",
+      "Denise Sheridan",
+      "Helen Brophy"
+    ],
+    "source": "https://thebookerprizes.com/the-booker-library/features/reading-guide-normal-people-by-sally-rooney"
+  },
+  {
+    "author": "Diana Gabaldon",
+    "title": "Outlander",
+    "shelf": "Romantasy",
+    "universe": "Outlander",
+    "characters": [
+      "Claire Fraser",
+      "Jamie Fraser",
+      "Frank Randall",
+      "Jonathan Randall",
+      "Dougal MacKenzie",
+      "Colum MacKenzie",
+      "Geillis Duncan",
+      "Murtagh Fitzgibbons Fraser"
+    ],
+    "source": "https://www.penguin.co.uk/books/431405/outlander-by-diana-gabaldon/9781446494301"
+  },
+  {
+    "author": "Olivie Blake",
+    "title": "The Atlas Six",
+    "shelf": "BookTok",
+    "characters": [
+      "Libby Rhodes",
+      "Nicolás Ferrer de Varona",
+      "Reina Mori",
+      "Tristan Caine",
+      "Parisa Kamali",
+      "Callum Nova",
+      "Atlas Blakely",
+      "Dalton Ellery",
+      "Ezra Fowler"
+    ],
+    "source": "https://www.panmacmillan.com/authors/olivie-blake/the-atlas-six/9781529095258"
+  },
+  {
+    "author": "Matt Haig",
+    "title": "The Midnight Library",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Nora Seed",
+      "Mrs. Elm",
+      "Joe Seed",
+      "Dan Lord",
+      "Izzy Hirsh",
+      "Ash"
+    ],
+    "source": "https://www.matthaig.com/books/midnight-library/"
+  },
+  {
+    "author": "Gabrielle Zevin",
+    "title": "Tomorrow, and Tomorrow, and Tomorrow",
+    "shelf": "BookTok",
+    "characters": [
+      "Sam Masur",
+      "Sadie Green",
+      "Marx Watanabe",
+      "Dov Mizrah",
+      "Anna Lee",
+      "Zoe Cadogan"
+    ],
+    "source": "https://gabriellezevin.com/tomorrowx3/"
+  },
+  {
+    "author": "Diana Gabaldon",
+    "title": "Dragonfly in Amber",
+    "shelf": "Romantasy",
+    "universe": "Outlander",
+    "characters": [
+      "Claire Fraser",
+      "Jamie Fraser",
+      "Brianna Fraser",
+      "Roger MacKenzie",
+      "Charles Edward Stuart",
+      "Fergus Fraser",
+      "Master Raymond",
+      "Jonathan Randall"
+    ],
+    "source": "https://www.penguinrandomhouse.com/books/704972/dragonfly-in-amber-25th-anniversary-edition-by-diana-gabaldon/"
+  },
+  {
+    "author": "Diana Gabaldon",
+    "title": "Voyager",
+    "shelf": "Romantasy",
+    "universe": "Outlander",
+    "characters": [
+      "Claire Fraser",
+      "Jamie Fraser",
+      "Brianna Fraser",
+      "Roger MacKenzie",
+      "Lord John Grey",
+      "Young Ian Murray",
+      "Geillis Duncan",
+      "Fergus Fraser"
+    ],
+    "source": "https://www.penguinrandomhouse.com/books/57277/voyager-by-diana-gabaldon/"
+  },
+  {
+    "author": "Diana Gabaldon",
+    "title": "Drums of Autumn",
+    "shelf": "Romantasy",
+    "universe": "Outlander",
+    "characters": [
+      "Claire Fraser",
+      "Jamie Fraser",
+      "Brianna Fraser",
+      "Roger MacKenzie",
+      "Stephen Bonnet",
+      "Jocasta Cameron",
+      "Young Ian Murray"
+    ],
+    "source": "https://www.penguin.co.uk/books/355038/drums-of-autumn-by-diana-gabaldon/9781784751340"
+  },
+  {
+    "author": "Diana Gabaldon",
+    "title": "The Fiery Cross",
+    "shelf": "Romantasy",
+    "universe": "Outlander",
+    "characters": [
+      "Claire Fraser",
+      "Jamie Fraser",
+      "Brianna Fraser",
+      "Roger MacKenzie",
+      "Stephen Bonnet",
+      "Jocasta Cameron",
+      "Duncan Innes",
+      "William Tryon"
+    ],
+    "source": "https://www.penguinrandomhouse.ca/books/57266/the-fiery-cross-by-diana-gabaldon/9780385659437"
+  },
+  {
+    "author": "Jennifer L. Armentrout",
+    "title": "A Kingdom of Flesh and Fire",
+    "shelf": "Romantasy",
+    "universe": "Blood and Ash",
+    "characters": [
+      "Penellaphe Balfour (Poppy)",
+      "Casteel Da’Neer (Hawke)",
+      "Kieran Contou",
+      "Alastir Davenwell",
+      "Delano"
+    ],
+    "source": "https://jenniferlarmentrout.com/books/a-kingdom-of-flesh-and-fire/"
+  },
+  {
+    "author": "Jennifer L. Armentrout",
+    "title": "The Crown of Gilded Bones",
+    "shelf": "Romantasy",
+    "universe": "Blood and Ash",
+    "characters": [
+      "Penellaphe Balfour (Poppy)",
+      "Casteel Da’Neer (Hawke)",
+      "Kieran Contou",
+      "Eloana Da’Neer",
+      "Valyn Da’Neer",
+      "Ian Balfour",
+      "Alastir Davenwell",
+      "Isbeth"
+    ],
+    "source": "https://jenniferlarmentrout.com/books/the-crown-of-gilded-bones/"
+  },
+  {
+    "author": "Jennifer L. Armentrout",
+    "title": "The War of Two Queens",
+    "shelf": "Romantasy",
+    "universe": "Blood and Ash",
+    "characters": [
+      "Penellaphe Balfour (Poppy)",
+      "Casteel Da’Neer (Hawke)",
+      "Kieran Contou",
+      "Isbeth",
+      "Malik Da’Neer",
+      "Millicent",
+      "Reaver",
+      "Callum"
+    ],
+    "source": "https://jenniferlarmentrout.com/books/the-war-of-two-queens/"
+  },
+  {
+    "author": "Julia Quinn",
+    "title": "The Duke and I",
+    "shelf": "BookTok",
+    "universe": "Bridgerton",
+    "characters": [
+      "Daphne Bridgerton",
+      "Simon Basset",
+      "Anthony Bridgerton",
+      "Violet Bridgerton",
+      "Colin Bridgerton"
+    ],
+    "source": "https://juliaquinn.com/books/the-duke-and-i/"
+  },
+  {
+    "author": "Julia Quinn",
+    "title": "The Viscount Who Loved Me",
+    "shelf": "BookTok",
+    "universe": "Bridgerton",
+    "characters": [
+      "Anthony Bridgerton",
+      "Kate Sheffield",
+      "Edwina Sheffield",
+      "Mary Sheffield",
+      "Violet Bridgerton",
+      "Colin Bridgerton"
+    ],
+    "source": "https://juliaquinn.com/books/the-viscount-who-loved-me/"
+  },
+  {
+    "author": "Julia Quinn",
+    "title": "An Offer from a Gentleman",
+    "shelf": "BookTok",
+    "universe": "Bridgerton",
+    "characters": [
+      "Benedict Bridgerton",
+      "Sophie Beckett",
+      "Araminta Gunningworth",
+      "Posy Reiling",
+      "Rosamund Reiling",
+      "Violet Bridgerton"
+    ],
+    "source": "https://juliaquinn.com/books/an-offer-from-a-gentleman/"
+  },
+  {
+    "author": "Julia Quinn",
+    "title": "Romancing Mister Bridgerton",
+    "shelf": "BookTok",
+    "universe": "Bridgerton",
+    "characters": [
+      "Penelope Featherington",
+      "Colin Bridgerton",
+      "Lady Danbury",
+      "Eloise Bridgerton",
+      "Portia Featherington",
+      "Cressida Twombley"
+    ],
+    "source": "https://juliaquinn.com/books/romancing-mr-bridgerton/"
+  }
+]

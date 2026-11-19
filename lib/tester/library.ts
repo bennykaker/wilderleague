@@ -1,6 +1,7 @@
 import {createServiceClient} from '../supabase/service'
-import type {Catalogue,Challenge,TesterRole} from './model'
-export type LibraryTitle={slug:string;title:string;type:string;year:number|null}
+import type {LibraryTitle,Challenge,TesterRole} from './model'
+import {literaryChallenge} from './books'
+export type {LibraryTitle} from './model'
 export const featuredSpecs=[
  {id:'snl-brooklyn-99',slug:'brooklyn-nine-nine',pool:'snl',rule:'SNL cast members only.'},
  {id:'snl-good-place',slug:'the-good-place',pool:'snl',rule:'SNL cast members only.'},
@@ -19,6 +20,8 @@ export async function fetchLibraryTitles():Promise<LibraryTitle[]>{
 }
 export async function fetchLibraryChallenge(slug:string):Promise<Challenge>{
  if(!/^[a-z0-9-]{1,150}$/.test(slug))throw new Error('Unknown title.')
+ const literary=literaryChallenge(slug)
+ if(literary)return literary
  const db=createServiceClient()
  const [title,roles]=await Promise.all([db.from('titles').select('slug,title,type,year').eq('slug',slug).single(),db.from('roles').select('role_name,original_actor,original_actor_image,role_description,display_order').eq('title_slug',slug).order('display_order')])
  if(title.error||roles.error||!roles.data?.length)throw new Error('This title has no casting roles yet. Use “Add your own title” to enter them.')

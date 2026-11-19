@@ -17,6 +17,17 @@ async function photo(url:string){
  }catch{return ''}
 }
 export async function castImage(s:CastSnapshot){
+ // Large ensembles use a readable credits sheet without fetching hundreds of portraits.
+ if (s.actors.length>30) {
+   const width=1080, rows=Math.ceil(s.actors.length/2), header=180, height=header+rows*86+60
+   const credits=s.actors.map((actor,i)=>{
+     const x=36+(i%2)*526,y=header+Math.floor(i/2)*86
+     const roleLines=lines(s.challenge.roles[i].name,43).slice(0,2)
+     return '<g>'+roleLines.map((l,j)=>`<text x="${x}" y="${y+j*18}" fill="#d7f572" font-size="17">${xml(l)}</text>`).join('')+`<text x="${x}" y="${y+44}" fill="white" font-size="20">${xml(actor.name)}</text></g>`
+   }).join('')
+   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" font-family="Arial,sans-serif"><rect width="100%" height="100%" fill="#193b31"/><text x="36" y="48" fill="#d7f572" font-size="20">WilderLeague · Casting sheet</text><text x="36" y="110" font-size="40" fill="white">${xml(s.challenge.title)}</text>${credits}</svg>`
+   return sharp(Buffer.from(svg)).png().toBuffer()
+ }
  const photos=await Promise.all(s.actors.map(a=>photo(a.image)))
  const titleLines=lines(s.challenge.title,38),header=140+titleLines.length*52
  const width=1080,rows=Math.ceil(s.actors.length/3),height=header+rows*430+80

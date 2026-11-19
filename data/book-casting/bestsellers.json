@@ -1,0 +1,1492 @@
+[
+  {
+    "title": "Carrie",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Carrie White",
+      "Sue Snell",
+      "Margaret White",
+      "Chris Hargensen",
+      "Tommy Ross",
+      "Billy Nolan",
+      "Rita Desjardin"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Carrie_(novel)"
+  },
+  {
+    "title": "The Shining",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "universe": "The Shining",
+    "characters": [
+      "Jack Torrance",
+      "Wendy Torrance",
+      "Danny Torrance",
+      "Dick Hallorann",
+      "Stuart Ullman"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Shining_(novel)"
+  },
+  {
+    "title": "Doctor Sleep",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "universe": "The Shining",
+    "characters": [
+      "Danny Torrance",
+      "Abra Stone",
+      "Rose the Hat",
+      "Billy Freeman",
+      "John Dalton",
+      "Crow Daddy"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Doctor_Sleep_(novel)"
+  },
+  {
+    "title": "'Salem's Lot",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Ben Mears",
+      "Susan Norton",
+      "Mark Petrie",
+      "Kurt Barlow",
+      "Richard Straker",
+      "Father Donald Callahan",
+      "Matt Burke",
+      "Jimmy Cody"
+    ],
+    "source": "https://stephenking.com/works/novel/salems-lot.html"
+  },
+  {
+    "title": "It",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Bill Denbrough",
+      "Beverly Marsh",
+      "Ben Hanscom",
+      "Richie Tozier",
+      "Eddie Kaspbrak",
+      "Mike Hanlon",
+      "Stanley Uris",
+      "Pennywise",
+      "Henry Bowers"
+    ],
+    "source": "https://en.wikipedia.org/wiki/It_(novel)"
+  },
+  {
+    "title": "The Stand",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Stu Redman",
+      "Frannie Goldsmith",
+      "Randall Flagg",
+      "Mother Abagail",
+      "Larry Underwood",
+      "Nick Andros",
+      "Tom Cullen",
+      "Harold Lauder",
+      "Nadine Cross"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Stand"
+  },
+  {
+    "title": "Pet Sematary",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Louis Creed",
+      "Rachel Creed",
+      "Jud Crandall",
+      "Ellie Creed",
+      "Gage Creed",
+      "Victor Pascow"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Pet_Sematary"
+  },
+  {
+    "title": "11/22/63",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Jake Epping",
+      "Sadie Dunhill",
+      "Al Templeton",
+      "Lee Harvey Oswald",
+      "Harry Dunning"
+    ],
+    "source": "https://en.wikipedia.org/wiki/11/22/63"
+  },
+  {
+    "title": "Mr. Mercedes",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "universe": "Bill Hodges",
+    "characters": [
+      "Bill Hodges",
+      "Brady Hartsfield",
+      "Holly Gibney",
+      "Jerome Robinson",
+      "Janey Patterson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Mr._Mercedes"
+  },
+  {
+    "title": "The Green Mile",
+    "author": "Stephen King",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Paul Edgecombe",
+      "John Coffey",
+      "Percy Wetmore",
+      "Brutus Howell",
+      "Eduard Delacroix",
+      "William Wharton",
+      "Hal Moores"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Green_Mile_(novel)"
+  },
+  {
+    "title": "Murder on the Orient Express",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Hercule Poirot",
+    "characters": [
+      "Hercule Poirot",
+      "Samuel Ratchett",
+      "Monsieur Bouc",
+      "Dr. Constantine",
+      "Mary Debenham",
+      "Colonel Arbuthnot",
+      "Hector MacQueen",
+      "Hildegarde Schmidt"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Murder_on_the_Orient_Express"
+  },
+  {
+    "title": "Death on the Nile",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Hercule Poirot",
+    "characters": [
+      "Hercule Poirot",
+      "Linnet Ridgeway",
+      "Simon Doyle",
+      "Jacqueline de Bellefort",
+      "Colonel Race",
+      "Rosalie Otterbourne",
+      "Tim Allerton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Death_on_the_Nile"
+  },
+  {
+    "title": "The Murder of Roger Ackroyd",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Hercule Poirot",
+    "characters": [
+      "Hercule Poirot",
+      "Dr. James Sheppard",
+      "Roger Ackroyd",
+      "Caroline Sheppard",
+      "Flora Ackroyd",
+      "Ralph Paton"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Murder_of_Roger_Ackroyd"
+  },
+  {
+    "title": "The A.B.C. Murders",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Hercule Poirot",
+    "characters": [
+      "Hercule Poirot",
+      "Arthur Hastings",
+      "Alexander Bonaparte Cust",
+      "Franklin Clarke",
+      "Donald Fraser",
+      "Inspector Crome"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_A.B.C._Murders"
+  },
+  {
+    "title": "The Mysterious Affair at Styles",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Hercule Poirot",
+    "characters": [
+      "Hercule Poirot",
+      "Arthur Hastings",
+      "Emily Inglethorp",
+      "Alfred Inglethorp",
+      "Evelyn Howard",
+      "John Cavendish",
+      "Mary Cavendish"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Mysterious_Affair_at_Styles"
+  },
+  {
+    "title": "The Body in the Library",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Miss Marple",
+    "characters": [
+      "Jane Marple",
+      "Dolly Bantry",
+      "Arthur Bantry",
+      "Ruby Keene",
+      "Josephine Turner",
+      "Conway Jefferson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Body_in_the_Library"
+  },
+  {
+    "title": "A Murder Is Announced",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "universe": "Miss Marple",
+    "characters": [
+      "Jane Marple",
+      "Letitia Blacklock",
+      "Dora Bunner",
+      "Inspector Dermot Craddock",
+      "Julia Simmons",
+      "Rudi Scherz",
+      "Mitzi"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Murder_Is_Announced"
+  },
+  {
+    "title": "And Then There Were None",
+    "author": "Agatha Christie",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Vera Claythorne",
+      "Philip Lombard",
+      "Lawrence Wargrave",
+      "Edward Armstrong",
+      "William Blore",
+      "Emily Brent",
+      "John Macarthur",
+      "Anthony Marston",
+      "Thomas Rogers",
+      "Ethel Rogers"
+    ],
+    "source": "https://en.wikipedia.org/wiki/And_Then_There_Were_None"
+  },
+  {
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "shelf": "Bestsellers",
+    "universe": "Dune",
+    "characters": [
+      "Paul Atreides",
+      "Lady Jessica",
+      "Duke Leto Atreides",
+      "Chani",
+      "Stilgar",
+      "Baron Vladimir Harkonnen",
+      "Feyd-Rautha Harkonnen",
+      "Gurney Halleck",
+      "Duncan Idaho",
+      "Liet-Kynes"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Dune_(novel)"
+  },
+  {
+    "title": "Dune Messiah",
+    "author": "Frank Herbert",
+    "shelf": "Bestsellers",
+    "universe": "Dune",
+    "characters": [
+      "Paul Atreides",
+      "Chani",
+      "Alia Atreides",
+      "Duncan Idaho",
+      "Princess Irulan",
+      "Scytale",
+      "Stilgar",
+      "Edric"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Dune_Messiah"
+  },
+  {
+    "title": "Children of Dune",
+    "author": "Frank Herbert",
+    "shelf": "Bestsellers",
+    "universe": "Dune",
+    "characters": [
+      "Leto II Atreides",
+      "Ghanima Atreides",
+      "Alia Atreides",
+      "Lady Jessica",
+      "Duncan Idaho",
+      "Stilgar",
+      "Farad'n Corrino",
+      "Paul Atreides"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Children_of_Dune"
+  },
+  {
+    "title": "God Emperor of Dune",
+    "author": "Frank Herbert",
+    "shelf": "Bestsellers",
+    "universe": "Dune",
+    "characters": [
+      "Leto II Atreides",
+      "Siona Atreides",
+      "Duncan Idaho",
+      "Moneo Atreides",
+      "Hwi Noree"
+    ],
+    "source": "https://en.wikipedia.org/wiki/God_Emperor_of_Dune"
+  },
+  {
+    "title": "Jurassic Park",
+    "author": "Michael Crichton",
+    "shelf": "Bestsellers",
+    "universe": "Jurassic Park",
+    "characters": [
+      "Alan Grant",
+      "Ellie Sattler",
+      "Ian Malcolm",
+      "John Hammond",
+      "Tim Murphy",
+      "Lex Murphy",
+      "Robert Muldoon",
+      "Dennis Nedry",
+      "Henry Wu",
+      "Donald Gennaro"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Jurassic_Park_(novel)"
+  },
+  {
+    "title": "The Lost World",
+    "author": "Michael Crichton",
+    "shelf": "Bestsellers",
+    "universe": "Jurassic Park",
+    "characters": [
+      "Ian Malcolm",
+      "Sarah Harding",
+      "Richard Levine",
+      "Jack Thorne",
+      "Eddie Carr",
+      "Arby Benton",
+      "Kelly Curtis",
+      "Lewis Dodgson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Lost_World_(Crichton_novel)"
+  },
+  {
+    "title": "The Andromeda Strain",
+    "author": "Michael Crichton",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Jeremy Stone",
+      "Charles Burton",
+      "Peter Leavitt",
+      "Mark Hall"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Andromeda_Strain"
+  },
+  {
+    "title": "Sphere",
+    "author": "Michael Crichton",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Norman Johnson",
+      "Beth Halpern",
+      "Harry Adams",
+      "Ted Fielding",
+      "Harold Barnes"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Sphere_(novel)"
+  },
+  {
+    "title": "Congo",
+    "author": "Michael Crichton",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Karen Ross",
+      "Peter Elliot",
+      "Amy",
+      "Charles Munro"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Congo_(novel)"
+  },
+  {
+    "title": "The Firm",
+    "author": "John Grisham",
+    "shelf": "Bestsellers",
+    "universe": "The Firm",
+    "characters": [
+      "Mitch McDeere",
+      "Abby McDeere",
+      "Avery Tolar",
+      "Wayne Tarrance",
+      "Ray McDeere",
+      "Tammy Hemphill"
+    ],
+    "source": "https://www.penguinrandomhouse.ca/books/72157/the-firm-by-john-grisham/9780385416344"
+  },
+  {
+    "title": "The Pelican Brief",
+    "author": "John Grisham",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Darby Shaw",
+      "Gray Grantham",
+      "Thomas Callahan",
+      "Gavin Verheek",
+      "Fletcher Coal",
+      "Khamel"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Pelican_Brief"
+  },
+  {
+    "title": "The Client",
+    "author": "John Grisham",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Mark Sway",
+      "Reggie Love",
+      "Roy Foltrigg",
+      "Barry Muldanno",
+      "Dianne Sway",
+      "Ricky Sway"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Client_(novel)"
+  },
+  {
+    "title": "A Time to Kill",
+    "author": "John Grisham",
+    "shelf": "Bestsellers",
+    "universe": "Jake Brigance",
+    "characters": [
+      "Jake Brigance",
+      "Carl Lee Hailey",
+      "Ellen Roark",
+      "Lucien Wilbanks",
+      "Ozzie Walls",
+      "Rufus Buckley",
+      "Tonya Hailey",
+      "Harry Rex Vonner"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Time_to_Kill_(Grisham_novel)"
+  },
+  {
+    "title": "The Runaway Jury",
+    "author": "John Grisham",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Nicholas Easter",
+      "Marlee",
+      "Rankin Fitch",
+      "Wendall Rohr"
+    ],
+    "source": "https://jgrisham.com/the-runaway-jury"
+  },
+  {
+    "title": "The Silence of the Lambs",
+    "author": "Thomas Harris",
+    "shelf": "Bestsellers",
+    "universe": "Hannibal Lecter",
+    "characters": [
+      "Clarice Starling",
+      "Hannibal Lecter",
+      "Jame Gumb",
+      "Jack Crawford",
+      "Catherine Martin",
+      "Frederick Chilton",
+      "Ardelia Mapp"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Silence_of_the_Lambs_(novel)"
+  },
+  {
+    "title": "Red Dragon",
+    "author": "Thomas Harris",
+    "shelf": "Bestsellers",
+    "universe": "Hannibal Lecter",
+    "characters": [
+      "Will Graham",
+      "Francis Dolarhyde",
+      "Hannibal Lecter",
+      "Jack Crawford",
+      "Reba McClane",
+      "Freddy Lounds",
+      "Molly Graham"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Red_Dragon_(novel)"
+  },
+  {
+    "title": "Hannibal",
+    "author": "Thomas Harris",
+    "shelf": "Bestsellers",
+    "universe": "Hannibal Lecter",
+    "characters": [
+      "Hannibal Lecter",
+      "Clarice Starling",
+      "Mason Verger",
+      "Margot Verger",
+      "Rinaldo Pazzi",
+      "Paul Krendler"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Hannibal_(Harris_novel)"
+  },
+  {
+    "title": "Gone Girl",
+    "author": "Gillian Flynn",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Amy Dunne",
+      "Nick Dunne",
+      "Margo Dunne",
+      "Desi Collings",
+      "Rhonda Boney",
+      "Tanner Bolt"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Gone_Girl_(novel)"
+  },
+  {
+    "title": "Sharp Objects",
+    "author": "Gillian Flynn",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Camille Preaker",
+      "Adora Crellin",
+      "Amma Crellin",
+      "Richard Willis",
+      "Alan Crellin"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Sharp_Objects"
+  },
+  {
+    "title": "Dark Places",
+    "author": "Gillian Flynn",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Libby Day",
+      "Ben Day",
+      "Patty Day",
+      "Lyle Wirth",
+      "Diondra Wertzner"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Dark_Places_(Flynn_novel)"
+  },
+  {
+    "title": "The Girl with the Dragon Tattoo",
+    "author": "Stieg Larsson",
+    "shelf": "Bestsellers",
+    "universe": "Millennium",
+    "characters": [
+      "Lisbeth Salander",
+      "Mikael Blomkvist",
+      "Henrik Vanger",
+      "Harriet Vanger",
+      "Martin Vanger",
+      "Erika Berger",
+      "Nils Bjurman"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Girl_with_the_Dragon_Tattoo"
+  },
+  {
+    "title": "The Girl Who Played with Fire",
+    "author": "Stieg Larsson",
+    "shelf": "Bestsellers",
+    "universe": "Millennium",
+    "characters": [
+      "Lisbeth Salander",
+      "Mikael Blomkvist",
+      "Paolo Roberto",
+      "Alexander Zalachenko",
+      "Ronald Niedermann",
+      "Miriam Wu",
+      "Sonja Modig"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Girl_Who_Played_with_Fire"
+  },
+  {
+    "title": "The Girl Who Kicked the Hornets' Nest",
+    "author": "Stieg Larsson",
+    "shelf": "Bestsellers",
+    "universe": "Millennium",
+    "characters": [
+      "Lisbeth Salander",
+      "Mikael Blomkvist",
+      "Annika Giannini",
+      "Erika Berger",
+      "Peter Teleborian",
+      "Evert Gullberg"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Girl_Who_Kicked_the_Hornets%27_Nest"
+  },
+  {
+    "title": "The Hunt for Red October",
+    "author": "Tom Clancy",
+    "shelf": "Bestsellers",
+    "universe": "Jack Ryan",
+    "characters": [
+      "Jack Ryan",
+      "Marko Ramius",
+      "Bart Mancuso",
+      "Skip Tyler",
+      "Viktor Tupolev",
+      "Ronald Jones"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Hunt_for_Red_October"
+  },
+  {
+    "title": "Patriot Games",
+    "author": "Tom Clancy",
+    "shelf": "Bestsellers",
+    "universe": "Jack Ryan",
+    "characters": [
+      "Jack Ryan",
+      "Cathy Ryan",
+      "Sean Miller",
+      "Kevin O'Donnell",
+      "Robby Jackson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Patriot_Games"
+  },
+  {
+    "title": "The Bourne Identity",
+    "author": "Robert Ludlum",
+    "shelf": "Bestsellers",
+    "universe": "Jason Bourne",
+    "characters": [
+      "Jason Bourne",
+      "Marie St. Jacques",
+      "Alexander Conklin",
+      "Carlos the Jackal"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Bourne_Identity_(novel)"
+  },
+  {
+    "title": "The Day of the Jackal",
+    "author": "Frederick Forsyth",
+    "shelf": "Bestsellers",
+    "characters": [
+      "The Jackal",
+      "Claude Lebel",
+      "Marc Rodin",
+      "Charles de Gaulle",
+      "Viktor Kowalski"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Day_of_the_Jackal"
+  },
+  {
+    "title": "Tinker Tailor Soldier Spy",
+    "author": "John le Carré",
+    "shelf": "Bestsellers",
+    "universe": "George Smiley",
+    "characters": [
+      "George Smiley",
+      "Peter Guillam",
+      "Bill Haydon",
+      "Jim Prideaux",
+      "Ricki Tarr",
+      "Toby Esterhase",
+      "Percy Alleline",
+      "Roy Bland"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Tinker_Tailor_Soldier_Spy"
+  },
+  {
+    "title": "The Spy Who Came in from the Cold",
+    "author": "John le Carré",
+    "shelf": "Bestsellers",
+    "universe": "George Smiley",
+    "characters": [
+      "Alec Leamas",
+      "Liz Gold",
+      "Hans-Dieter Mundt",
+      "Jens Fiedler",
+      "Control",
+      "George Smiley"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Spy_Who_Came_in_from_the_Cold"
+  },
+  {
+    "title": "The Night Manager",
+    "author": "John le Carré",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Jonathan Pine",
+      "Richard Onslow Roper",
+      "Leonard Burr",
+      "Jed",
+      "Lance Corkoran"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Night_Manager"
+  },
+  {
+    "title": "The Da Vinci Code",
+    "author": "Dan Brown",
+    "shelf": "Bestsellers",
+    "universe": "Robert Langdon",
+    "characters": [
+      "Robert Langdon",
+      "Sophie Neveu",
+      "Leigh Teabing",
+      "Silas",
+      "Bézu Fache",
+      "Jacques Saunière",
+      "Bishop Aringarosa"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Da_Vinci_Code"
+  },
+  {
+    "title": "Angels & Demons",
+    "author": "Dan Brown",
+    "shelf": "Bestsellers",
+    "universe": "Robert Langdon",
+    "characters": [
+      "Robert Langdon",
+      "Vittoria Vetra",
+      "Carlo Ventresca",
+      "Maximilian Kohler",
+      "Commander Olivetti",
+      "Hassassin"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Angels_%26_Demons"
+  },
+  {
+    "title": "The Girl on the Train",
+    "author": "Paula Hawkins",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Rachel Watson",
+      "Megan Hipwell",
+      "Anna Watson",
+      "Tom Watson",
+      "Scott Hipwell",
+      "Kamal Abdic"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Girl_on_the_Train_(novel)"
+  },
+  {
+    "title": "The Thursday Murder Club",
+    "author": "Richard Osman",
+    "shelf": "Bestsellers",
+    "universe": "The Thursday Murder Club",
+    "characters": [
+      "Elizabeth Best",
+      "Joyce Meadowcroft",
+      "Ibrahim Arif",
+      "Ron Ritchie",
+      "Donna De Freitas",
+      "Chris Hudson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Thursday_Murder_Club"
+  },
+  {
+    "title": "The Man Who Died Twice",
+    "author": "Richard Osman",
+    "shelf": "Bestsellers",
+    "universe": "The Thursday Murder Club",
+    "characters": [
+      "Elizabeth Best",
+      "Joyce Meadowcroft",
+      "Ibrahim Arif",
+      "Ron Ritchie",
+      "Douglas Middlemiss",
+      "Bogdan Jankowski",
+      "Donna De Freitas"
+    ],
+    "source": "https://www.bookcompanion.com/the_man_who_died_twice_name_list.html"
+  },
+  {
+    "title": "Big Little Lies",
+    "author": "Liane Moriarty",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Madeline",
+      "Celeste",
+      "Jane",
+      "Perry",
+      "Renata",
+      "Bonnie",
+      "Ziggy"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Big_Little_Lies_(novel)"
+  },
+  {
+    "title": "The Husband's Secret",
+    "author": "Liane Moriarty",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Cecilia Fitzpatrick",
+      "Tess",
+      "Rachel Crowley",
+      "John-Paul Fitzpatrick",
+      "Connor Whitby"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Husband%27s_Secret"
+  },
+  {
+    "title": "Room",
+    "author": "Emma Donoghue",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Jack",
+      "Ma",
+      "Old Nick",
+      "Grandma"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Room_(novel)"
+  },
+  {
+    "title": "Life of Pi",
+    "author": "Yann Martel",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Piscine Molitor Patel",
+      "Richard Parker",
+      "Santosh Patel",
+      "Gita Patel",
+      "Ravi Patel"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Life_of_Pi"
+  },
+  {
+    "title": "The Kite Runner",
+    "author": "Khaled Hosseini",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Amir",
+      "Hassan",
+      "Baba",
+      "Ali",
+      "Rahim Khan",
+      "Soraya",
+      "Assef",
+      "Sohrab"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Kite_Runner"
+  },
+  {
+    "title": "A Thousand Splendid Suns",
+    "author": "Khaled Hosseini",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Mariam",
+      "Laila",
+      "Rasheed",
+      "Tariq",
+      "Jalil",
+      "Nana",
+      "Aziza"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Thousand_Splendid_Suns"
+  },
+  {
+    "title": "The Book Thief",
+    "author": "Markus Zusak",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Liesel Meminger",
+      "Death",
+      "Hans Hubermann",
+      "Rosa Hubermann",
+      "Rudy Steiner",
+      "Max Vandenburg",
+      "Ilsa Hermann"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Book_Thief"
+  },
+  {
+    "title": "A Man Called Ove",
+    "author": "Fredrik Backman",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Ove",
+      "Parvaneh",
+      "Sonja",
+      "Rune",
+      "Anita",
+      "Patrick"
+    ],
+    "source": "https://en.wikipedia.org/wiki/A_Man_Called_Ove_(novel)"
+  },
+  {
+    "title": "Anxious People",
+    "author": "Fredrik Backman",
+    "shelf": "Bestsellers",
+    "characters": [
+      "The bank robber",
+      "Jack",
+      "Jim",
+      "Zara",
+      "Anna-Lena",
+      "Roger",
+      "Julia",
+      "Ro",
+      "Estelle"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Anxious_People"
+  },
+  {
+    "title": "The Help",
+    "author": "Kathryn Stockett",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Aibileen Clark",
+      "Minny Jackson",
+      "Eugenia Phelan",
+      "Hilly Holbrook",
+      "Celia Foote",
+      "Elizabeth Leefolt"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Help"
+  },
+  {
+    "title": "The Secret Life of Bees",
+    "author": "Sue Monk Kidd",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Lily Owens",
+      "Rosaleen Daise",
+      "August Boatwright",
+      "June Boatwright",
+      "May Boatwright",
+      "T. Ray Owens",
+      "Zachary Taylor"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Secret_Life_of_Bees_(novel)"
+  },
+  {
+    "title": "The Joy Luck Club",
+    "author": "Amy Tan",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Jing-mei Woo",
+      "Suyuan Woo",
+      "Lindo Jong",
+      "Waverly Jong",
+      "An-mei Hsu",
+      "Rose Hsu Jordan",
+      "Ying-ying St. Clair",
+      "Lena St. Clair"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Joy_Luck_Club_(novel)"
+  },
+  {
+    "title": "Beloved",
+    "author": "Toni Morrison",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Sethe",
+      "Denver",
+      "Beloved",
+      "Paul D",
+      "Baby Suggs",
+      "Stamp Paid"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Beloved_(novel)"
+  },
+  {
+    "title": "The Color Purple",
+    "author": "Alice Walker",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Celie",
+      "Nettie",
+      "Shug Avery",
+      "Albert",
+      "Sofia",
+      "Harpo"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Color_Purple"
+  },
+  {
+    "title": "The Remains of the Day",
+    "author": "Kazuo Ishiguro",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Stevens",
+      "Miss Kenton",
+      "Lord Darlington",
+      "Mr. Farraday"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Remains_of_the_Day"
+  },
+  {
+    "title": "Never Let Me Go",
+    "author": "Kazuo Ishiguro",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Kathy H.",
+      "Tommy D.",
+      "Ruth",
+      "Miss Lucy",
+      "Miss Emily",
+      "Madame"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Never_Let_Me_Go_(novel)"
+  },
+  {
+    "title": "The Poisonwood Bible",
+    "author": "Barbara Kingsolver",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Orleanna Price",
+      "Nathan Price",
+      "Rachel Price",
+      "Leah Price",
+      "Adah Price",
+      "Ruth May Price",
+      "Anatole Ngemba"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Poisonwood_Bible"
+  },
+  {
+    "title": "Demon Copperhead",
+    "author": "Barbara Kingsolver",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Damon Fields",
+      "Angus Winfield",
+      "Dori",
+      "Fast Forward",
+      "Maggot",
+      "Coach Winfield",
+      "Miss Betsy Woodall"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Demon_Copperhead"
+  },
+  {
+    "title": "The God of Small Things",
+    "author": "Arundhati Roy",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Estha",
+      "Rahel",
+      "Ammu",
+      "Velutha",
+      "Baby Kochamma",
+      "Sophie Mol",
+      "Chacko"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_God_of_Small_Things"
+  },
+  {
+    "title": "The Namesake",
+    "author": "Jhumpa Lahiri",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Gogol Ganguli",
+      "Ashima Ganguli",
+      "Ashoke Ganguli",
+      "Sonia Ganguli",
+      "Moushumi Mazoomdar",
+      "Maxine Ratliff"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Namesake_(novel)"
+  },
+  {
+    "title": "Atonement",
+    "author": "Ian McEwan",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Briony Tallis",
+      "Cecilia Tallis",
+      "Robbie Turner",
+      "Lola Quincey",
+      "Paul Marshall",
+      "Emily Tallis"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Atonement_(novel)"
+  },
+  {
+    "title": "The Handmaid's Tale",
+    "author": "Margaret Atwood",
+    "shelf": "Bestsellers",
+    "universe": "Gilead",
+    "characters": [
+      "Offred",
+      "Serena Joy",
+      "The Commander",
+      "Moira",
+      "Nick",
+      "Ofglen",
+      "Aunt Lydia"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Handmaid%27s_Tale"
+  },
+  {
+    "title": "The Testaments",
+    "author": "Margaret Atwood",
+    "shelf": "Bestsellers",
+    "universe": "Gilead",
+    "characters": [
+      "Aunt Lydia",
+      "Agnes Jemima",
+      "Daisy",
+      "Aunt Vidala",
+      "Becka",
+      "Commander Judd"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Testaments"
+  },
+  {
+    "title": "Oryx and Crake",
+    "author": "Margaret Atwood",
+    "shelf": "Bestsellers",
+    "universe": "MaddAddam",
+    "characters": [
+      "Jimmy",
+      "Crake",
+      "Oryx"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Oryx_and_Crake"
+  },
+  {
+    "title": "The Year of the Flood",
+    "author": "Margaret Atwood",
+    "shelf": "Bestsellers",
+    "universe": "MaddAddam",
+    "characters": [
+      "Toby",
+      "Ren",
+      "Adam One",
+      "Zeb",
+      "Amanda Payne",
+      "Blanco"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Year_of_the_Flood"
+  },
+  {
+    "title": "The Martian",
+    "author": "Andy Weir",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Mark Watney",
+      "Melissa Lewis",
+      "Mitch Henderson",
+      "Venkat Kapoor",
+      "Annie Montrose",
+      "Beth Johanssen",
+      "Rich Purnell"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Martian_(Weir_novel)"
+  },
+  {
+    "title": "Project Hail Mary",
+    "author": "Andy Weir",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Ryland Grace",
+      "Rocky",
+      "Eva Stratt",
+      "Olesya Ilyukhina",
+      "Yáo Li-Jie"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Project_Hail_Mary"
+  },
+  {
+    "title": "Leviathan Wakes",
+    "author": "James S. A. Corey",
+    "shelf": "Bestsellers",
+    "universe": "The Expanse",
+    "characters": [
+      "James Holden",
+      "Josephus Miller",
+      "Naomi Nagata",
+      "Amos Burton",
+      "Alex Kamal",
+      "Julie Mao",
+      "Fred Johnson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Leviathan_Wakes"
+  },
+  {
+    "title": "Caliban's War",
+    "author": "James S. A. Corey",
+    "shelf": "Bestsellers",
+    "universe": "The Expanse",
+    "characters": [
+      "James Holden",
+      "Chrisjen Avasarala",
+      "Bobbie Draper",
+      "Praxidike Meng",
+      "Naomi Nagata",
+      "Amos Burton",
+      "Alex Kamal",
+      "Mei Meng"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Caliban%27s_War"
+  },
+  {
+    "title": "Abaddon's Gate",
+    "author": "James S. A. Corey",
+    "shelf": "Bestsellers",
+    "universe": "The Expanse",
+    "characters": [
+      "James Holden",
+      "Clarissa Mao",
+      "Anna Volovodov",
+      "Carlos de Baca",
+      "Naomi Nagata",
+      "Amos Burton",
+      "Alex Kamal"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Abaddon%27s_Gate"
+  },
+  {
+    "title": "Neuromancer",
+    "author": "William Gibson",
+    "shelf": "Bestsellers",
+    "universe": "Sprawl",
+    "characters": [
+      "Henry Dorsett Case",
+      "Molly Millions",
+      "Armitage",
+      "Peter Riviera",
+      "Lady 3Jane",
+      "Wintermute",
+      "The Dixie Flatline"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Neuromancer"
+  },
+  {
+    "title": "Snow Crash",
+    "author": "Neal Stephenson",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Hiro Protagonist",
+      "Y.T.",
+      "Raven",
+      "Juanita Marquez",
+      "Uncle Enzo",
+      "L. Bob Rife"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Snow_Crash"
+  },
+  {
+    "title": "The Three-Body Problem",
+    "author": "Liu Cixin",
+    "shelf": "Bestsellers",
+    "universe": "Remembrance of Earth's Past",
+    "characters": [
+      "Ye Wenjie",
+      "Wang Miao",
+      "Shi Qiang",
+      "Yang Dong",
+      "Mike Evans",
+      "Shen Yufei"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Three-Body_Problem_(novel)"
+  },
+  {
+    "title": "The Dark Forest",
+    "author": "Liu Cixin",
+    "shelf": "Bestsellers",
+    "universe": "Remembrance of Earth's Past",
+    "characters": [
+      "Luo Ji",
+      "Shi Qiang",
+      "Zhang Beihai",
+      "Zhuang Yan",
+      "Manuel Rey Diaz",
+      "Frederick Tyler",
+      "Bill Hines"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Dark_Forest"
+  },
+  {
+    "title": "Death's End",
+    "author": "Liu Cixin",
+    "shelf": "Bestsellers",
+    "universe": "Remembrance of Earth's Past",
+    "characters": [
+      "Cheng Xin",
+      "Yun Tianming",
+      "Ai AA",
+      "Thomas Wade",
+      "Guan Yifan",
+      "Luo Ji",
+      "Sophon"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Death%27s_End"
+  },
+  {
+    "title": "The Hitchhiker's Guide to the Galaxy",
+    "author": "Douglas Adams",
+    "shelf": "Bestsellers",
+    "universe": "The Hitchhiker's Guide to the Galaxy",
+    "characters": [
+      "Arthur Dent",
+      "Ford Prefect",
+      "Zaphod Beeblebrox",
+      "Trillian",
+      "Marvin",
+      "Slartibartfast"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy_(novel)"
+  },
+  {
+    "title": "The Restaurant at the End of the Universe",
+    "author": "Douglas Adams",
+    "shelf": "Bestsellers",
+    "universe": "The Hitchhiker's Guide to the Galaxy",
+    "characters": [
+      "Arthur Dent",
+      "Ford Prefect",
+      "Zaphod Beeblebrox",
+      "Trillian",
+      "Marvin",
+      "Zarniwoop"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Restaurant_at_the_End_of_the_Universe"
+  },
+  {
+    "title": "Kindred",
+    "author": "Octavia E. Butler",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Dana Franklin",
+      "Kevin Franklin",
+      "Rufus Weylin",
+      "Alice Greenwood",
+      "Tom Weylin",
+      "Sarah"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Kindred_(novel)"
+  },
+  {
+    "title": "Parable of the Sower",
+    "author": "Octavia E. Butler",
+    "shelf": "Bestsellers",
+    "universe": "Earthseed",
+    "characters": [
+      "Lauren Olamina",
+      "Taylor Bankole",
+      "Harry Balter",
+      "Zahra Moss",
+      "Reverend Olamina"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Parable_of_the_Sower_(novel)"
+  },
+  {
+    "title": "The Road",
+    "author": "Cormac McCarthy",
+    "shelf": "Bestsellers",
+    "characters": [
+      "The Father",
+      "The Boy",
+      "Ely",
+      "The Mother"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Road"
+  },
+  {
+    "title": "No Country for Old Men",
+    "author": "Cormac McCarthy",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Llewelyn Moss",
+      "Anton Chigurh",
+      "Ed Tom Bell",
+      "Carla Jean Moss",
+      "Carson Wells"
+    ],
+    "source": "https://en.wikipedia.org/wiki/No_Country_for_Old_Men_(novel)"
+  },
+  {
+    "title": "Lonesome Dove",
+    "author": "Larry McMurtry",
+    "shelf": "Bestsellers",
+    "universe": "Lonesome Dove",
+    "characters": [
+      "Augustus McCrae",
+      "Woodrow Call",
+      "Lorena Wood",
+      "Jake Spoon",
+      "Newt Dobbs",
+      "Clara Allen",
+      "Joshua Deets",
+      "Blue Duck",
+      "July Johnson"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Lonesome_Dove"
+  },
+  {
+    "title": "The Pillars of the Earth",
+    "author": "Ken Follett",
+    "shelf": "Bestsellers",
+    "universe": "Kingsbridge",
+    "characters": [
+      "Prior Philip",
+      "Tom Builder",
+      "Jack Jackson",
+      "Aliena",
+      "William Hamleigh",
+      "Ellen",
+      "Waleran Bigod"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Pillars_of_the_Earth"
+  },
+  {
+    "title": "Shōgun",
+    "author": "James Clavell",
+    "shelf": "Bestsellers",
+    "universe": "The Asian Saga",
+    "characters": [
+      "John Blackthorne",
+      "Yoshi Toranaga",
+      "Toda Mariko",
+      "Kashigi Yabu",
+      "Toda Buntaro",
+      "Ishido Kazunari"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Sh%C5%8Dgun_(novel)"
+  },
+  {
+    "title": "Jaws",
+    "author": "Peter Benchley",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Martin Brody",
+      "Matt Hooper",
+      "Quint",
+      "Ellen Brody",
+      "Larry Vaughan"
+    ],
+    "source": "https://en.wikipedia.org/wiki/Jaws_(novel)"
+  },
+  {
+    "title": "The Princess Bride",
+    "author": "William Goldman",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Buttercup",
+      "Westley",
+      "Inigo Montoya",
+      "Fezzik",
+      "Prince Humperdinck",
+      "Count Rugen",
+      "Vizzini",
+      "Miracle Max"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Princess_Bride_(novel)"
+  },
+  {
+    "title": "The Outsiders",
+    "author": "S. E. Hinton",
+    "shelf": "Bestsellers",
+    "characters": [
+      "Ponyboy Curtis",
+      "Johnny Cade",
+      "Dallas Winston",
+      "Sodapop Curtis",
+      "Darrel Curtis",
+      "Cherry Valance",
+      "Two-Bit Mathews"
+    ],
+    "source": "https://en.wikipedia.org/wiki/The_Outsiders_(novel)"
+  }
+]

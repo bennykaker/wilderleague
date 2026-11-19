@@ -1,3 +1,4 @@
+import {selectedLiteraryRoles} from './library-client'
 import {HostedStore} from './hosted-store'
 import {hostedFeedback,readHostedFeedback} from './hosted-ai'
 import {aiSearch} from './ai-search'
@@ -46,7 +47,7 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   if(action==='logout'){await store.logout(token(req));return json({user:null},200,{'Set-Cookie':cookie('',0)})}
   async function castCatalogue(candidate:Record<string,unknown>=body){
    let cat=await catalogue()
-   try{if(candidate.challengeId==='custom')cat=withChallenge(cat,customChallenge(candidate.custom));else if(typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:'))cat=withChallenge(cat,await resolveTitle(candidate.challengeId.slice(5)))}catch(e){throw new StoreError((e as Error).message)}
+   try{if(candidate.challengeId==='custom')cat=withChallenge(cat,customChallenge(candidate.custom));else if(typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:'))cat=withChallenge(cat,selectedLiteraryRoles(await resolveTitle(candidate.challengeId.slice(5)),candidate.roleIds))}catch(e){throw new StoreError((e as Error).message)}
    return cat
   }
   if(action==='ai-search')return json(await aiSearch(store,await castCatalogue(),body.challengeId,body.query,user?.id))
@@ -64,7 +65,7 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   if(action==='publish'){
    const owner=requireUser();if(typeof body.id!=='string')throw new StoreError('Invalid cast.')
    const existing=await store.cast(body.id,owner.id);if(!existing||existing.ownerId!==owner.id)throw new StoreError('Cast not found.',404)
-   const c=existing.snapshot.challenge,candidate={challengeId:c.id,picks:existing.snapshot.actors.map(a=>a.id),pitch:existing.snapshot.pitch,publish:true,custom:{title:c.title,kind:c.season.split(' ')[1],roles:c.roles.map(r=>r.name)}}
+   const c=existing.snapshot.challenge,candidate={challengeId:c.id,roleIds:c.literary?c.roles.map(r=>r.id):undefined,picks:existing.snapshot.actors.map(a=>a.id),pitch:existing.snapshot.pitch,publish:true,custom:{title:c.title,kind:c.season.split(' ')[1],roles:c.roles.map(r=>r.name)}}
    const cat=await castCatalogue(candidate);try{validateCast(candidate,cat)}catch{throw new StoreError('This saved cast has choices that are no longer eligible. Open it and choose replacements before sharing.')}
    return json({cast:await store.publish(owner,body.id)})
   }

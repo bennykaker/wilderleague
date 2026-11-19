@@ -9,3 +9,19 @@ export function customChallenge(value:unknown):Challenge{
  return{id:'custom',title:b.title.trim(),season:`Your ${b.kind} · custom characters`,rule:'Reboot casting with living actors today. All genders welcome for every role. Use each actor once.',pool:'all',source:'',roles:names.map((name,i)=>({id:'r'+(i+1),name,originalActor:'',description:''}))}
 }
 export function withChallenge(cat:Catalogue,challenge:Challenge):Catalogue{if(challenge.pool==='all')challenge={...challenge,rule:rebootRule+' Use each actor once.'};return {...cat,challenges:[...cat.challenges.filter(c=>c.id!==challenge.id),challenge],pools:{...cat.pools,[challenge.id]:cat.actors.map(a=>a.id)}}}
+
+// A book or universe cast may start with one role and grow over several sessions.
+export function selectedLiteraryRoles(challenge:Challenge, roleIds:unknown):Challenge {
+ if (roleIds === undefined) return challenge
+ if (!challenge.literary || !Array.isArray(roleIds) || !roleIds.length || roleIds.length > challenge.roles.length)
+   throw new Error('Choose at least one character from this roster.')
+ const rolesById = new Map(challenge.roles.map(role => [role.id, role]))
+ const seen = new Set<string>()
+ const roles = roleIds.map(id => {
+   const role = typeof id === 'string' && rolesById.get(id)
+   if (!role || seen.has(id)) throw new Error('Each character must belong to this roster and appear once.')
+   seen.add(id)
+   return role
+ })
+ return {...challenge, roles}
+}

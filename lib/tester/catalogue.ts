@@ -1,3 +1,4 @@
+import {mergeLibrary} from './books'
 import lifeStatus from './life-status.json'
 import {eligibleForReboot,type LifeRecord} from './reboot'
 import {extractDescriptionTags} from './description-search'
@@ -73,7 +74,7 @@ async function loadCatalogue(cached:boolean):Promise<Catalogue>{
  const images=new Map(pages.flat().map(({actor:a})=>[nameKey(a.name),a.image]))
  for(const r of portraits)images.set(nameKey(r.original_actor),r.original_actor_image)
  const picturedChallenges=[...challenges,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(nameKey(r.originalActor))||''}))}))
- return {actors,challenges:picturedChallenges,pools,titles}
+ return {actors,challenges:picturedChallenges,pools,titles:mergeLibrary(titles)}
 }
 // The assembled catalogue may exceed Next's 2 MB per-entry limit. Cache only
 // the independent chunks above; React cache deduplicates assembly per render.

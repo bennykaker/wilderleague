@@ -12,3 +12,45 @@
 .tester h1,.tester h2,.tester a{color:var(--ink)}
 .tester select option{background:var(--paper);color:var(--ink)}
 body:has(>.tester){margin:0;background:#f6f5ed}
+/* Preview landing page. */
+.tester .landing{padding-top:8px}.tester .landing-hero{display:grid;grid-template-columns:1.1fr 1fr;gap:70px;align-items:center;padding:20px 0 64px}.tester .landing-copy{max-width:550px}.tester .landing-copy h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(44px,5.8vw,76px);letter-spacing:-3px;line-height:1.04;margin:22px 0 26px}.tester .landing-copy>p:not(.eyebrow):not(.landing-note){max-width:450px}.tester .landing-copy .landing-lede{font-size:23px;line-height:1.4}.tester .landing-copy>p{color:#40594d}.tester .landing .eyebrow{color:var(--ink);font-size:10px;letter-spacing:1.8px}.tester .landing .landing-cta{padding:15px 22px;font-weight:600;border-radius:5px;display:inline-flex;align-items:center;justify-content:space-between;gap:28px;margin-top:12px}.tester .landing .landing-note{font-size:12px;color:#566653;margin-top:12px}.tester .landing-example{margin:0;background:#e7eadc;box-shadow:9px 10px 0 #d5dccb;transform:rotate(1deg);border:1px solid #bac7b6}.tester .landing-portrait{height:380px;position:relative;overflow:hidden;background:#244339}.tester .landing-portrait>img{width:100%;height:100%;object-fit:cover;object-position:center 25%;border-radius:0}.tester .landing-portrait:after{content:'';position:absolute;inset:40% 0 0;background:linear-gradient(transparent,#10271fed)}.tester .landing-example-label{position:absolute;top:18px;left:20px;background:#f6f5ed;color:#193b31;padding:6px 10px;font-size:9px;letter-spacing:1.7px;font-weight:bold}.tester .landing-photo-caption{position:absolute;bottom:22px;left:24px;right:20px;color:white;z-index:1;display:grid;gap:3px}.tester .landing-photo-caption>span{font-size:13px}.tester .landing-photo-caption strong{font:36px/1.1 Georgia,serif;letter-spacing:-1px}.tester .landing-example figcaption{padding:20px 25px 22px}.tester .landing-handnote{font:italic 24px Georgia,serif}.tester .landing-example figcaption p{font-size:14px;line-height:1.6;margin:10px 0}.tester .landing-example figcaption small{font-size:10px;color:#526553}.tester .landing-photo-fallback{font:54px Georgia,serif;color:#d9ef91;padding:60px 24px}.tester .landing-how{display:grid;grid-template-columns:repeat(3,1fr);gap:38px;border-block:1px solid #bac7b6;padding:32px 0}.tester .landing-how>div>span{font-size:11px;letter-spacing:1px;color:#627167}.tester .landing-how h2{font-size:19px;margin:12px 0}.tester .landing-how p{font-size:14px;color:#526553;margin-bottom:0;max-width:310px}.tester .landing-next{padding:64px 0}.tester .landing-section-head h2,.tester .landing-after h2{font:36px/1.15 Georgia,serif;letter-spacing:-1px}.tester .landing-section-head>p:last-child{color:#526553}.tester .landing-challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}.tester .landing-challenge-grid article{border-radius:3px;padding:25px;display:flex;flex-direction:column;min-height:295px}.tester .landing-challenge-grid article:first-child{background:#e6edcd}.tester .landing-number{font-size:10px;font-weight:600;letter-spacing:1.4px}.tester .landing-challenge-grid h3{font:29px/1.12 Georgia,serif;letter-spacing:-.6px;margin:25px 0 16px}.tester .landing-challenge-grid p{font-size:14px;color:#526553}.tester .landing-card-end{font-size:11px;font-weight:600;border-top:1px solid #bac7b6;padding-top:14px;margin-top:auto;display:flex;justify-content:space-between}.tester .landing-after{border-top:1px solid #bac7b6;padding:40px 0 0;display:grid;grid-template-columns:1.2fr 1fr;align-items:center;gap:60px}.tester .landing-after p:not(.eyebrow){max-width:510px;color:#526553;font-size:14px}.tester .landing-after-action{text-align:center}
+@media(max-width:760px){.tester:has(.landing) header{flex-direction:row;align-items:center;padding:14px 18px}.tester:has(.landing) nav>.muted{display:none}.tester .landing-hero{grid-template-columns:1fr;gap:32px;padding:6px 0 40px}.tester .landing-copy h1{font-size:52px;letter-spacing:-2px}.tester .landing-copy .landing-lede{font-size:21px}.tester .landing-example{max-width:480px;margin:0 9px 0 0;transform:none}.tester .landing-portrait{height:360px}.tester .landing-how{grid-template-columns:1fr;gap:26px;padding:30px 0}.tester .landing-how h2{margin:6px 0}.tester .landing-how p{max-width:none}.tester .landing-next{padding:40px 0}.tester .landing-challenge-grid{grid-template-columns:1fr;gap:14px}.tester .landing-challenge-grid article{min-height:0}.tester .landing-challenge-grid h3{margin-top:16px}.tester .landing-after{grid-template-columns:1fr;gap:12px}.tester .landing-after-action{text-align:left}.tester .landing-section-head h2,.tester .landing-after h2{font-size:31px}.tester .landing .landing-cta{max-width:100%;font-size:14px;gap:15px}}
+
+/* Compact ensemble of casting ideas replaces the single featured portrait. */
+.tester .landing-hero{display:block;padding:12px 0 28px}
+.tester .landing-copy{max-width:840px}
+.tester .landing-copy h1{font-size:clamp(42px,5vw,64px);margin:16px 0 20px}
+.tester .landing-copy h1 br{display:none}
+.tester .landing-copy h1 br:after{content:' '}
+.tester .landing-copy>p:not(.eyebrow):not(.landing-note){max-width:690px}
+.tester .landing-ideas{padding:0 0 35px}
+.tester .landing-ideas-heading{display:flex;justify-content:space-between;align-items:baseline;gap:20px;margin-bottom:16px}
+.tester .landing-ideas-heading h2{font:22px/1.3 Georgia,serif;margin:0}
+.tester .landing-ideas-heading p{font-size:12px;color:#526553;margin:0}
+.tester .landing-idea-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.tester .landing-idea{margin:0;border:1px solid #bac7b6;background:#fffef8;overflow:hidden;border-radius:5px}
+.tester .landing-idea:nth-child(n+3){background:#e9edde}
+.tester .landing-idea-photo{height:180px;background:#d5dccb}
+.tester .landing-idea-photo img{width:100%;height:100%;object-fit:cover;object-position:center 22%;border-radius:0}
+.tester .landing-idea-photo>span{display:grid;place-items:center;height:100%;padding:20px;font:24px Georgia,serif}
+.tester .landing-idea figcaption{padding:15px}
+.tester .landing-idea .landing-idea-show{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:bold;color:#526553;margin:0 0 10px}
+.tester .landing-idea h2{font-size:18px;line-height:1.2;margin:0 0 4px;letter-spacing:-.4px}
+.tester .landing-idea .landing-idea-role{font-size:12px;margin:0 0 12px}
+.tester .landing-idea .landing-idea-reason{font-size:12px;line-height:1.5;color:#526553;margin:0}
+.tester .landing-ideas-note{font-size:10px;color:#627167;margin:12px 0 0}
+@media(max-width:1000px){.tester .landing-idea-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.tester .landing-ideas-heading{display:block}.tester .landing-ideas-heading p{margin-top:8px}}
+@media(max-width:600px){.tester .landing-idea-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tester .landing-idea-photo{height:160px}.tester .landing-idea figcaption{padding:12px}.tester .landing-idea h2{font-size:17px}.tester .landing-hero{padding-top:0}.tester .landing-copy h1{letter-spacing:-1.8px}.tester .landing-ideas-heading h2{font-size:21px}}
+
+/* A loose pinboard of casting ideas, with room for each tilted card. */
+.tester .landing-idea-grid{gap:20px;padding:22px 8px 30px;align-items:start}
+.tester .landing-idea{box-shadow:5px 7px 0 #193b3114;position:relative;transition:transform .18s ease,box-shadow .18s ease}
+.tester .landing-idea:nth-child(1){transform:rotate(-4deg);margin-top:12px}
+.tester .landing-idea:nth-child(2){transform:rotate(3deg);margin-top:42px}
+.tester .landing-idea:nth-child(3){transform:rotate(-2deg);margin-top:0}
+.tester .landing-idea:nth-child(4){transform:rotate(4deg);margin-top:35px}
+.tester .landing-idea:nth-child(5){transform:rotate(-3deg);margin-top:10px}
+@media(hover:hover){.tester .landing-idea:hover{transform:rotate(0deg) translateY(-5px);z-index:1;box-shadow:7px 12px 0 #193b311c}}
+@media(max-width:1000px){.tester .landing-idea-grid{gap:25px 20px;padding-inline:10px}.tester .landing-idea:nth-child(n+4){margin-top:8px}}
+@media(max-width:600px){.tester .landing-idea-grid{gap:22px 16px;padding:15px 8px 25px}.tester .landing-idea:nth-child(odd){transform:rotate(-2deg);margin-top:0}.tester .landing-idea:nth-child(even){transform:rotate(2deg);margin-top:20px}}
+@media(prefers-reduced-motion:reduce){.tester .landing-idea{transition:none}}
