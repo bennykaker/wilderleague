@@ -1,6 +1,7 @@
 'use client'
 import {useEffect, useRef, useState} from 'react'
 import type {Catalogue} from '../../lib/tester/model'
+import ChallengePosters from './ChallengePosters'
 import TesterApp from './TesterApp'
 import './tester.css'
 import './bookshelf.css'
@@ -94,13 +95,15 @@ export default function CastingEntry({publicMode}:{publicMode:boolean}) {
   if (screen==='starting') return <div className="splash-boot" aria-label="Opening WilderLeague" aria-busy="true"/>
   if (screen==='welcome') return <main className="wl-splash" aria-labelledby="splash-title">
     <div className="splash-content">
-      <h1 id="splash-title" aria-label="WilderLeague"><span>Wilder</span><span>League</span></h1>
+      <p className="classic-brand">WilderLeague</p>
+      <h1 id="splash-title">Recast movies.<br/>Make them better.</h1>
       <div className="splash-choices">
         <button className="splash-new" onClick={()=>selectPath('new')}>New here<small>Take the quick tutorial</small></button>
         <button className="splash-expert" onClick={()=>selectPath('expert')}>Expert Caster<small>Go straight to casting</small></button>
       </div>
       <label className="splash-preference"><input type="checkbox" checked={hideSplash} onChange={e=>setHideSplash(e.target.checked)}/>Don’t show this to me again</label>
     </div>
+    <div className="splash-films" aria-hidden="true"><ChallengePosters/></div>
   </main>
 
   if (screen==='room' && data) return <TesterApp data={data} publicMode={publicMode} initialMode={mode} onTutorial={howTo} onRoomChange={rememberRoom}/>

@@ -12,7 +12,7 @@ async function photo(url:string){
  try{const u=new URL(url);if(u.protocol!=='https:'||u.hostname!=='image.tmdb.org'||!/^\/t\/p\/[^/]+\/[a-zA-Z0-9_.-]+$/.test(u.pathname))return ''
  const response=await fetch(u,{redirect:'error',signal:AbortSignal.timeout(7000)});if(!response.ok)return ''
  const bytes=Buffer.from(await response.arrayBuffer());if(bytes.length>5_000_000)return ''
- const jpeg=await sharp(bytes).resize(310,260,{fit:'contain',background:'#222226'}).jpeg({quality:85}).toBuffer()
+ const jpeg=await sharp(bytes).resize(310,260,{fit:'contain',background:'#18181c'}).jpeg({quality:85}).toBuffer()
  return 'data:image/jpeg;base64,'+jpeg.toString('base64')
  }catch{return ''}
 }
@@ -23,9 +23,9 @@ export async function castImage(s:CastSnapshot){
    const credits=s.actors.map((actor,i)=>{
      const x=36+(i%2)*526,y=header+Math.floor(i/2)*86
      const roleLines=lines(s.challenge.roles[i].name,43).slice(0,2)
-     return '<g>'+roleLines.map((l,j)=>`<text x="${x}" y="${y+j*18}" fill="#ff6948" font-size="17">${xml(l)}</text>`).join('')+`<text x="${x}" y="${y+44}" fill="white" font-size="20">${xml(actor.name)}</text></g>`
+     return '<g>'+roleLines.map((l,j)=>`<text x="${x}" y="${y+j*18}" fill="#a78bfa" font-size="17">${xml(l)}</text>`).join('')+`<text x="${x}" y="${y+44}" fill="white" font-size="20">${xml(actor.name)}</text></g>`
    }).join('')
-   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" font-family="Arial,sans-serif"><rect width="100%" height="100%" fill="#0b0b0e"/><text x="36" y="48" fill="#ff6948" font-size="20">WilderLeague · Casting sheet</text><text x="36" y="110" font-size="40" fill="white">${xml(s.challenge.title)}</text>${credits}</svg>`
+   const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" font-family="Arial,sans-serif"><rect width="100%" height="100%" fill="#09090b"/><text x="36" y="48" fill="#a78bfa" font-size="20">WilderLeague · Casting sheet</text><text x="36" y="110" font-size="40" fill="white">${xml(s.challenge.title)}</text>${credits}</svg>`
    return sharp(Buffer.from(svg)).png().toBuffer()
  }
  const photos=await Promise.all(s.actors.map(a=>photo(a.image)))
@@ -33,8 +33,8 @@ export async function castImage(s:CastSnapshot){
  const width=1080,rows=Math.ceil(s.actors.length/3),height=header+rows*430+80
  const cards=s.actors.map((a,i)=>{
   const x=50+(i%3)*330,y=header+Math.floor(i/3)*430
-  return `<g><rect x="${x}" y="${y}" width="310" height="410" rx="8" fill="#222226"/>${photos[i]?`<image href="${photos[i]}" x="${x}" y="${y}" width="310" height="260"/>`:`<text x="${x+155}" y="${y+145}" text-anchor="middle" fill="#ff6948" font-size="48">${xml(a.name.split(' ').map(n=>n[0]).join(''))}</text>`}${lines(s.challenge.roles[i].name,30).slice(0,3).map((l,j)=>`<text x="${x+14}" y="${y+287+j*19}" fill="#ff6948" font-size="17">${xml(l)}</text>`).join('')}${lines(a.name,23).slice(0,2).map((l,j)=>`<text x="${x+14}" y="${y+355+j*24}" fill="white" font-size="21">${xml(l)}</text>`).join('')}</g>`
+  return `<g><rect x="${x}" y="${y}" width="310" height="410" rx="8" fill="#18181c"/>${photos[i]?`<image href="${photos[i]}" x="${x}" y="${y}" width="310" height="260"/>`:`<text x="${x+155}" y="${y+145}" text-anchor="middle" fill="#a78bfa" font-size="48">${xml(a.name.split(' ').map(n=>n[0]).join(''))}</text>`}${lines(s.challenge.roles[i].name,30).slice(0,3).map((l,j)=>`<text x="${x+14}" y="${y+287+j*19}" fill="#a78bfa" font-size="17">${xml(l)}</text>`).join('')}${lines(a.name,23).slice(0,2).map((l,j)=>`<text x="${x+14}" y="${y+355+j*24}" fill="white" font-size="21">${xml(l)}</text>`).join('')}</g>`
  }).join('')
- const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" font-family="Arial, sans-serif"><rect width="100%" height="100%" fill="#0b0b0e"/><text x="50" y="60" fill="#ff6948" font-size="22">WILDERLEAGUE · TESTER CAST</text>${titleLines.map((l,j)=>`<text x="50" y="${118+j*52}" fill="white" font-size="42">${xml(l)}</text>`).join('')}<text x="50" y="${header-18}" fill="#d5cecb" font-size="21">${xml(s.challenge.season)} · ${s.challenge.pool==='british'?'British actors':s.challenge.pool==='snl'?'SNL actors':s.challenge.pool==='all'?'Reboot cast':'Ensemble challenge'}</text>${cards}<text x="50" y="${height-45}" fill="#d5cecb" font-size="18">Fan casting · Images from the WilderLeague catalogue · Made at WilderLeague</text></svg>`
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" font-family="Arial, sans-serif"><rect width="100%" height="100%" fill="#09090b"/><text x="50" y="60" fill="#a78bfa" font-size="22">WILDERLEAGUE · TESTER CAST</text>${titleLines.map((l,j)=>`<text x="50" y="${118+j*52}" fill="white" font-size="42">${xml(l)}</text>`).join('')}<text x="50" y="${header-18}" fill="#e4e4e7" font-size="21">${xml(s.challenge.season)} · ${s.challenge.pool==='british'?'British actors':s.challenge.pool==='snl'?'SNL actors':s.challenge.pool==='all'?'Reboot cast':'Ensemble challenge'}</text>${cards}<text x="50" y="${height-45}" fill="#e4e4e7" font-size="18">Fan casting · Images from the WilderLeague catalogue · Made at WilderLeague</text></svg>`
  return sharp(Buffer.from(svg)).png().toBuffer()
 }
