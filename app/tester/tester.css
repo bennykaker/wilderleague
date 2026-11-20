@@ -88,12 +88,60 @@ body:has(>.tester){margin:0;background:#09090b}
 
 .tester .actors button[draggable="true"] { cursor:grab; }
 .tester .actors button[draggable="true"]:active { cursor:grabbing; }
-.tester .role.drop-target {
-  outline:2px dashed var(--accent);
-  outline-offset:-4px;
-  background:var(--active);
-}
 @media (min-width:761px) {
   .tester .casting-roster { position:sticky; top:12px; }
   .tester .casting-roster aside { max-height:64vh; overflow:auto; }
+}
+
+.tester .role .active-role-label,
+.tester .slot-label small {
+  display:block; color:var(--accent-hover); font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.09em;
+}
+.tester .cast-instructions { margin:12px 0 8px; font-size:14px; }
+.tester .cast-slot {
+  position:sticky; top:8px; z-index:3; display:flex; gap:12px; align-items:center;
+  padding:12px 16px; border:2px dashed var(--accent); border-radius:10px;
+  background:var(--panel); box-shadow:0 4px 12px #0005; scroll-margin-top:12px;
+}
+.tester .slot-arrow {
+  display:grid; place-items:center; flex:none; width:34px; height:38px;
+  border-radius:6px; background:var(--active); color:var(--accent-hover); font-size:23px; line-height:1;
+}
+.tester .slot-photo { width:34px; height:42px; object-fit:cover; border-radius:5px; flex:none; }
+.tester .slot-label strong { display:block; font-size:17px; line-height:1.25; overflow-wrap:anywhere; }
+.tester .slot-action { margin-left:auto; text-align:right; font-size:14px; font-weight:600; }
+.tester .cast-slot.ready { background:var(--active); border-color:var(--accent-hover); }
+.tester .cast-slot.over { background:var(--accent-hover); color:var(--on-accent); border-style:solid; }
+.tester .cast-slot.over .slot-label small { color:var(--on-accent); }
+.tester .actors button { position:relative; }
+.tester .actor-grip {
+  position:absolute; top:6px; left:6px; display:inline-flex; align-items:center; gap:5px;
+  min-height:26px; padding:4px 9px; border:1px solid #ffffff45; border-radius:5px;
+  background:#18151fed; color:white; font:600 12px/1 system-ui,sans-serif;
+  touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
+.tester .actor-grip i {
+  width:9px; height:14px;
+  background:radial-gradient(circle at 2px 2px,currentColor 1.35px,transparent 1.6px) 0 0/5px 5px;
+}
+.tester .casting-sr-only {
+  position:absolute; height:1px; width:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap;
+}
+.tester .touch-instruction { display:none; }
+.tester .touch-drag-label {
+  position:fixed; z-index:15; pointer-events:none; transform:translate(-50%,calc(-100% - 14px));
+  width:max-content; max-width:80vw; padding:6px 12px; border-radius:5px;
+  background:var(--accent-hover); color:var(--on-accent); box-shadow:0 3px 12px #0006; font-weight:700;
+}
+@media (any-pointer:coarse) {
+  .tester .actor-grip { min-width:58px; min-height:44px; justify-content:center; }
+  .tester .touch-instruction { display:inline; }
+  .tester .mouse-instruction { display:none; }
+}
+@media (max-width:600px) {
+  .tester .cast-slot { top:4px; gap:8px; padding:8px 10px; }
+  .tester .slot-arrow { width:25px; height:32px; }
+  .tester .slot-action { max-width:46%; font-size:12px; }
+  .tester .slot-label strong { font-size:15px; }
 }

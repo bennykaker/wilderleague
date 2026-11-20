@@ -16,7 +16,7 @@ const hideSplashKey = 'wilderleague:hide-splash'
 
 const lessons = [
   {title:'Pick a story.', text:'Pick a movie or a book. Search for the title you have in mind, or choose one of the suggestions.', label:'Title', example:'The Fellowship of the Ring'},
-  {title:'Put a face to the name.', text:'Choose a character and search for the actor you see in the role. Pick a living actor of any gender. Each actor gets one part.', label:'Role', example:'Gandalf'},
+  {title:'Put a face to the name.', text:'Select a character. Drag a living actor’s headshot into the outlined slot for that role. Actors of any gender can play the part.', label:'Role', example:'Gandalf'},
   {title:'Make your case.', text:'Add a line about your choices. Sign in to save a private cast or share a link. A book or universe cast can start with a single role.', label:'Your pitch', example:'“I want a Gandalf who seems delighted by hobbits.”'},
 ]
 
