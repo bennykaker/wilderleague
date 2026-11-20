@@ -1,5 +1,5 @@
 'use client'
-import {useState} from 'react'
+import ActorPortrait from './ActorPortrait'
 import type {TesterActor} from '../../lib/tester/model'
 
 const castingIdeas=[
@@ -10,9 +10,8 @@ const castingIdeas=[
  {name:'Hugh Grant',role:'Roger Sterling',show:'British Mad Men',reason:'A man who can turn being absolutely no help into a charm offensive.'},
 ]
 function CastingIdea({idea,actor}:{idea:typeof castingIdeas[number];actor?:TesterActor}){
- const [failed,setFailed]=useState(false)
  return <figure className="landing-idea">
-  <div className="landing-idea-photo">{actor?.image&&!failed?<img src={actor.image} alt={idea.name} width={300} height={240} onError={()=>setFailed(true)}/>:<span>{idea.name}</span>}</div>
+  <div className="landing-idea-photo"><ActorPortrait name={idea.name} src={actor?.image} className="idea-headshot"/></div>
   <figcaption><p className="landing-idea-show">{idea.show}</p><h2>{idea.name}</h2><p className="landing-idea-role">as {idea.role}</p><p className="landing-idea-reason">{idea.reason}</p></figcaption>
  </figure>
 }
