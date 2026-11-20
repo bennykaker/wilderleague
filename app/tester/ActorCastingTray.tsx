@@ -65,7 +65,7 @@ export default function ActorCastingTray({candidates,roleName,pickedActor,picks,
 
   return <div className="cast-tray">
     <p className="cast-instructions">
-      Select a role, then drag <span className="mouse-instruction">an actor’s headshot</span><span className="touch-instruction">the grip on an actor’s photo</span> into the outlined slot.
+      Select a role, then drag <span className="mouse-instruction">an actor’s headshot</span><span className="touch-instruction">the Drag handle on an actor card</span> into the outlined slot.
     </p>
     <div ref={slot} className={'cast-slot'+(drag?' ready':'')+(over?' over':'')}
       role="group" aria-label={'Casting slot for '+roleName} tabIndex={-1}
@@ -129,8 +129,11 @@ export default function ActorCastingTray({candidates,roleName,pickedActor,picks,
           onPointerCancel={endDrag} onLostPointerCapture={()=>{if (pointer.current) endDrag()}}>
           <i/>Drag
         </span>}
-        <strong>{actor.name}</strong>{actor.birthYear&&<span className="actor-birth">Born {actor.birthYear}</span>}
-        <small>{used?'Already cast':detailFor(actor)}</small>
+        <span className="actor-card-copy">
+          <strong>{actor.name}</strong>
+          {actor.birthYear&&<span className="actor-birth">Born {actor.birthYear}</span>}
+          <small>{used?'Already cast':detailFor(actor)}</small>
+        </span>
       </button>
     })}</div>
     {point && drag?.method==='touch' && <span className="touch-drag-label" aria-hidden="true"
