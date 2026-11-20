@@ -85,3 +85,15 @@ body:has(>.tester){margin:0;background:#09090b}
 .tester .photo-unavailable { display:grid; place-items:center; background:var(--panel-alt); color:var(--muted); font-weight:600; }
 .tester .actors .candidate-photo { display:block; width:100%; height:clamp(150px,18vw,230px); object-fit:cover; object-position:center 22%; }
 .tester .actors .candidate-photo.photo-unavailable { display:grid; font-size:26px; }
+
+.tester .actors button[draggable="true"] { cursor:grab; }
+.tester .actors button[draggable="true"]:active { cursor:grabbing; }
+.tester .role.drop-target {
+  outline:2px dashed var(--accent);
+  outline-offset:-4px;
+  background:var(--active);
+}
+@media (min-width:761px) {
+  .tester .casting-roster { position:sticky; top:12px; }
+  .tester .casting-roster aside { max-height:64vh; overflow:auto; }
+}

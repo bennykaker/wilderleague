@@ -17,9 +17,9 @@ export function hasBundledPortrait(name:string) {
   return Object.hasOwn(portraits,name)
 }
 
-type PortraitProps = {name:string; src?:string; className?:string; compact?:boolean; eager?:boolean}
+type PortraitProps = {name:string; src?:string; className?:string; compact?:boolean; eager?:boolean; draggable?:boolean}
 
-export default function ActorPortrait({name,src='',className='',compact=false,eager=false}:PortraitProps) {
+export default function ActorPortrait({name,src='',className='',compact=false,eager=false,draggable}:PortraitProps) {
   const [failed,setFailed] = useState<string[]>([])
   const bundled = hasBundledPortrait(name) ? portraits[name] : undefined
   const local = typeof bundled==='string' ? bundled : bundled?.src
@@ -36,7 +36,7 @@ export default function ActorPortrait({name,src='',className='',compact=false,ea
   if (!source) return <span className={className+' photo-unavailable'} role="img" aria-label={name?'Photo unavailable for '+name:label}>
     {name.split(/\s+/).filter(Boolean).map(part=>part[0]).slice(0,2).join('')||'—'}
   </span>
-  const props = {className,alt:label,width:compact?52:185,height:compact?66:248,
+  const props = {className,draggable,alt:label,width:compact?52:185,height:compact?66:248,
     loading:eager?'eager' as const:'lazy' as const,
     onError:()=>setFailed(previous=>[...previous,String(source.optimize)+source.url])}
   return source.optimize ? <Image {...props} src={source.url} sizes={compact?'52px':'(max-width: 760px) 45vw, 240px'}/> :
