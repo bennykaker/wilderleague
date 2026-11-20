@@ -11,6 +11,7 @@ import type {Catalogue,Challenge} from '../lib/tester/model'
 import {receiveContribution} from '../lib/tester/contributions'
 import {castImage} from '../lib/tester/exports'
 import {selectedLiteraryRoles} from '../lib/tester/library-client'
+import characterDescriptions from '../data/book-casting/character-descriptions.json'
 
 const resolve = async(slug:string) => {
  const roster=literaryChallenge(slug)
@@ -47,6 +48,19 @@ test('shared-world rosters cover the specified books without repeating returning
    assert.equal(universe.roles.filter(role=>role.name===name).length,1)
    assert.ok(universe.roles.length>100)
  }
+})
+
+test('book descriptions cover each selected roster and follow the character into the right book', () => {
+ const entries = Object.entries(characterDescriptions)
+ assert.ok(entries.length >= 200)
+ for (const [slug, descriptions] of entries) {
+   const book = literaryChallenge(slug)
+   assert.equal(book?.literary?.kind, 'book', slug)
+   assert.deepEqual(Object.fromEntries(book!.roles.map(role => [role.name, role.description])), descriptions, slug)
+   assert.ok(Object.values(descriptions).every(text => text.trim().length > 0), slug)
+ }
+ const haymitch = (slug:string) => literaryChallenge(slug)!.roles.find(role => role.name === 'Haymitch Abernathy')!.description
+ assert.notEqual(haymitch('book-suzanne-collins-the-hunger-games'), haymitch('book-suzanne-collins-sunrise-on-the-reaping'))
 })
 
 test('partial literary lineups survive saving, sharing, reopening, retrying and exporting',async()=>{

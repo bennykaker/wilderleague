@@ -1,12 +1,14 @@
 import booktok from '../../data/book-casting/booktok.json'
 import bestsellers from '../../data/book-casting/bestsellers.json'
 import classics from '../../data/book-casting/classics.json'
+import characterDescriptions from '../../data/book-casting/character-descriptions.json'
 import expansion from '../../data/book-casting/expansion.json'
 import worlds from '../../data/book-casting/worlds.json'
 import type {Challenge, LibraryTitle, TesterRole} from './model'
 import {rebootRule} from './reboot'
 
 type Book = {title:string; author:string; shelf:string; universe?:string; characters:string[]; source:string}
+const descriptionsByBook: Readonly<Record<string, Readonly<Record<string, string>>>> = characterDescriptions
 const books: Book[] = [...booktok, ...bestsellers, ...classics, ...worlds, ...expansion]
 const slugPart = (text:string) => text.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/['’]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
 const bookSlug = (book:Book) => 'book-' + slugPart(book.author + '-' + book.title)
@@ -51,7 +53,7 @@ export function literaryChallenge(slug:string):Challenge|undefined {
     const appearances = book ? [] : members.filter(b => b.characters.includes(name)).map(b => b.title)
     return {
       id:'character-' + slugPart(name), name, originalActor:'',
-      description: appearances.length ? 'In ' + appearances.slice(0,3).join(' · ') + (appearances.length>3 ? ' and ' + (appearances.length-3) + ' more.' : '.') : '',
+      description: appearances.length ? 'In ' + appearances.slice(0,3).join(' · ') + (appearances.length>3 ? ' and ' + (appearances.length-3) + ' more.' : '.') : descriptionsByBook[slug]?.[name] ?? '',
     }
   })
   return {
