@@ -3,6 +3,7 @@ import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,timingSafeEqu
 import {promisify} from 'node:util'
 import {mkdirSync} from 'node:fs'
 import path from 'node:path'
+import type {BoardCategory,Vote} from './leaderboard'
 import type {CastRecord,CastSnapshot,User} from './model'
 const scrypt=promisify(scryptCallback)
 const hash=(s:string)=>createHash('sha256').update(s).digest('hex')
@@ -19,6 +20,18 @@ export class TesterStore{
   CREATE TABLE IF NOT EXISTS votes(user_id TEXT NOT NULL REFERENCES users(id),cast_id TEXT NOT NULL REFERENCES casts(id),category TEXT CHECK(category IN ('best','hear')) NOT NULL,PRIMARY KEY(user_id,cast_id,category));
   CREATE TABLE IF NOT EXISTS limits(key TEXT PRIMARY KEY,count INTEGER NOT NULL,expires INTEGER NOT NULL);
   CREATE INDEX IF NOT EXISTS cast_challenge ON casts(challenge_id,published);`)
+  this.db.exec(`CREATE TABLE IF NOT EXISTS feedback(key TEXT PRIMARY KEY,status TEXT NOT NULL,created_at TEXT NOT NULL,day TEXT NOT NULL,reserved REAL NOT NULL,model TEXT NOT NULL,result TEXT,cost REAL);`)
+  this.db.exec('BEGIN IMMEDIATE')
+  try {
+    if(!this.db.prepare('PRAGMA table_info(votes)').all().some(column=>column.name==='direction')) {
+      this.db.exec('ALTER TABLE votes ADD COLUMN direction INTEGER NOT NULL DEFAULT 1 CHECK(direction IN (-1,1))')
+    }
+    this.db.exec('CREATE INDEX IF NOT EXISTS votes_by_cast ON votes(cast_id,category,direction); COMMIT')
+  } catch (error) {
+    this.db.exec('ROLLBACK')
+    throw error
+  }
+
  }
  limit(key:string,max:number,ms:number){
   const now=Date.now(),k=hash(key)
@@ -52,20 +65,42 @@ export class TesterStore{
  }
  private rows(where:string,args:(string|number)[],viewer=''):CastRecord[]{
   return this.db.prepare(`SELECT c.*,u.username,
-  (SELECT COUNT(*) FROM votes v WHERE v.cast_id=c.id AND v.category='best') AS best,
-  (SELECT COUNT(*) FROM votes v WHERE v.cast_id=c.id AND v.category='hear') AS hear,
-  EXISTS(SELECT 1 FROM votes v WHERE v.cast_id=c.id AND v.category='best' AND v.user_id=?) AS my_best,
-  EXISTS(SELECT 1 FROM votes v WHERE v.cast_id=c.id AND v.category='hear' AND v.user_id=?) AS my_hear
+  (SELECT COUNT(*) FROM votes v WHERE v.cast_id=c.id AND v.category='best' AND v.direction=1) AS best,
+  (SELECT COUNT(*) FROM votes v WHERE v.cast_id=c.id AND v.category='hear' AND v.direction=1) AS hear,
+  EXISTS(SELECT 1 FROM votes v WHERE v.cast_id=c.id AND v.category='best' AND v.direction=1 AND v.user_id=?) AS my_best,
+  EXISTS(SELECT 1 FROM votes v WHERE v.cast_id=c.id AND v.category='hear' AND v.direction=1 AND v.user_id=?) AS my_hear
   FROM casts c JOIN users u ON u.id=c.user_id WHERE ${where}`).all(viewer,viewer,...args).map(r=>({id:String(r.id),ownerId:String(r.user_id),username:String(r.username),challengeId:String(r.challenge_id),snapshot:JSON.parse(String(r.snapshot)),published:!!r.published,createdAt:String(r.created_at),best:Number(r.best),hear:Number(r.hear),myBest:!!r.my_best,myHear:!!r.my_hear}))
  }
  cast(id:string,viewer=''){return this.rows('c.id=? AND (c.published=1 OR c.user_id=?)',[id,viewer],viewer)[0]||null}
  mine(user:User){return this.rows('c.user_id=? ORDER BY c.created_at DESC LIMIT 100',[user.id],user.id)}
- board(challengeId:string,category:'best'|'hear',viewer=''){return this.rows(`c.challenge_id=? AND c.published=1 ORDER BY ${category} DESC,c.created_at ASC,c.id ASC LIMIT 50`,[challengeId],viewer)}
+ board(challengeId:string, category:BoardCategory, viewer=''):CastRecord[] {
+  const entries=this.db.prepare(`
+    WITH tallies AS (
+      SELECT c.id, c.created_at, COUNT(v.user_id) FILTER (WHERE v.direction=1) AS up,
+             COUNT(v.user_id) FILTER (WHERE v.direction=-1) AS down,
+             COALESCE(MAX(v.direction) FILTER (WHERE v.user_id=?),0) AS mine,
+             json_extract(f.result,?) AS ai
+      FROM casts c
+      LEFT JOIN votes v ON v.cast_id=c.id AND v.category=?
+      LEFT JOIN feedback f ON f.key='board-v1:'||c.id AND f.status='ready'
+      WHERE c.challenge_id=? AND c.published=1 GROUP BY c.id
+    )
+    SELECT *,CASE WHEN up+down>20 THEN (ai+100.0*up/(up+down))/2 ELSE ai END AS score FROM tallies
+    ORDER BY score DESC NULLS LAST, CASE WHEN ai IS NULL THEN up-down END DESC, created_at,id
+    LIMIT 50
+  `).all(viewer,'$.'+category,category,challengeId)
+  return entries.map(row=>({...this.cast(String(row.id),viewer)!,rating:{
+    up:Number(row.up),down:Number(row.down),mine:Number(row.mine) as Vote,
+    ai:row.ai===null?null:Number(row.ai),score:row.score===null?null:Number(row.score)
+  }}))
+ }
  publish(user:User,id:string){const r=this.db.prepare('UPDATE casts SET published=1 WHERE id=? AND user_id=?').run(id,user.id);if(!r.changes)throw new StoreError('Cast not found.',404);return this.cast(id,user.id)}
- vote(user:User,id:string,category:'best'|'hear',enabled:boolean){
+ vote(user:User,id:string,category:BoardCategory,value:Vote|boolean){
   const c=this.cast(id,user.id);if(!c?.published)throw new StoreError('Cast not found.',404)
   if(c.ownerId===user.id)throw new StoreError('You cannot vote for your own cast.')
-  if(enabled)this.db.prepare('INSERT OR IGNORE INTO votes VALUES(?,?,?)').run(user.id,id,category)
+  const direction=Number(value)
+  if(direction)this.db.prepare(`INSERT INTO votes(user_id,cast_id,category,direction) VALUES(?,?,?,?)
+    ON CONFLICT(user_id,cast_id,category) DO UPDATE SET direction=excluded.direction`).run(user.id,id,category,direction)
   else this.db.prepare('DELETE FROM votes WHERE user_id=? AND cast_id=? AND category=?').run(user.id,id,category)
   return this.cast(id,user.id)
  }

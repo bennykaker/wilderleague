@@ -18,8 +18,7 @@ export const provider:FeedbackProvider=async input=>{
  return {text:r.content.filter(b=>b.type==='text').map(b=>b.type==='text'?b.text:'').join(''),inputTokens:r.usage.input_tokens,outputTokens:r.usage.output_tokens,complete:r.stop_reason==='end_turn'}
 }
 export function feedbackKey(s:CastSnapshot){return createHash('sha256').update(JSON.stringify({title:s.challenge.title,season:s.challenge.season,rule:s.challenge.rule,roles:s.challenge.roles.map((r,i)=>({name:r.name,brief:r.description,actor:s.actors[i].id})),pitch:s.pitch.trim()})).digest('hex')}
-function table(store:TesterStore){store.db.exec(`CREATE TABLE IF NOT EXISTS feedback(key TEXT PRIMARY KEY,status TEXT NOT NULL,created_at TEXT NOT NULL,day TEXT NOT NULL,reserved REAL NOT NULL,model TEXT NOT NULL,result TEXT,cost REAL);`)}
-export function readFeedback(store:TesterStore,s:CastSnapshot){table(store);const row=store.db.prepare('SELECT * FROM feedback WHERE key=?').get(feedbackKey(s));if(!row)return {status:'none'};return {status:String(row.status),createdAt:String(row.created_at),model:String(row.model),feedback:row.result?JSON.parse(String(row.result)) as Feedback:null}}
+export function readFeedback(store:TesterStore,s:CastSnapshot){const row=store.db.prepare('SELECT * FROM feedback WHERE key=?').get(feedbackKey(s));if(!row)return {status:'none'};return {status:String(row.status),createdAt:String(row.created_at),model:String(row.model),feedback:row.result?JSON.parse(String(row.result)) as Feedback:null}}
 export async function requestFeedback(store:TesterStore,s:CastSnapshot,generate:FeedbackProvider=provider){
  if(process.env.WILDERLEAGUE_PREVIEW!=='1')throw new StoreError('AI feedback is preview-only.',403)
  const prior=readFeedback(store,s);if(prior.status!=='none')return prior

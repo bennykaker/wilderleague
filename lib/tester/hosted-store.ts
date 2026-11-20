@@ -1,3 +1,4 @@
+import type {BoardCategory,Vote} from './leaderboard'
 import {createServiceClient} from '../supabase/service'
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,timingSafeEqual} from 'node:crypto'
 import {promisify} from 'node:util'
@@ -27,7 +28,15 @@ export class HostedStore{
  async save(user:User,snapshot:CastSnapshot,publish:boolean):Promise<CastRecord>{const fingerprint=hash(JSON.stringify({actors:snapshot.actors.map(a=>a.id),...(snapshot.challenge.literary?{roles:snapshot.challenge.roles.map(r=>r.id)}:{}),pitch:snapshot.pitch,...(snapshot.challenge.id==='custom'?{custom:snapshot.challenge}: {})}));const id=await this.rpc('save',{id:randomUUID(),user:user.id,challenge:snapshot.challenge.id,snapshot,fingerprint,publish});return (await this.cast(id,user.id))!}
  async cast(id:string,viewer=''):Promise<CastRecord|null>{return await this.rpc('cast',{id,viewer})}
  async mine(user:User):Promise<CastRecord[]>{return await this.rpc('mine',{viewer:user.id})}
- async board(challengeId:string,category:'best'|'hear',viewer=''):Promise<CastRecord[]>{return await this.rpc('board',{challenge:challengeId,category,viewer})}
+ async board(challengeId:string,category:BoardCategory,viewer=''):Promise<CastRecord[]>{
+  const {data,error}=await this.client.rpc('wl_beta_ranked_board',{challenge:challengeId,board_category:category,viewer})
+  if(error)throw new StoreError('The leaderboard could not be loaded.',503)
+  return data
+ }
  async publish(user:User,id:string){await this.rpc('publish',{user:user.id,id});return await this.cast(id,user.id)}
- async vote(user:User,id:string,category:'best'|'hear',enabled:boolean){await this.rpc('vote',{user:user.id,id,category,enabled});return await this.cast(id,user.id)}
+ async vote(user:User,id:string,category:BoardCategory,value:Vote|boolean){
+  const {error}=await this.client.rpc('wl_beta_set_vote',{voter:user.id,entry:id,board_category:category,choice:Number(value)})
+  if(error)throw new StoreError(error.message.startsWith('WL:')?error.message.slice(3):'The vote could not be saved.',error.message.startsWith('WL:')?400:503)
+  return await this.cast(id,user.id)
+ }
 }

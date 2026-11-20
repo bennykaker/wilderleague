@@ -54,3 +54,25 @@ test('HTTP API rejects cross-origin writes and preserves account boundaries',asy
 test('exports include complete ensemble and render as PNG without actor photos',async()=>{
  for(const c of challenges){const snap=makeSnapshot({...input,challengeId:c.id,picks:actors.slice(0,c.roles.length).map(a=>a.id)},catalogue),pack=analysisPack(snap);for(const r of c.roles)assert.ok(pack.includes(r.name));assert.ok(pack.includes('does not include a RAG index'));const meta=await sharp(await castImage(snap)).metadata();assert.equal(meta.format,'png');assert.equal(meta.width,1080);assert.equal(meta.height,272+Math.ceil(c.roles.length/3)*430)}
 })
+
+test('signed-in ballot requests can switch or clear one vote and reject invalid directions',async()=>{
+ const store=new TesterStore(':memory:'),handle=createTesterApi(store,async()=>catalogue)
+ const post=(body:unknown,cookie='')=>handle(new Request('http://preview.test/api/preview/vote',{
+   method:'POST',headers:{origin:'http://preview.test','Content-Type':'application/json',cookie},body:JSON.stringify(body)
+ }))
+ try {
+   const owner=await store.register('director','owner password'),voter=await store.register('reader','reader password')
+   const cookie='wl_tester_session='+store.session(voter)
+   const cast=store.save(owner,makeSnapshot(input,catalogue),true)
+   const ballot={category:'best',id:cast.id}
+   assert.equal((await post({...ballot,direction:-1})).status,401)
+   assert.equal((await post({...ballot,direction:2},cookie)).status,400)
+   assert.equal((await post({...ballot,enabled:true},cookie)).status,200)
+   assert.equal((await post({...ballot,direction:-1},cookie)).status,200)
+   const url='http://preview.test/api/preview/board?category=best&challenge='+input.challengeId
+   const board=await (await handle(new Request(url,{headers:{cookie}}))).json()
+   assert.deepEqual(board.casts[0].rating,{ai:null,score:null,up:0,down:1,mine:-1})
+   assert.equal((await post({...ballot,direction:0},cookie)).status,200)
+   assert.equal(store.board(input.challengeId,'best')[0].rating!.down,0)
+ } finally {store.close()}
+})

@@ -1,3 +1,5 @@
+import {scoreBoardCast} from './board-judge'
+import type {CastRecord} from './model'
 import {selectedLiteraryRoles} from './library-client'
 import {HostedStore} from './hosted-store'
 import {hostedFeedback,readHostedFeedback} from './hosted-ai'
@@ -62,22 +64,30 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
    const snapshot=makeSnapshot(input,cat)
    return json(action==='feedback-status'?(store instanceof HostedStore?await readHostedFeedback(store,snapshot):readFeedback(store,snapshot)):await (store instanceof HostedStore?hostedFeedback(store,snapshot,user?.id):requestFeedback(store,snapshot)))
   }
+  async function saved(cast:CastRecord|null,submitted:boolean,cat:Catalogue){
+   if(!cast || !submitted || !cat.challenges.some(c=>c.id===cast.challengeId) ||
+      cast.challengeId==='custom' || cast.challengeId.startsWith('free:')) return json({cast})
+   // A cast stays published and open to voters even when judging is unavailable.
+   try {return json({cast,judging:await scoreBoardCast(store,cast)})}
+   catch(error){return json({cast,judging:error instanceof StoreError && error.status===429?'budget':'unavailable'})}
+  }
   if(action==='save'){
    const owner=requireUser();await store.limit('save:'+owner.id,30,3600000)
    const cat=await castCatalogue();let input;try{input=validateCast(body,cat)}catch(e){throw new StoreError((e as Error).message)}
-   return json({cast:await store.save(owner,makeSnapshot(input,cat),input.publish)})
+   return saved(await store.save(owner,makeSnapshot(input,cat),input.publish),input.publish,cat)
   }
   if(action==='publish'){
    const owner=requireUser();if(typeof body.id!=='string')throw new StoreError('Invalid cast.')
    const existing=await store.cast(body.id,owner.id);if(!existing||existing.ownerId!==owner.id)throw new StoreError('Cast not found.',404)
    const c=existing.snapshot.challenge,candidate={challengeId:c.id,roleIds:c.literary?c.roles.map(r=>r.id):undefined,picks:existing.snapshot.actors.map(a=>a.id),pitch:existing.snapshot.pitch,publish:true,custom:{title:c.title,kind:c.season.split(' ')[1],roles:c.roles.map(r=>r.name)}}
    const cat=await castCatalogue(candidate);try{validateCast(candidate,cat)}catch{throw new StoreError('This saved cast has choices that are no longer eligible. Open it and choose replacements before sharing.')}
-   return json({cast:await store.publish(owner,body.id)})
+   return saved(await store.publish(owner,body.id),true,cat)
   }
   if(action==='vote'){
    const voter=requireUser();await store.limit('vote:'+voter.id,120,60000)
-   if(typeof body.id!=='string'||!['best','hear'].includes(String(body.category))||typeof body.enabled!=='boolean')throw new StoreError('Invalid vote.')
-   return json({cast:await store.vote(voter,body.id,body.category as 'best'|'hear',body.enabled)})
+   const value=body.direction===undefined && typeof body.enabled==='boolean'?Number(body.enabled):body.direction
+   if(typeof body.id!=='string'||!['best','hear'].includes(String(body.category))||(value!==-1 && value!==0 && value!==1))throw new StoreError('Invalid vote.')
+   return json({cast:await store.vote(voter,body.id,body.category as 'best'|'hear',value)})
   }
   if(action==='export-image'||action==='export-analysis'){
    await store.limit('export:'+(user?.id||visitor),30,600000)

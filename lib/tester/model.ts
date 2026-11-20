@@ -1,3 +1,4 @@
+import type {BoardRating} from './leaderboard'
 export type TesterActor={id:string;name:string;image:string;knownFor:string;biography:string;nationality:string;ethnicity?:string;gender?:string;descriptionTags?:string[];birthYear?:number}
 export type TesterRole={id:string;name:string;originalActor:string;originalImage?:string;description:string}
 export type LibraryTitle={slug:string;title:string;type:string;year:number|null;author?:string;shelf?:string;universe?:string;bookCount?:number;roleCount?:number;keywords?:string}
@@ -6,7 +7,7 @@ export type Catalogue={titles?:LibraryTitle[];challenges:Challenge[];actors:Test
 export type CastInput={challengeId:string;picks:string[];pitch:string;publish:boolean}
 export type CastSnapshot={challenge:Challenge;actors:TesterActor[];pitch:string}
 export type User={id:string;username:string}
-export type CastRecord={id:string;ownerId:string;username:string;challengeId:string;snapshot:CastSnapshot;published:boolean;createdAt:string;best:number;hear:number;myBest:boolean;myHear:boolean}
+export type CastRecord={rating?:BoardRating;id:string;ownerId:string;username:string;challengeId:string;snapshot:CastSnapshot;published:boolean;createdAt:string;best:number;hear:number;myBest:boolean;myHear:boolean}
 export function isBritish(value:string){return value.split(/[,;/|]/).some(s=>/^(british|united kingdom|uk|u\.k\.|england|english|scotland|scottish|wales|welsh|northern ireland|northern irish)$/i.test(s.trim()))}
 export function validateCast(body:unknown,catalogue:Catalogue):CastInput{
  if(!body||typeof body!=='object')throw new Error('Invalid cast.')
