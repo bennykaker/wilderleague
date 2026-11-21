@@ -3,6 +3,7 @@ import {useEffect, useMemo, useRef, useState} from 'react'
 import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
+import CastingTutorial from './CastingTutorial'
 import ActorPortrait from './ActorPortrait'
 import {CastingTip,CastingTipsProvider} from './CastingTips'
 import {literaryTitles} from '../../lib/tester/books'
@@ -22,12 +23,6 @@ const welcomeCast = [
   {actor:'Tatiana Maslany', role:'Leslie Knope', photo:'x8lBkm9CBJbIlLpqjEwkQydZ2or'},
   {actor:'Ryan Gosling', role:'Sam Vimes', photo:'k50021gkK92Lx6m99pBy6FUOvNf'},
   {actor:'Theo James', role:'Rhysand', photo:'lSC4cMhcQeCjPFkK6qCjSGDSeR3'},
-]
-
-const lessons = [
-  {title:'Pick a story.', text:'Pick a movie or a book. Search for the title you have in mind, or choose one of the suggestions.', label:'Title', example:'The Fellowship of the Ring'},
-  {title:'Put a face to the name.', text:'Select a character. Drag a living actor’s headshot into the outlined slot for that role. Actors of any gender can play the part.', label:'Role', example:'Gandalf'},
-  {title:'Make your case.', text:'Add a line about your choices. Sign in to save a private cast or share a link. A book or universe cast can start with a single role.', label:'Your pitch', example:'“I want a Gandalf who seems delighted by hobbits.”'},
 ]
 
 function readDirectory(body:unknown) {
@@ -56,7 +51,8 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
   const [hideSplash,setHideSplash] = useState(false)
   const [atTitlePicker,setAtTitlePicker] = useState(false)
   const splash = useRef<HTMLElement>(null)
-  const [lesson,setLesson] = useState(0)
+  const [roomTutorial,setRoomTutorial] = useState(false)
+  const returnScroll=useRef(0)
   const [mode,setMode] = useState<Room>('library')
   const [selection,setSelection] = useState(initialPicker)
   const [initialTitle,setInitialTitle] = useState('')
@@ -74,7 +70,6 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
   const waitingForTitles=!embeddedCatalogue && !titleIndex.value && !localShelf
   const picker={selection,onChange:setSelection,loading:waitingForTitles && !titleIndex.failed,
     error:waitingForTitles && titleIndex.failed?'The screen titles could not load. You can still cast a book or universe.':'',retry:titleIndex.retry}
-  const lessonTitle = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
@@ -85,16 +80,14 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
     setHideSplash(skip)
     if (params.get('cast') || params.get('title')) {
       setScreen('room')
+    } else if (params.get('tutorial')==='1') {
+      setScreen('tutorial')
     } else if (skip && params.get('landing')!=='1') {
       setScreen('room')
     } else {
       setScreen('welcome')
     }
   },[])
-
-  useEffect(() => {
-    if (screen==='tutorial') lessonTitle.current?.focus({preventScroll:true})
-  },[screen,lesson])
 
   useEffect(()=>{
     const heading=splash.current?.querySelector('#library-heading')
@@ -107,6 +100,7 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
   },[screen])
 
   function enter(room:Room,slug='') {
+    if (new URLSearchParams(location.search).get('tutorial')==='1') history.replaceState(null,'',location.pathname)
     setInitialTitle(slug)
     setMode(room)
     setScreen('room')
@@ -116,7 +110,6 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
   function howTo() {
     setInitialTitle('')
     if (location.search) history.replaceState(null,'',location.pathname)
-    setLesson(0)
     setScreen('tutorial')
     window.scrollTo(0,0)
   }
@@ -169,24 +162,26 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
     </main>
   </div>
 
-  if (screen==='room' && (mode==='library'||!partial)) return <TesterApp data={data} publicMode={publicMode}
-    initialMode={mode} initialTitle={initialTitle} preferBundledPhotos={!!embeddedCatalogue} partialCatalogue={partial}
-    directoryFailed={directory.failed} retryDirectory={directory.retry} picker={picker} onTutorial={howTo} onRoomChange={setMode}
-    retryFeatures={features.failed?features.retry:undefined}/>
+  if (screen==='tutorial') return <CastingTutorial exitText="Start casting" onExit={()=>enter('library')}
+    onWelcome={()=>setScreen('welcome')} onGuided={()=>enter('guided')}/>
+  if (screen==='room' && (mode==='library'||!partial)) return <>
+    <div hidden={roomTutorial}><TesterApp data={data} publicMode={publicMode}
+      initialMode={mode} initialTitle={initialTitle} preferBundledPhotos={!!embeddedCatalogue} partialCatalogue={partial}
+      directoryFailed={directory.failed} retryDirectory={directory.retry} picker={picker} onRoomChange={setMode}
+      onTutorial={()=>{returnScroll.current=window.scrollY;setRoomTutorial(true);window.scrollTo(0,0)}}
+      retryFeatures={features.failed?features.retry:undefined}/></div>
+    {roomTutorial&&<CastingTutorial exitText="Return to casting" onExit={()=>{
+      setRoomTutorial(false)
+      requestAnimationFrame(()=>{
+        document.getElementById('open-casting-tutorial')?.focus({preventScroll:true})
+        window.scrollTo(0,returnScroll.current)
+      })
+    }}/>}
+  </>
   return <div className="tester book-entry">
-    <header><button className="brand plain" onClick={()=>setScreen('welcome')}>WilderLeague</button>{screen==='tutorial'&&<button className="plain" onClick={()=>enter('library')}>Skip tutorial</button>}</header>
-    <main>{screen==='tutorial'?<section className="quick-lesson" aria-labelledby="lesson-heading">
-      <div className="lesson-progress" aria-hidden="true">{lessons.map((step,i)=><span key={step.title} className={i<=lesson?'done':''}/>)}</div>
-      <p className="lesson-count">Quick tutorial · {lesson+1} of {lessons.length}</p>
-      <div aria-live="polite"><h1 id="lesson-heading" ref={lessonTitle} tabIndex={-1}>{lessons[lesson].title}</h1><p>{lessons[lesson].text}</p>
-        <div className="example-choice"><small>{lessons[lesson].label}</small><strong>{lessons[lesson].example}</strong></div>
-      </div>
-      <div className="actions">
-        <button onClick={()=>lesson?setLesson(lesson-1):setScreen('welcome')}>Back</button>
-        {lesson<2?<button className="primary" onClick={()=>setLesson(lesson+1)}>Next</button>:<><button className="primary" onClick={()=>enter('library')}>Start casting</button><button onClick={()=>enter('guided')}>Try a guided challenge</button></>}
-      </div>
-    </section>:<section className="quick-lesson" aria-live="polite"><h1>Guided casting</h1><p>{directory.failed?'The full actor list could not load.':'Loading actors for your guided challenge…'}</p>
+    <header><button className="brand plain" onClick={()=>setScreen('welcome')}>WilderLeague</button></header>
+    <main><section className="quick-lesson" aria-live="polite"><h1>Guided casting</h1><p>{directory.failed?'The full actor list could not load.':'Loading actors for your guided challenge…'}</p>
       {directory.failed&&<button className="primary" onClick={directory.retry}>Try again</button>} <button onClick={()=>enter('library')}>Open the casting room</button> <button className="plain" onClick={()=>setScreen('welcome')}>Back to welcome</button>
-    </section>}</main>
+    </section></main>
   </div>
 }
