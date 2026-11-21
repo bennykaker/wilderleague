@@ -40,7 +40,12 @@ test('HTTP API rejects cross-origin writes and preserves account boundaries',asy
  try{
  assert.equal((await post('register',{username:'tester',password:'long test password'},'','http://evil.test')).status,403)
  assert.equal((await post('save',input)).status,401)
- const reg=await post('register',{username:'tester',password:'long test password'});assert.equal(reg.status,200);assert.match(reg.headers.get('set-cookie')!,/HttpOnly; SameSite=Strict/)
+ for(const password of ['short','x'.repeat(129)]) {
+  const rejected=await post('register',{username:'tester',password})
+  assert.equal(rejected.status,400)
+  assert.match((await rejected.json()).error,/6–128 characters/)
+ }
+ const reg=await post('register',{username:'tester',password:'sitcom'});assert.equal(reg.status,200);assert.match(reg.headers.get('set-cookie')!,/HttpOnly; SameSite=Strict/)
  const cookie=reg.headers.get('set-cookie')!.split(';')[0]
  const saved=await (await post('save',input,cookie)).json();assert.ok(saved.cast.id)
  assert.equal((await handle(new Request('http://preview.test/api/preview/cast?id='+saved.cast.id))).status,404)
@@ -49,6 +54,7 @@ test('HTTP API rejects cross-origin writes and preserves account boundaries',asy
  assert.equal((await handle(new Request('http://preview.test/api/preview/cast?id='+saved.cast.id))).status,200)
  assert.equal((await post('export-analysis',input)).status,200)
  await post('logout',{},cookie);assert.equal((await post('save',input,cookie)).status,401)
+ assert.equal((await post('login',{username:'tester',password:'sitcom'})).status,200)
  }finally{s.close()}
 })
 test('exports include complete ensemble and render as PNG without actor photos',async()=>{

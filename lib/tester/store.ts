@@ -4,6 +4,7 @@ import {promisify} from 'node:util'
 import {mkdirSync} from 'node:fs'
 import path from 'node:path'
 import type {BoardCategory,Vote} from './leaderboard'
+import {isValidNewPassword,MAX_PASSWORD_LENGTH,passwordLengthMessage} from './password'
 import type {CastRecord,CastSnapshot,User} from './model'
 const scrypt=promisify(scryptCallback)
 const hash=(s:string)=>createHash('sha256').update(s).digest('hex')
@@ -41,14 +42,14 @@ export class TesterStore{
  }
  async register(username:unknown,password:unknown):Promise<User>{
   if(typeof username!=='string'||! /^[A-Za-z0-9_]{3,24}$/.test(username))throw new StoreError('Use 3–24 letters, numbers or underscores for your username.')
-  if(typeof password!=='string'||password.length<12||password.length>128)throw new StoreError('Use a password of 12–128 characters.')
+  if(!isValidNewPassword(password))throw new StoreError(passwordLengthMessage)
   const id=randomUUID(),salt=randomBytes(16).toString('hex'),derived=await scrypt(password,salt,64) as Buffer
   try{this.db.prepare('INSERT INTO users VALUES(?,?,?,?,?)').run(id,username,username.toLowerCase(),salt,derived.toString('hex'))}
   catch(e){if(String(e).includes('UNIQUE'))throw new StoreError('That username is already taken.',409);throw e}
   return{id,username}
  }
  async login(username:unknown,password:unknown):Promise<User>{
-  if(typeof username!=='string'||typeof password!=='string'||password.length>128)throw new StoreError('Invalid username or password.',401)
+  if(typeof username!=='string'||typeof password!=='string'||password.length>MAX_PASSWORD_LENGTH)throw new StoreError('Invalid username or password.',401)
   const row=this.db.prepare('SELECT * FROM users WHERE username_key=?').get(username.toLowerCase())
   const derived=await scrypt(password,String(row?.salt||'00000000000000000000000000000000'),64) as Buffer
   if(!row||!timingSafeEqual(derived,Buffer.from(String(row.password_hash),'hex')))throw new StoreError('Invalid username or password.',401)

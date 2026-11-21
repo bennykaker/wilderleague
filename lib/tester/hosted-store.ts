@@ -1,4 +1,5 @@
 import type {BoardCategory,Vote} from './leaderboard'
+import {isValidNewPassword,MAX_PASSWORD_LENGTH,passwordLengthMessage} from './password'
 import {createServiceClient} from '../supabase/service'
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,timingSafeEqual} from 'node:crypto'
 import {promisify} from 'node:util'
@@ -12,12 +13,12 @@ export class HostedStore{
  async limit(key:string,max:number,ms:number){await this.rpc('limit',{key:hash(key),max,ms})}
  async register(username:unknown,password:unknown):Promise<User>{
   if(typeof username!=='string'||! /^[A-Za-z0-9_]{3,24}$/.test(username))throw new StoreError('Use 3–24 letters, numbers or underscores for your username.')
-  if(typeof password!=='string'||password.length<12||password.length>128)throw new StoreError('Use a password of 12–128 characters.')
+  if(!isValidNewPassword(password))throw new StoreError(passwordLengthMessage)
   const id=randomUUID(),salt=randomBytes(16).toString('hex'),derived=await scrypt(password,salt,64) as Buffer
   await this.rpc('register',{id,username,salt,password_hash:derived.toString('hex')});return {id,username}
  }
  async login(username:unknown,password:unknown):Promise<User>{
-  if(typeof username!=='string'||typeof password!=='string'||password.length>128)throw new StoreError('Invalid username or password.',401)
+  if(typeof username!=='string'||typeof password!=='string'||password.length>MAX_PASSWORD_LENGTH)throw new StoreError('Invalid username or password.',401)
   const row=await this.rpc('login-record',{username:username.toLowerCase()}),derived=await scrypt(password,String(row?.salt||'00000000000000000000000000000000'),64) as Buffer
   if(!row||!timingSafeEqual(derived,Buffer.from(row.password_hash,'hex')))throw new StoreError('Invalid username or password.',401)
   return{id:row.id,username:row.username}
