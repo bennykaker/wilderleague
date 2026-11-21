@@ -1,6 +1,7 @@
 'use client'
 import {createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useRef, useState} from 'react'
 import type {ReactNode} from 'react'
+import type {SearchTarget} from './CastingSearchField'
 
 const preferenceKey = 'wilderleague:casting-tips'
 const TipsContext = createContext({enabled:false, change:(_value:boolean)=>{}})
@@ -18,26 +19,34 @@ export function CastingTipsProvider({children}:{children:ReactNode}) {
   return <TipsContext.Provider value={{enabled,change}}>{children}</TipsContext.Provider>
 }
 
+export function useCastingTipsEnabled() {
+  return useContext(TipsContext).enabled
+}
+
 export function TipsToggle() {
   const {enabled,change} = useContext(TipsContext)
   return <button type="button" className="tips-toggle" aria-pressed={enabled}
     onClick={()=>change(!enabled)}><span aria-hidden="true">?</span> Casting tips</button>
 }
 
-type Target = 'entry'|'format'|'search'|'title'|'role'|'actor'|'slot'|'review'
+type Target = 'entry'|'format'|'search'|'title'|'role'|'actor'|'slot'|'review'|SearchTarget
 type Side = 'above'|'below'|'right'
 
-export function CastingTip({target,heading,message,prefer='above'}:{
-  target:Target; heading:string; message:string; prefer?:Side
+export function CastingTip({target,heading,message,prefer='above',onDismiss}:{
+  target:Target; heading:string; message:string; prefer?:Side; onDismiss?:()=>void
 }) {
   const {enabled,change} = useContext(TipsContext)
+  const visible = enabled || Boolean(onDismiss)
+  const dismiss = useCallback(()=>{if (onDismiss) onDismiss(); else change(false)},[change,onDismiss])
   const box = useRef<HTMLDivElement>(null)
-  const id = useId()
+  const uniqueId = useId()
+  const id = onDismiss?target+'-instructions':uniqueId
 
   useLayoutEffect(()=>{
-    if (!enabled || !box.current) return
+    if (!visible || !box.current) return
     const bubble = box.current
     const anchors = Array.from(document.querySelectorAll<HTMLElement>('[data-casting-tip="'+target+'"]'))
+    const clipped=new Set<Element>()
     let frame = 0
     let described:HTMLElement|undefined
     function describe(next?:HTMLElement) {
@@ -56,7 +65,7 @@ export function CastingTip({target,heading,message,prefer='above'}:{
       describe()
     }
     function position() {
-      const anchor=anchors.find(el=>el.getClientRects().length>0)
+      const anchor=anchors.find(el=>!clipped.has(el) && el.getClientRects().length>0)
       const rect=anchor?.getBoundingClientRect()
       const width=document.documentElement.clientWidth, height=window.innerHeight
       const margin=10, gap=23, bw=bubble.offsetWidth, bh=bubble.offsetHeight
@@ -91,8 +100,24 @@ export function CastingTip({target,heading,message,prefer='above'}:{
     }
     function schedule() { cancelAnimationFrame(frame);frame=requestAnimationFrame(position) }
     function escape(event:KeyboardEvent) {
-      if (event.key==='Escape' && !event.defaultPrevented && !document.querySelector('[aria-modal=true]') && bubble.style.visibility==='visible') change(false)
+      if (event.key==='Escape' && !event.defaultPrevented && !document.querySelector('[aria-modal=true]') && bubble.style.visibility==='visible') dismiss()
     }
+    function dismissOutside(event:Event) {
+      const el=event.target
+      if (el instanceof Element && !bubble.contains(el) && !el.closest('[data-search-controls="'+target+'"]')) dismiss()
+    }
+    if (onDismiss) {
+      document.addEventListener('pointerdown',dismissOutside,true)
+      document.addEventListener('focusin',dismissOutside,true)
+    }
+    const intersection=new IntersectionObserver(entries=>{
+      for (const entry of entries) {
+        if (entry.isIntersecting) clipped.delete(entry.target)
+        else clipped.add(entry.target)
+      }
+      schedule()
+    })
+    for (const el of anchors) intersection.observe(el)
     position()
     const observer=new ResizeObserver(schedule)
     for (const el of [document.body,bubble,...anchors]) observer.observe(el)
@@ -101,19 +126,25 @@ export function CastingTip({target,heading,message,prefer='above'}:{
     document.addEventListener('keydown',escape)
     return ()=>{
       observer.disconnect()
+      intersection.disconnect()
+      document.removeEventListener('pointerdown',dismissOutside,true)
+      document.removeEventListener('focusin',dismissOutside,true)
       cancelAnimationFrame(frame)
       window.removeEventListener('scroll',schedule,true)
       window.removeEventListener('resize',schedule)
       document.removeEventListener('keydown',escape)
       describe()
     }
-  },[enabled,target,heading,message,prefer,id,change])
+  },[visible,target,heading,message,prefer,id,onDismiss,dismiss])
 
-  if (!enabled) return null
-  return <div className="casting-tip" ref={box}>
+  if (!visible) return null
+  return <div className="casting-tip" data-search-help={onDismiss?true:undefined} ref={box}>
     <div key={heading} className="tip-balloon">
       <div role="tooltip" id={id}><strong>{heading}</strong><p>{message}</p></div>
-      <button type="button" className="tip-close" aria-label="Hide casting tips" onClick={()=>change(false)}>×</button>
+      <button type="button" className="tip-close" aria-label={onDismiss?'Close search help':'Hide casting tips'} onClick={()=>{
+        if (onDismiss) document.querySelector<HTMLButtonElement>('[data-search-controls="'+target+'"] .search-help-button')?.focus({preventScroll:true})
+        dismiss()
+      }}>×</button>
     </div>
     <span className="tip-arrow" aria-hidden="true"><i>↓</i></span>
   </div>

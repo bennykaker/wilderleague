@@ -8,7 +8,7 @@ const actorDragType='application/x-wilderleague-actor'
 type Drag = {actor:TesterActor; method:'native'|'touch'|'keyboard'}
 type Point = {x:number; y:number}
 type Props = {
-  guideStep:'role'|'actor'|'review'
+  guideStep:'role'|'actor'|'review'|null
   hasPicks:boolean
   candidates:TesterActor[]
   roleName:string

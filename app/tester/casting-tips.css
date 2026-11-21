@@ -98,3 +98,14 @@
   .tester .casting-navigation { flex-wrap:wrap; }
   .tester .casting-tip { max-width:min(278px,calc(100vw - 24px)); }
 }
+
+.tester .casting-search-field { margin:12px 0; }
+.tester .search-label-row { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+.tester .search-label-row label { margin:0; }
+.tester .search-help-button {
+  display:inline-grid; place-items:center; width:28px; height:28px; padding:0;
+  border:1px solid #ae8bc9; border-radius:50%; color:#efdaff; background:#35253f;
+  font:bold 16px/1 Georgia,serif;
+}
+.tester .search-help-button:is(:hover,:focus-visible,[aria-expanded=true]) { color:#2b183d; background:#eddaff; }
+.tester .casting-tip[data-search-help] .tip-balloon { pointer-events:auto; }
