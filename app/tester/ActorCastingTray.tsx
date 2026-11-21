@@ -15,10 +15,11 @@ type Props = {
   pickedActor?:TesterActor
   picks:string[]
   detailFor:(actor:TesterActor)=>string|undefined
+  onInspect:(actor:TesterActor)=>void
   onCast:(id:string)=>void
 }
 
-export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName,pickedActor,picks,detailFor,onCast}:Props) {
+export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName,pickedActor,picks,detailFor,onCast,onInspect}:Props) {
   const slot=useRef<HTMLDivElement>(null)
   const keyboardSource=useRef<HTMLButtonElement|null>(null)
   const pointer=useRef<{id:number; start:Point; lifted:boolean}|null>(null)
@@ -109,8 +110,8 @@ export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName
     <div className="actors">{candidates.map((actor,index)=>{
       const chosen=pickedActor?.id===actor.id
       const used=!chosen && picks.includes(actor.id)
-      return <button key={actor.id} data-casting-tip={actor.id===firstAvailable?.id?'actor':undefined} type="button" disabled={used} draggable={!used}
-        className={chosen?'chosen':''} aria-label={'Drag '+actor.name+' to cast '+roleName} aria-describedby="actor-key-help"
+      return <div className="candidate-card" key={actor.id}><button data-casting-tip={actor.id===firstAvailable?.id?'actor':undefined} type="button" disabled={used} draggable={!used}
+        className={'actor-drag'+(chosen?' chosen':'')} aria-label={'Drag '+actor.name+' to cast '+roleName} aria-describedby="actor-key-help"
         onKeyDown={event=>{
           if (event.key!==' ' && event.key!=='Enter') return
           event.preventDefault()
@@ -146,6 +147,9 @@ export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName
           <small>{used?'Already cast':detailFor(actor)}</small>
         </span>
       </button>
+      <button type="button" className="analysis-trigger" aria-haspopup="dialog" aria-label={'Actor analysis for '+actor.name}
+        onClick={()=>onInspect(actor)}>Actor analysis</button>
+      </div>
     })}</div>
     {point && drag?.method==='touch' && <span className="touch-drag-label" aria-hidden="true"
       style={{left:point.x,top:point.y}}>{drag.actor.name}</span>}
