@@ -4,12 +4,12 @@ import { getChallenge } from '../../../data/challenges'
 import { getTitle } from '../../../data/titles'
 import ChallengeTop10Client from '../../../components/ChallengeTop10Client'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export default async function ChallengeTop10Page({ params }: { params: Promise<{ id: string }> }) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const { id } = await params
 
   const challenge = getChallenge(id)

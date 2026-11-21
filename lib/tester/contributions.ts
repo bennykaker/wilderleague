@@ -1,6 +1,6 @@
 import {clientAddress} from './client-address'
 import {createHash} from 'node:crypto'
-import sharp from 'sharp'
+import {imageSize} from 'image-size'
 import {StoreError,TesterStore} from './store'
 import type {HostedStore} from './hosted-store'
 import type {Challenge} from './model'
@@ -52,8 +52,8 @@ export async function receiveContribution(req:Request,store:HostedStore|TesterSt
     const bytes=Buffer.from(await file.arrayBuffer())
     let format:string|undefined
     try {
-      const meta=await sharp(bytes,{limitInputPixels:48_000_000}).metadata()
-      format=meta.format
+      const meta=imageSize(bytes)
+      format=meta.type==='jpg'?'jpeg':meta.type
       if (!meta.width || !meta.height || meta.width*meta.height>48_000_000)throw new Error()
     } catch {throw new StoreError('Choose a readable image of up to 48 megapixels.')}
     if (!['png','jpeg','webp'].includes(format||''))throw new StoreError('Choose a PNG, JPEG or WebP image.')

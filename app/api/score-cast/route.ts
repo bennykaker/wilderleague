@@ -113,12 +113,12 @@ Return ONLY this JSON (no markdown):
   }
 }
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function POST(req: NextRequest) {
+  const serviceSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const body = await req.json()
   const { movie_slug, movie_title, budget = 100, cast = [], isChallenge = false } = body
 

@@ -2,10 +2,6 @@ import { NextRequest } from 'next/server'
 import { createClient } from '../../../lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
-const serviceSupabase = createServiceClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 function computeCastKey(movieSlug: string, selections: Record<string, string>): string {
   const pairs = Object.entries(selections)
@@ -16,6 +12,10 @@ function computeCastKey(movieSlug: string, selections: Record<string, string>): 
 }
 
 export async function POST(request: NextRequest) {
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return Response.json({ error: 'Not signed in' }, { status: 401 })

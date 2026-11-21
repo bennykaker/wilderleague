@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server'
-import { stripe } from '../../../../lib/stripe'
+import { getStripe } from '../../../../lib/stripe'
 import { createClient } from '../../../../lib/supabase/server'
 
 export async function POST(request: NextRequest) {
+  const stripe = getStripe()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return Response.json({ error: 'Not signed in' }, { status: 401 })

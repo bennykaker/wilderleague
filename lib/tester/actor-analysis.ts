@@ -16,7 +16,7 @@ export function mergeAnalysis(current?:ActorAnalysis|null, archived?:ActorAnalys
 }
 
 let archive:Map<string,ActorAnalysis> | undefined
-export function archivedAnalysis(id:string) {
+export function actorArchive() {
   if (!archive) {
     const csv = readFileSync(path.join(process.cwd(),'data','enriched-actors.csv'),'utf8')
     const rows:(ActorAnalysis & {tmdb_id:string})[] = parse(csv,{columns:true,skip_empty_lines:true})
@@ -27,5 +27,19 @@ export function archivedAnalysis(id:string) {
     }
     archive = profiles
   }
-  return archive.get(id)
+  return archive
+}
+
+
+export function archivedAnalysis(id:string) {
+  return actorArchive().get(id)
+}
+
+export async function readArchivedAnalysis(id:string):Promise<ActorAnalysis|undefined> {
+  if (process.env.WL_CLOUDFLARE !== '1') return archivedAnalysis(id)
+  const {workerBindings}=await import('./worker-bindings')
+  const response=await workerBindings().ASSETS.fetch('https://assets.local/actor-analysis/'+id+'.json')
+  if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+    return response.json() as Promise<ActorAnalysis>
+  }
 }

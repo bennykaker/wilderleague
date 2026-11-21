@@ -29,8 +29,19 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy Wilder League
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Cloudflare Workers serves `wilderleague.com` and `www.wilderleague.com` through the `wilderleague-game` Worker. Supabase holds accounts, casts, votes, and Big Pudding usage limits.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+With Node 24 installed, run the following from the project root. The Cloudflare build uses the project's public `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Set those in the build environment or in the checkout's `.env.local`. The deployed Worker receives its private keys from Cloudflare secrets.
+
+```sh
+npm ci
+node --import tsx --test tests/*.test.ts
+npm run build:cloudflare
+npm run deploy:cloudflare
+```
+
+Cloudflare runs the monthly title refresh on the first of the month at 08:00 UTC.
+
+The root domain redirects to `www`. A production response from `/api/preview/me` includes `X-WilderLeague-Host: cloudflare-workers`.

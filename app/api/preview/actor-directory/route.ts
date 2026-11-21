@@ -1,7 +1,6 @@
 import {getCastingDirectory} from '../../../../lib/tester/catalogue'
 
-export const dynamic = 'force-static'
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
 // Build the public directory before deployment and serve the last successful
@@ -13,5 +12,5 @@ export async function GET() {
 
   const directory = await getCastingDirectory()
   if (!directory.actors.length) throw new Error('The casting directory is empty.')
-  return Response.json(directory)
+  return Response.json(directory,{headers:{'Cache-Control':'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400'}})
 }

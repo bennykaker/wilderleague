@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function GET(request: NextRequest) {
+  const serviceSupabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const { searchParams } = new URL(request.url)
   const title_slug = searchParams.get('title_slug')
   const category = searchParams.get('category') ?? 'best_cast' // 'best_cast' | 'hear_me_out'

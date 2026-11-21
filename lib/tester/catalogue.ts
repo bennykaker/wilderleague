@@ -79,7 +79,11 @@ async function loadChallengeRosters(cached:boolean) {
  return [...coreRosters,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(r.originalActor)||''}))}))
 }
 
-export const getCastingDirectory=cache(()=>loadCastingDirectory(true))
+export const getCastingDirectory=cache(async()=>{
+  if(process.env.WL_CLOUDFLARE!=='1')return loadCastingDirectory(true)
+  const {cloudflareDirectory}=await import('./worker-directory')
+  return cloudflareDirectory(()=>loadCastingDirectory(false))
+})
 export const getChallengeRosters=cache(()=>loadChallengeRosters(true))
 async function loadCatalogue(cached:boolean):Promise<Catalogue>{
  const [directory,rosters,titles]=await Promise.all([

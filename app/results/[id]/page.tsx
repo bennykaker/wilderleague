@@ -4,12 +4,12 @@ import { createClient as createServerClient } from '../../../lib/supabase/server
 import { getTitle, getRolesForTitle } from '../../data/titles'
 import ResultsClient from './ResultsClient'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export default async function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
   const { id } = await params
 
   const authClient = await createServerClient()

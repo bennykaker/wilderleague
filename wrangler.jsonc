@@ -1,11 +1,50 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "wilderleague-game",
-  "main": ".open-next/worker.js",
+  "main": "cloudflare-worker.mjs",
   "compatibility_date": "2026-11-19",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "assets": {"binding": "ASSETS", "directory": ".open-next/assets"},
-  "services": [{"binding": "WORKER_SELF_REFERENCE", "service": "wilderleague-game"}],
-  "vars": {"WILDERLEAGUE_PUBLIC": "1", "WL_CLOUDFLARE": "1"},
-  "workers_dev": true
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "wilderleague-game"
+    }
+  ],
+  "vars": {
+    "WILDERLEAGUE_PUBLIC": "1",
+    "WL_CLOUDFLARE": "1"
+  },
+  "workers_dev": true,
+  "rules": [
+    {
+      "type": "Data",
+      "globs": [
+        "**/Geist-Regular.ttf"
+      ],
+      "fallthrough": true
+    }
+  ],
+  "minify": true,
+  "routes": [
+    {
+      "pattern": "wilderleague.com/*",
+      "zone_name": "wilderleague.com"
+    },
+    {
+      "pattern": "www.wilderleague.com/*",
+      "zone_name": "wilderleague.com"
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "0 8 1 * *"
+    ]
+  }
 }

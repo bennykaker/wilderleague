@@ -1,4 +1,4 @@
-import {analysisFields,archivedAnalysis,mergeAnalysis,type ActorAnalysis} from '../../../../../lib/tester/actor-analysis'
+import {analysisFields,readArchivedAnalysis,mergeAnalysis,type ActorAnalysis} from '../../../../../lib/tester/actor-analysis'
 import {createServiceClient} from '../../../../../lib/supabase/service'
 
 export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}) {
@@ -7,7 +7,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
   }
   const {id} = await params
   if (!/^[1-9]\d{0,11}$/.test(id)) return Response.json({error:'Invalid actor ID.'},{status:400})
-  const archived = archivedAnalysis(id)
+  const archived = await readArchivedAnalysis(id)
   try {
     const {data,error} = await createServiceClient().from('actors').select(analysisFields.join(',')).eq('tmdb_id',id).maybeSingle<ActorAnalysis>()
     if (error) throw error

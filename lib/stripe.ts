@@ -11,9 +11,11 @@ function getEnv(name: string): string {
   } catch { return '' }
 }
 
-export const stripe = new Stripe(getEnv('STRIPE_SECRET_KEY'), {
-  apiVersion: '2026-03-25.dahlia',
-})
+let client: Stripe | undefined
+export function getStripe() {
+  client ??= new Stripe(getEnv('STRIPE_SECRET_KEY'), {apiVersion: '2026-03-25.dahlia'})
+  return client
+}
 
 export const PRICE_ID = getEnv('STRIPE_PRICE_ID')
 export const PRICE_ID_DIRECTOR = getEnv('STRIPE_PRICE_ID_DIRECTOR')

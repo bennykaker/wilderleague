@@ -1,8 +1,6 @@
 {
-  "crons": [
-    {
-      "path": "/api/admin/refresh-titles",
-      "schedule": "0 8 1 * *"
-    }
-  ]
+  "git": {
+    "deploymentEnabled": false
+  },
+  "crons": []
 }
