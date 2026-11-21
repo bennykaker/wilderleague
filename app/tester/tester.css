@@ -192,7 +192,7 @@ body:has(>.tester){margin:0;background:#09090b}
 
 .tester.casting-screen main { max-width:1600px; padding-inline:clamp(16px,2.5vw,40px); }
 .tester .casting-navigation { display:flex; justify-content:space-between; align-items:center; }
-.tester .role-tools-toggle { display:none; }
+.tester .role-tools-toggle,.tester .mobile-role-picker { display:none; }
 .tester .casting {
   display:grid;
   grid-template-columns:clamp(190px,20vw,310px) minmax(0,1fr) clamp(224px,22vw,320px);
@@ -243,6 +243,18 @@ body:has(>.tester){margin:0;background:#09090b}
     grid-template-columns:minmax(0,1fr); grid-template-areas:"intro" "tools" "roster" "pool";
     grid-template-rows:auto; row-gap:8px;
   }
+  .tester.casting-screen header { padding:8px 16px; }
+  .tester.casting-screen nav { width:100%; flex-wrap:nowrap; overflow-x:auto; padding-block:3px; }
+  .tester.casting-screen nav button { flex:none; white-space:nowrap; padding-inline:6px; }
+  .tester.casting-screen header .brand { padding-block:4px; }
+  .tester .actor-pool .cast-slot { min-height:64px; padding:8px 10px; }
+  .tester .casting .casting-roster aside { display:none; }
+  .tester .casting-roster .mobile-role-picker {
+    display:flex; gap:10px; align-items:center; margin:0;
+  }
+  .tester .mobile-role-picker select { flex:1; min-width:0; margin:0; padding:7px 10px; }
+  .tester .casting-intro .roster-tools,.tester .casting-intro .draft-bar { font-size:13px; }
+  .tester .casting-intro .roster-tools details { margin-block:2px; padding-block:2px; }
   .tester .role-tools-toggle { display:inline-block; padding:6px 10px; font-size:13px; }
   .tester .role-search-panel { position:static; max-height:none; }
   .tester .role-search-panel:not(.expanded) { display:none; }
