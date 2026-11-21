@@ -1,4 +1,5 @@
 'use client'
+import {TipsToggle} from './CastingTips'
 import BoardBallot from './BoardBallot'
 import type {Vote} from '../../lib/tester/leaderboard'
 import ActorPortrait, {hasBundledPortrait} from './ActorPortrait'
@@ -39,6 +40,7 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  const [discoveryIntroDismissed,setDiscoveryIntroDismissed]=useState(false)
  const [suggestionSeed,setSuggestionSeed]=useState(0)
  function refreshSuggestions(){setSuggestionSeed(Math.floor(Math.random()*4294967296));setLimit(24)}
+ const [actorTip,setActorTip]=useState(false)
  const [roleToolsOpen,setRoleToolsOpen]=useState(false)
  const [searchMode,setSearchMode]=useState<'name'|'description'>('name')
  const [opened,setOpened]=useState<Challenge[]>([])
@@ -86,8 +88,8 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  useEffect(()=>{if(view==='cast'&&ready){try{localStorage.setItem('wl-tester:'+challengeId,JSON.stringify({picks,pitch,roleIds:challenge.literary?challenge.roles.map(r=>r.id):undefined}))}catch{}}},[view,ready,challengeId,picks,pitch])
  const [boardRevision,setBoardRevision]=useState(0)
  useEffect(()=>{if(view!=='board'&&view!=='mine')return;let active=true;setRecords([]);api(view==='mine'?'mine':`board?challenge=${challengeId}&category=${category}`).then(d=>{if(active)setRecords(d.casts)}).catch(e=>{if(active)setNotice(e.message)});return()=>{active=false}},[view,challengeId,category,user,boardRevision])
- function start(id:string,override?:Challenge){setRoleToolsOpen(false);setRoleSearch('');refreshSuggestions();const c=override||data.challenges.find(c=>c.id===id)!;let draft={picks:Array(c.roles.length).fill('') as string[],pitch:''};try{const d=JSON.parse(localStorage.getItem('wl-tester:'+id)||'null');if(id!=='custom'&&d&&Array.isArray(d.picks)&&(d.picks.length===c.roles.length || c.literary&&Array.isArray(d.roleIds))){const eligible=new Set(data.pools[id]||data.actors.map(a=>a.id));const stored=c.literary&&Array.isArray(d.roleIds)?c.roles.map(r=>d.picks[d.roleIds.indexOf(r.id)]):d.picks;draft={picks:stored.map((v:unknown)=>typeof v==='string'&&(partialCatalogue||eligible.has(v))?v:''),pitch:typeof d.pitch==='string'?d.pitch.slice(0,1000):''}}}catch{}setSearchMode(id===initialData.challenges[1].id?'description':'name');setChallengeId(id);setPicks(draft.picks);setPitch(draft.pitch);setRole(Math.max(0,draft.picks.findIndex(x=>!x)));setSaved(null);setSearch('');setLimit(24);setReady(true);setView('cast');setNotice('')}
- async function openCast(c:CastRecord) {setRoleToolsOpen(false);
+ function start(id:string,override?:Challenge){setActorTip(false);setRoleToolsOpen(false);setRoleSearch('');refreshSuggestions();const c=override||data.challenges.find(c=>c.id===id)!;let draft={picks:Array(c.roles.length).fill('') as string[],pitch:''};try{const d=JSON.parse(localStorage.getItem('wl-tester:'+id)||'null');if(id!=='custom'&&d&&Array.isArray(d.picks)&&(d.picks.length===c.roles.length || c.literary&&Array.isArray(d.roleIds))){const eligible=new Set(data.pools[id]||data.actors.map(a=>a.id));const stored=c.literary&&Array.isArray(d.roleIds)?c.roles.map(r=>d.picks[d.roleIds.indexOf(r.id)]):d.picks;draft={picks:stored.map((v:unknown)=>typeof v==='string'&&(partialCatalogue||eligible.has(v))?v:''),pitch:typeof d.pitch==='string'?d.pitch.slice(0,1000):''}}}catch{}setSearchMode(id===initialData.challenges[1].id?'description':'name');setChallengeId(id);setPicks(draft.picks);setPitch(draft.pitch);setRole(Math.max(0,draft.picks.findIndex(x=>!x)));setSaved(null);setSearch('');setLimit(24);setReady(true);setView('cast');setNotice('')}
+ async function openCast(c:CastRecord) {setActorTip(false);setRoleToolsOpen(false);
   let roster=c.snapshot.challenge
   if(roster.literary) {
     try {const slug=c.challengeId.slice(5);roster=literaryChallenge(slug)||(await api('title?slug='+encodeURIComponent(slug))).challenge}
@@ -123,11 +125,13 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  }
  function castActor(actorId:string) {
   if (picks.includes(actorId)) return
+  setActorTip(false)
   setPicks(previous=>previous.map((pick,i)=>i===role?actorId:pick))
   setReady(true)
   setSaved(null)
  }
  function selectCastingRole(index:number) {
+  setActorTip(true)
   setRole(index)
   setSearch('')
   setLimit(24)
@@ -143,6 +147,7 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  {view==='cast'&&<>
  <div className="casting-navigation">
    <button className="plain" onClick={()=>guided?setView('home'):home()}>{guided?'← Introduction':'← Casting room'}</button>
+   <TipsToggle/>
    <button className="role-tools-toggle" aria-controls="role-search-panel" aria-expanded={roleToolsOpen} onClick={()=>setRoleToolsOpen(open=>!open)}>Role &amp; actor search</button>
  </div>
  <div className="casting"><div className="casting-intro">{guided&&<p className="eyebrow">OPENING CHALLENGE {journey.stage+1} OF 3</p>}<div className="section-title"><div><p className="eyebrow">{challenge.season} · {picks.filter(Boolean).length}/{challenge.roles.length} CAST</p><h1>{challenge.title}</h1><p>{challenge.rule}</p></div>{challenge.source&&<a href={challenge.source} target="_blank" rel="noreferrer">Roster reference ↗</a>}</div>{challenge.id.startsWith('free:')&&<section className="roster-tools">{challenge.literary?.kind==='book'&&challenge.literary.universeSlug&&<button className="plain" disabled={busy} onClick={()=>openTitle(challenge.literary!.universeSlug!)}>Cast the {challenge.literary.universe} universe</button>}{challenge.literary?.books&&<details><summary>Books in this universe ({challenge.literary.books.length})</summary><ul className="source-list">{challenge.literary.books.map(b=><li key={b.slug}><button className="plain" onClick={()=>openTitle(b.slug)} disabled={busy}>{b.title}</button> · <a href={b.source} target="_blank" rel="noreferrer">Book reference</a></li>)}</ul></details>}<RosterContribution key={challenge.id} challenge={challenge} roleName={challenge.roles[role].name}/></section>}
@@ -151,12 +156,13 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  </div>
  <div className={challenge.literary?'casting-roster roster-pane':'casting-roster'}>{challenge.literary&&challenge.roles.length>10&&<label>Find a character<input type="search" value={roleSearch} placeholder="Character name" onChange={e=>setRoleSearch(e.target.value)}/></label>}
  <label className="mobile-role-picker">Role
-   <select value={selectedRoleVisible?String(role):''} onChange={e=>selectCastingRole(Number(e.target.value))}>
+   <select data-casting-tip="role" value={selectedRoleVisible?String(role):''} onChange={e=>selectCastingRole(Number(e.target.value))}>
      {!selectedRoleVisible&&<option value="" disabled>{visibleRoles.length?'Choose a matching role':'No matching characters'}</option>}
      {visibleRoles.map(({r,i})=><option key={r.id} value={i}>{i+1}. {r.name}{picks[i]?' — '+(actors.get(picks[i])?.name||'Cast'):''}</option>)}
    </select>
  </label>
  <aside aria-label="Roles">{visibleRoles.map(({r,i})=><button
+   data-casting-tip={i===(picks[role]?picks.findIndex(p=>!p):role)?'role':undefined}
    className={'role '+(i===role?'selected':'')} key={r.id} aria-pressed={i===role}
    onClick={()=>selectCastingRole(i)}>{!challenge.literary&&<OriginalPhoto key={originalImage(r)} name={r.originalActor} src={originalImage(r)}/>}<span className="role-label">{i===role&&<span className="active-role-label">Selected</span>}<span>{i+1}. {r.name}</span>{r.originalActor&&<small>Original: {r.originalActor}</small>}<strong>{actors.get(picks[i])?.name||(picks[i]?'Saved actor pick':'Choose an actor')}</strong></span>{actors.get(picks[i])&&<ActorPortrait name={actors.get(picks[i])!.name} src={actors.get(picks[i])!.image} className="role-pick-photo" compact/>}</button>)}{!visibleRoles.length&&<p>No matching characters.</p>}</aside></div>
  <section id="role-search-panel" aria-label="Role details and actor search" className={'role-search-panel'+(roleToolsOpen?' expanded':'')}>
@@ -178,7 +184,8 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  <div className="pool-toolbar"><p className="muted">{search.trim() && <>{pool.length.toLocaleString('en-US')} {pool.length===1?'match':'matches'} · </>}
    {eligibleActors.length.toLocaleString('en-US')} {partialCatalogue?'starter actors available':'actors in this pool'}.
  </p>{!search.trim()&&<button className="plain" onClick={refreshSuggestions}>Show a different mix ↻</button>}</div>
- <ActorCastingTray key={challenge.id+'/'+challenge.roles[role].id} candidates={pool.slice(0,limit)}
+ {complete&&<a className="review-cast-link" data-casting-tip="review" href="#finish-casting">Review your cast ↓</a>}
+ <ActorCastingTray guideStep={complete?'review':actorTip?'actor':'role'} hasPicks={filledRoles.length>0} key={challenge.id+'/'+challenge.roles[role].id} candidates={pool.slice(0,limit)}
    roleName={challenge.roles[role].name} pickedActor={pickedActor} picks={picks} onCast={castActor}
    detailFor={a=>activeAI?activeAI.matches.find(m=>m.id===a.id)?.reason:description&&search.trim()?reasons.get(a.id):a.knownFor||a.nationality}/>
  {!pool.length&&<p>{description?'No catalogue matches in this actor pool. Try a broader description or switch to name search.':'No matches. Try another name.'}</p>}{pool.length>limit&&<button onClick={()=>setLimit(limit+24)}>Show more actors</button>}</section></div><section id="finish-casting" className="finish"><h2>{canSave?'Your cast':'Make your case'}</h2>{challenge.literary&&<p className="muted">Your draft keeps your place on this device. You can share after casting one role.</p>}{filledRoles.length>0&&<div className="cast-summary">{challenge.roles.map((r,i)=>picks[i]&&<CastCredit key={r.id} role={r} actor={actors.get(picks[i])}/>)}</div>}<label>Why these choices? <span className="muted">Optional · {pitch.length}/1,000</span><textarea value={pitch} maxLength={1000} placeholder="Tell people what you see in this cast." onChange={e=>{setPitch(e.target.value);setReady(true);setSaved(null)}}/></label>{guided?<div className="actions"><button className="primary" disabled={!complete||busy} onClick={showResult}>Finish cast & see sample score →</button></div>:<div className="actions"><button disabled={!canSave||busy} onClick={()=>save(false)}>Save privately</button><button className="primary" disabled={!canSave||busy} onClick={()=>save(true)}>{initialData.challenges.some(c=>c.id===challengeId)?'Submit to leaderboards':'Share this cast'}</button><button disabled={!canSave||busy} onClick={()=>download('image')}>Download cast image</button><button disabled={!canSave||busy} onClick={()=>download('analysis')}>Take this cast to your AI</button></div>}{complete&&<><CastingFeedback key={JSON.stringify(payload)} payload={payload}/><BringBack key={JSON.stringify(payload)} snapshot={{challenge,actors:picks.map(id=>actors.get(id)!),pitch:pitch.trim()}} catalogue={data} onApply={next=>{setPicks(next);setReady(true);setSaved(null);setView('cast');setNotice('Accepted AI suggestions applied to your draft. Save when you are ready.')}}/></>}{!complete&&!challenge.literary&&<p>Choose all {challenge.roles.length} roles to finish your cast.</p>}{guided?<p className="sample-label">Sample scores demonstrate the flow; they do not assess your choices. No account required.</p>:<p className="muted">Saving is private. Sharing makes your cast and username visible to other users. Submitting a featured challenge sends the cast and rationale to Anthropic for a starting score on each board.</p>}{saved?.published&&<button onClick={()=>run(async()=>{await navigator.clipboard.writeText(`${location.origin}/tester?cast=${saved.id}`);setNotice('Cast link copied. Share it with someone to show them your cast.')})}>Copy cast link</button>}</section></>}

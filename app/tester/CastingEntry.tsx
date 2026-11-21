@@ -4,12 +4,14 @@ import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
 import ActorPortrait from './ActorPortrait'
+import {CastingTip,CastingTipsProvider} from './CastingTips'
 import {literaryTitles} from '../../lib/tester/books'
 import {starterCatalogue} from '../../lib/tester/starter-catalogue'
 import {useCastingResource} from './useCastingResource'
 import './tester.css'
 import './bookshelf.css'
 import './splash.css'
+import './casting-tips.css'
 
 type Room = 'library'|'guided'
 type Screen = 'starting'|'welcome'|'tutorial'|'room'
@@ -44,9 +46,16 @@ function readRosters(body:unknown):Challenge[] {
   return data.challenges
 }
 
-export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:boolean;embeddedCatalogue?:Catalogue}) {
+type EntryProps = {publicMode:boolean; embeddedCatalogue?:Catalogue}
+export default function CastingEntry(props:EntryProps) {
+  return <CastingTipsProvider><CastingExperience {...props}/></CastingTipsProvider>
+}
+
+function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
   const [screen,setScreen] = useState<Screen>('starting')
   const [hideSplash,setHideSplash] = useState(false)
+  const [atTitlePicker,setAtTitlePicker] = useState(false)
+  const splash = useRef<HTMLElement>(null)
   const [lesson,setLesson] = useState(0)
   const [mode,setMode] = useState<Room>('library')
   const [selection,setSelection] = useState(initialPicker)
@@ -87,6 +96,16 @@ export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:
     if (screen==='tutorial') lessonTitle.current?.focus({preventScroll:true})
   },[screen,lesson])
 
+  useEffect(()=>{
+    const heading=splash.current?.querySelector('#library-heading')
+    if (screen!=='welcome' || !heading) return
+    const observer=new IntersectionObserver(([entry])=>{
+      setAtTitlePicker(entry.boundingClientRect.top<(entry.rootBounds?.bottom ?? window.innerHeight))
+    },{rootMargin:'0px 0px -12% 0px'})
+    observer.observe(heading)
+    return ()=>observer.disconnect()
+  },[screen])
+
   function enter(room:Room,slug='') {
     setInitialTitle(slug)
     setMode(room)
@@ -116,20 +135,23 @@ export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:
 
   if (screen==='starting') return <div className="splash-boot" aria-label="Opening WilderLeague" aria-busy="true"/>
   if (screen==='welcome') return <div className="tester wl-splash">
-    <main className="splash-layout">
+    <main className="splash-layout" ref={splash}>
       <section className="welcome-feature" aria-labelledby="welcome-title">
         <div className="welcome-story">
-          <h1 id="welcome-title"><span>Welcome to </span>Wilder League.</h1>
-          <a className="welcome-jump" href="#library-heading">Pick a title <span aria-hidden="true">↓</span></a>
-          <p className="welcome-lede">This is a game. It is for film and book nerds.</p>
-          <div className="welcome-copy">
-            <p>The idea is that you pick an old movie and recast it with actors you think could do a better job.</p>
-            <p>Or maybe do a recast with constraints, like recasting <em>Parks &amp; Rec</em> with Canadian actors (Will Sasso as Ron Swanson? Tatiana Maslany as Leslie Knope?). Or recast <em>The West Wing</em> with actors from the Chuck Lorre Cinematic Universe.</p>
-            <p>For the book nerds, you can cast that novel with actors. Ryan Gosling as Sam Vimes from <em>Guards! Guards!</em>? Is Theo James as Rhysand just too obvious?</p>
-            <p>Pick the cast, get the AI to review, post it on your favourite feed, and then submit it to our high score list (decided by <strong>Big Pudding</strong>, our in-house AI, and then by member voting).</p>
+          <div className="welcome-balloon">
+            <h1 id="welcome-title"><span>Welcome to </span>Wilder League.</h1>
+            <a className="welcome-jump" href="#library-heading">Pick a title <span aria-hidden="true">↓</span></a>
+            <p className="welcome-lede">This is a game. It is for film and book nerds.</p>
+            <div className="welcome-copy">
+              <p>The idea is that you pick an old movie and recast it with actors you think could do a better job.</p>
+              <p>Or maybe do a recast with constraints, like recasting <em>Parks &amp; Rec</em> with Canadian actors (Will Sasso as Ron Swanson? Tatiana Maslany as Leslie Knope?). Or recast <em>The West Wing</em> with actors from the Chuck Lorre Cinematic Universe.</p>
+              <p>For the book nerds, you can cast that novel with actors. Ryan Gosling as Sam Vimes from <em>Guards! Guards!</em>? Is Theo James as Rhysand just too obvious?</p>
+              <p>Pick the cast, get the AI to review, post it on your favourite feed, and then submit it to our high score list (decided by <strong>Big Pudding</strong>, our in-house AI, and then by member voting).</p>
+            </div>
           </div>
           <div className="splash-paths" role="group" aria-label="Welcome options">
-            <div className="splash-choices">
+            {!atTitlePicker&&<CastingTip target="entry" heading="Ready to cast?" message="Take the quick tutorial or go straight to the casting room." prefer="right"/>}
+            <div className="splash-choices" data-casting-tip="entry">
               <button className="splash-new" onClick={()=>selectPath('new')}>New here<small>Take the quick tutorial</small></button>
               <button className="splash-expert" onClick={()=>selectPath('expert')}>Expert Caster<small>Enter the casting room</small></button>
             </div>
@@ -143,7 +165,7 @@ export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:
           </figure>)}
         </div>
       </section>
-      <CastingLibrary {...picker} headingLevel={2} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
+      <CastingLibrary {...picker} headingLevel={2} showTips={atTitlePicker} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
     </main>
   </div>
 

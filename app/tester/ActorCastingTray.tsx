@@ -1,12 +1,15 @@
 'use client'
 import {useRef,useState,type DragEvent,type KeyboardEvent,type PointerEvent} from 'react'
 import type {TesterActor} from '../../lib/tester/model'
+import {CastingTip} from './CastingTips'
 import ActorPortrait from './ActorPortrait'
 
 const actorDragType='application/x-wilderleague-actor'
 type Drag = {actor:TesterActor; method:'native'|'touch'|'keyboard'}
 type Point = {x:number; y:number}
 type Props = {
+  guideStep:'role'|'actor'|'review'
+  hasPicks:boolean
   candidates:TesterActor[]
   roleName:string
   pickedActor?:TesterActor
@@ -15,7 +18,7 @@ type Props = {
   onCast:(id:string)=>void
 }
 
-export default function ActorCastingTray({candidates,roleName,pickedActor,picks,detailFor,onCast}:Props) {
+export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName,pickedActor,picks,detailFor,onCast}:Props) {
   const slot=useRef<HTMLDivElement>(null)
   const keyboardSource=useRef<HTMLButtonElement|null>(null)
   const pointer=useRef<{id:number; start:Point; lifted:boolean}|null>(null)
@@ -63,11 +66,19 @@ export default function ActorCastingTray({candidates,roleName,pickedActor,picks,
     keyboardSource.current?.focus({preventScroll:true})
   }
 
+  const firstAvailable=candidates.find(actor=>!picks.includes(actor.id))
   return <div className="cast-tray">
+    {drag ? <CastingTip target="slot" heading={'Cast '+drag.actor.name+' here.'}
+      message={drag.method==='keyboard'?'Press Space or Enter to confirm. Escape cancels.':'Release over the outlined slot for '+roleName+'.'}/> :
+     guideStep==='review' ? <CastingTip target="review" heading="Your cast is ready." message="Review your lineup and add a pitch for your choices."/> :
+     guideStep==='actor' && firstAvailable ? <CastingTip key={firstAvailable.id} target="actor" heading={'Who plays '+roleName+'?'}
+       message="Drag an actor into the outlined slot. On a phone, use the Drag handle." prefer="below"/> :
+     guideStep==='role' ? <CastingTip target="role" heading={hasPicks?'Choose your next role.':'Choose a role.'}
+       message={hasPicks?'Select another character to keep casting.':roleName+' is selected. You can start here or pick another character.'}/> : null}
     <p className="cast-instructions">
       Select a role, then drag <span className="mouse-instruction">an actor’s headshot</span><span className="touch-instruction">the Drag handle on an actor card</span> into the outlined slot.
     </p>
-    <div ref={slot} className={'cast-slot'+(drag?' ready':'')+(over?' over':'')}
+    <div ref={slot} data-casting-tip="slot" className={'cast-slot'+(drag?' ready':'')+(over?' over':'')}
       role="group" aria-label={'Casting slot for '+roleName} tabIndex={-1}
       onKeyDown={useSlotKey} onBlur={()=>{if(drag?.method==='keyboard') endDrag()}}
       onDragOver={event=>{
@@ -98,7 +109,7 @@ export default function ActorCastingTray({candidates,roleName,pickedActor,picks,
     <div className="actors">{candidates.map((actor,index)=>{
       const chosen=pickedActor?.id===actor.id
       const used=!chosen && picks.includes(actor.id)
-      return <button key={actor.id} type="button" disabled={used} draggable={!used}
+      return <button key={actor.id} data-casting-tip={actor.id===firstAvailable?.id?'actor':undefined} type="button" disabled={used} draggable={!used}
         className={chosen?'chosen':''} aria-label={'Drag '+actor.name+' to cast '+roleName} aria-describedby="actor-key-help"
         onKeyDown={event=>{
           if (event.key!==' ' && event.key!=='Enter') return

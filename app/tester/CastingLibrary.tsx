@@ -1,5 +1,6 @@
 'use client'
 import {useMemo, useRef, useState} from 'react'
+import {CastingTip,TipsToggle} from './CastingTips'
 import ActorPortrait, {featuredActors} from './ActorPortrait'
 import type {LibraryTitle} from '../../lib/tester/model'
 
@@ -33,13 +34,14 @@ function TitleArt({item}:{item:LibraryTitle}) {
   </span>
 }
 
-export default function CastingLibrary({titles,busy,open,selection,onChange,headingLevel=1,loading=false,error='',retry}:PickerControls & {
-  titles:LibraryTitle[]; busy:boolean; headingLevel?:1|2; open:(slug:string)=>void; loading?:boolean; error?:string; retry?:()=>void
+export default function CastingLibrary({titles,busy,open,selection,onChange,headingLevel=1,showTips=true,loading=false,error='',retry}:PickerControls & {
+  titles:LibraryTitle[]; busy:boolean; headingLevel?:1|2; showTips?:boolean; open:(slug:string)=>void; loading?:boolean; error?:string; retry?:()=>void
 }) {
   const Heading=headingLevel===1?'h1':'h2'
   const Subheading=headingLevel===1?'h2':'h3'
   const {format,query,shelf,browse,page} = selection
   const config = formats[format]
+  const [formatChosen,setFormatChosen]=useState(false)
   const search = useRef<HTMLInputElement>(null)
   const results = useRef<HTMLDivElement>(null)
   const index = useMemo(()=>titles.map(item=>({
@@ -63,19 +65,25 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,head
   const visible = showingResults ? matches.slice(start,start+pageSize) : [...new Set([...picks,...matches])].slice(0,3)
 
   function changeFormat(next:Format) {
+    setFormatChosen(true)
     onChange({...initialPicker,format:next,query})
     search.current?.focus({preventScroll:true})
   }
 
   return <section className="casting-library" aria-labelledby="library-heading">
-    <Heading id="library-heading">What are you casting?</Heading>
-    <div className="primary-formats" role="group" aria-label="Choose a casting format">
+    <div className="library-title-row"><Heading id="library-heading">What are you casting?</Heading><TipsToggle/></div>
+    {showTips && (showingResults && visible.length>0 && !loading && !error
+      ? <CastingTip key={visible[0].slug} target="title" heading="Open a title." message="Pick a title from the results to see its roles." prefer="below"/>
+      : formatChosen || showingResults
+      ? <CastingTip target="search" heading="Find your story." message="Type a title here, or choose a suggestion below."/>
+      : <CastingTip target="format" heading="Movie or book?" message="Pick what you want to cast." prefer="right"/>)}
+    <div className="primary-formats" data-casting-tip="format" role="group" aria-label="Choose a casting format">
       {(['movie','book'] as const).map(key=><button key={key} type="button" aria-pressed={format===key} onClick={()=>changeFormat(key)}>{formats[key].label}</button>)}
     </div>
     <form className="title-search" role="search" onSubmit={e=>{e.preventDefault();results.current?.querySelector('button')?.focus()}}>
       <div className="title-query"><label htmlFor="library-search">{config.question}</label>
         <div className="query-field"><span className="magnifier" aria-hidden="true"/>
-          <input ref={search} id="library-search" type="search" placeholder={config.hint} value={query} onChange={e=>onChange({...selection,query:e.target.value,page:0})}/>
+          <input ref={search} data-casting-tip="search" id="library-search" type="search" placeholder={config.hint} value={query} onFocus={()=>setFormatChosen(true)} onChange={e=>onChange({...selection,query:e.target.value,page:0})}/>
         </div>
       </div>
       {format==='book'&&<label className="shelf-select">Shelf<select value={shelf} onChange={e=>onChange({...selection,shelf:e.target.value,page:0})}>
@@ -89,7 +97,7 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,head
           {!showingResults&&matches.length>visible.length&&<button className="text-link" onClick={()=>onChange({...selection,browse:true,page:0})}>Browse all {config.plural}</button>}
           {showingResults&&<button className="text-link" onClick={()=>{onChange({...initialPicker,format});search.current?.focus()}}>Back to suggestions</button>}
         </div>
-        {visible.length ? <div className={'book-results'+(showingResults?'':' suggested-titles')} ref={results}>{visible.map(t=><button type="button" key={t.slug} disabled={busy} onClick={()=>open(t.slug)}>
+        {visible.length ? <div className={'book-results'+(showingResults?'':' suggested-titles')} ref={results}>{visible.map((t,i)=><button data-casting-tip={i===0?'title':undefined} type="button" key={t.slug} disabled={busy} onClick={()=>open(t.slug)}>
           {!showingResults&&<TitleArt item={t}/>}
           <span className="title-info"><strong>{t.title}</strong><small>{[t.author || typeNames[t.type] || t.type,t.year,t.type==='universe'&&t.bookCount?t.bookCount+' books':null].filter(Boolean).join(' · ')}</small></span>
         </button>)}</div> : <p className="title-status" role="status">No matches. Try another {format==='book'?'title or author':format==='universe'?'universe or author':'title'}{shelf?' or choose another shelf':''}.</p>}
