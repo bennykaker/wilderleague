@@ -47,3 +47,7 @@ next-env.d.ts
 
 /.next-check/
 /work/
+
+/.open-next/
+/.wrangler/
+/.dev.vars*

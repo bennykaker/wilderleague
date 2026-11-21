@@ -1,3 +1,4 @@
+import {clientAddress} from '../../../lib/tester/client-address'
 import {HostedStore} from '../../../lib/tester/hosted-store'
 import {StoreError} from '../../../lib/tester/store'
 import { NextRequest } from 'next/server'
@@ -6,7 +7,7 @@ import { Resend } from 'resend'
 export async function POST(req: NextRequest) {
   if(process.env.WILDERLEAGUE_PUBLIC==='1'){
     if(req.headers.get('origin')!==`${req.nextUrl.protocol}//${req.headers.get('host')||req.nextUrl.host}`)return Response.json({error:'Reload this page and try again.'},{status:403})
-    try{const store=new HostedStore();await store.limit('contact:'+ (req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim()||'unknown'),3,3600000);await store.limit('contact-global',30,86400000)}catch(e){return Response.json({error:e instanceof StoreError?e.message:'Contact is temporarily unavailable.'},{status:429})}
+    try{const store=new HostedStore();await store.limit('contact:'+ (clientAddress(req)),3,3600000);await store.limit('contact-global',30,86400000)}catch(e){return Response.json({error:e instanceof StoreError?e.message:'Contact is temporarily unavailable.'},{status:429})}
   }
   const raw=await req.text();if(raw.length>12000)return Response.json({error:'Message is too long.'},{status:413})
   let body;try{body=JSON.parse(raw)}catch{return Response.json({error:'Invalid message.'},{status:400})}

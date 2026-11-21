@@ -4,7 +4,8 @@ import {archivedAnalysis,mergeAnalysis} from '../lib/tester/actor-analysis'
 
 test('preserves saved notes and recovers missing columns from the same actor’s archive',()=>{
   const gosling = archivedAnalysis('30614')
-  assert.ok(gosling?.casting_profile?.includes('Gosling'))
+  assert.ok(gosling)
+  assert.ok(gosling.casting_profile?.includes('Gosling'))
   assert.ok(gosling.signature_quality && gosling.weaknesses && gosling.best_cast_as)
   const profile = mergeAnalysis({casting_profile:'Updated casting notes.',signature_quality:' '},gosling)
   assert.equal(profile?.casting_profile,'Updated casting notes.')

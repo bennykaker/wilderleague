@@ -1,4 +1,4 @@
-import {DatabaseSync} from 'node:sqlite'
+import type {DatabaseSync} from 'node:sqlite'
 import {randomBytes,randomUUID,createHash,scrypt as scryptCallback,timingSafeEqual} from 'node:crypto'
 import {promisify} from 'node:util'
 import {mkdirSync} from 'node:fs'
@@ -13,7 +13,8 @@ export class TesterStore{
  db:DatabaseSync
  constructor(file:string){
   if(file!==':memory:')mkdirSync(path.dirname(file),{recursive:true,mode:0o700})
-  this.db=new DatabaseSync(file)
+  const sqlite:typeof import('node:sqlite')=require('node:sqlite')
+  this.db=new sqlite.DatabaseSync(file)
   this.db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
   CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,username TEXT NOT NULL,username_key TEXT UNIQUE NOT NULL,salt TEXT NOT NULL,password_hash TEXT NOT NULL);
   CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),expires INTEGER NOT NULL);

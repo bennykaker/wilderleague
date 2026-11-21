@@ -20,7 +20,7 @@ export default function RootLayout({
         <ProgressBar />
         <MobileGate />
         {children}
-        {process.env.WILDERLEAGUE_PREVIEW !== '1' && <Analytics />}
+        {process.env.VERCEL === '1' && process.env.WILDERLEAGUE_PREVIEW !== '1' && <Analytics />}
       </body>
     </html>
   );

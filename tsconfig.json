@@ -40,6 +40,8 @@
   ],
   "exclude": [
     "node_modules",
-    "work"
+    "work",
+    ".open-next",
+    ".wrangler"
   ]
 }

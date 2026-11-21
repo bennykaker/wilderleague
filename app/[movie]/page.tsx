@@ -6,6 +6,7 @@ import { createClient } from '../../lib/supabase/server'
 import { createServiceClient } from '../../lib/supabase/service'
 
 export async function generateStaticParams() {
+  if (process.env.WL_CLOUDFLARE === '1') return []
   const titles = await getTitles()
   return titles.map(t => ({ movie: t.slug }))
 }

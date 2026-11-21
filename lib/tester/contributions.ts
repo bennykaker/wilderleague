@@ -1,3 +1,4 @@
+import {clientAddress} from './client-address'
 import {createHash} from 'node:crypto'
 import sharp from 'sharp'
 import {StoreError,TesterStore} from './store'
@@ -30,7 +31,7 @@ async function boundedForm(req:Request) {
 export async function receiveContribution(req:Request,store:HostedStore|TesterStore,resolve:(slug:string)=>Promise<Challenge>,deliver=fetch) {
   const url=new URL(req.url)
   if (req.headers.get('origin')!==url.protocol+'//'+(req.headers.get('host')||url.host)) throw new StoreError('Reload this page and try again.',403)
-  const visitor=store instanceof TesterStore?'local-preview':req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim()||'unknown'
+  const visitor=store instanceof TesterStore?'local-preview':clientAddress(req)
   await store.limit('fan-contribution:'+visitor,12,3600000)
   const form=await boundedForm(req)
   function field(key:string,max:number,required=false) {

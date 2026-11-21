@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { NextRequest } from 'next/server'
-import { proxy } from '../proxy'
+import { middleware as proxy } from '../middleware'
 test('preview blocks API requests, including scoring and writes',()=>{
  const previous=process.env.WILDERLEAGUE_PREVIEW
  process.env.WILDERLEAGUE_PREVIEW='1'

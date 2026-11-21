@@ -1,3 +1,4 @@
+import {clientAddress} from './client-address'
 import {hasLeaderboard} from './leaderboard'
 import {literaryChallenge} from './books'
 import {scoreBoardCast} from './board-judge'
@@ -52,7 +53,7 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   let body:Record<string,unknown>;try{body=JSON.parse(raw)}catch{throw new StoreError('Invalid request.')}
   if(!body||typeof body!=='object'||Array.isArray(body))throw new StoreError('Invalid request.')
   // This local preview is not behind a trusted proxy. Ignore caller-supplied IP headers.
-  const visitor=store instanceof HostedStore?(req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim()||'unknown'):'local-preview'
+  const visitor=store instanceof HostedStore?(clientAddress(req)):'local-preview'
   const cookie=(value:string,age:number)=>`${COOKIE}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${age}${url.protocol==='https:'?'; Secure':''}`
   if(action==='register'||action==='login'){
    await store.limit('auth:'+visitor,30,15*60000)
