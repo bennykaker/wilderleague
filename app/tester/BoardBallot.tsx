@@ -1,7 +1,8 @@
 import {AI_NAME} from '../../lib/big-pudding'
 import type {BoardRating,Vote} from '../../lib/tester/leaderboard'
 
-export default function BoardBallot({rating,disabled,onVote}:{
+export default function BoardBallot({rating,disabled,onVote,starter=false}:{
+  starter?:boolean
   rating:BoardRating
   disabled:boolean
   onVote:(vote:Vote)=>void
@@ -9,7 +10,7 @@ export default function BoardBallot({rating,disabled,onVote}:{
   const {ai,score,mine,up,down}=rating
   const total=up+down
   return <section aria-label="Cast score and votes">
-    <p><strong>{score===null?`Awaiting ${AI_NAME}’s score`:score.toFixed(1)+' / 100'}</strong>
+    <p><strong>{score===null?(starter?'Starter cast · open for voting':`Awaiting ${AI_NAME}’s score`):score.toFixed(1)+' / 100'}</strong>
       {ai!==null && <small> · {AI_NAME} {ai}/100{total>20?' · 50% audience weight':' · AI score only'}</small>}
     </p>
     <div className="actions">
@@ -17,6 +18,6 @@ export default function BoardBallot({rating,disabled,onVote}:{
       <button className={mine===-1?'primary':undefined} disabled={disabled} aria-pressed={mine===-1} onClick={()=>onVote(mine===-1?0:-1)}>Downvote · {down}</button>
     </div>
     <small>{total?Math.round(100*up/total)+'% approval · ':''}{total} {total===1?'vote':'votes'}
-      {total<21?' · '+(21-total)+' more for 50% audience weight':''}</small>
+      {total<21&&(!starter||ai!==null)?' · '+(21-total)+' more for 50% audience weight':''}</small>
   </section>
 }

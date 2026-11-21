@@ -1,3 +1,6 @@
+import {houseId,weeklySource} from './board-programme'
+import {houseCastId} from './house-cast-id'
+import type {Challenge} from './model'
 import type {BoardCategory,Vote} from './leaderboard'
 import {isValidNewPassword,MAX_PASSWORD_LENGTH,passwordLengthMessage} from './password'
 import {createServiceClient} from '../supabase/service'
@@ -33,6 +36,25 @@ export class HostedStore{
   const {data,error}=await this.client.rpc('wl_beta_ranked_board',{challenge:challengeId,board_category:category,viewer})
   if(error)throw new StoreError('The leaderboard could not be loaded.',503)
   return data
+ }
+ async seedWeekly(week:Challenge){
+  const slug=weeklySource(week.id)
+  if(!slug)return
+  const source='stunt:'+slug
+  const {data,error}=await this.client.from('wl_beta_casts').select('snapshot,fingerprint')
+    .eq('challenge_id',source).eq('user_id',houseId).eq('published',true)
+  if(error)throw new StoreError('The weekly starter casts could not be loaded.',503)
+  const rows=(data||[]).flatMap(row=>{
+    const slot=/^house-v1-([1-5])$/.exec(row.fingerprint)
+    const snapshot=row.snapshot as CastSnapshot
+    if(!slot||snapshot.challenge.roles.length!==week.roles.length||
+      !week.roles.every((role,i)=>role.name===snapshot.challenge.roles[i].name))return []
+    return [{id:houseCastId(week.id,Number(slot[1])-1),user_id:houseId,challenge_id:week.id,
+      fingerprint:row.fingerprint,snapshot:{...snapshot,challenge:week},published:true}]
+  })
+  if(!rows.length)return
+  const write=await this.client.from('wl_beta_casts').upsert(rows,{onConflict:'id',ignoreDuplicates:true})
+  if(write.error)throw new StoreError('The weekly starters could not be published.',503)
  }
  async publish(user:User,id:string){await this.rpc('publish',{user:user.id,id});return await this.cast(id,user.id)}
  async vote(user:User,id:string,category:BoardCategory,value:Vote|boolean){

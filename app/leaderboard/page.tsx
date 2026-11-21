@@ -10,6 +10,7 @@ const AWARD_LABELS: Record<string, { label: string; color: string }> = {
 }
 
 export default async function LeaderboardPage() {
+  if(process.env.WILDERLEAGUE_PUBLIC==='1'||process.env.WILDERLEAGUE_PREVIEW==='1')redirect('/?board=breaking-bad-three-v1')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

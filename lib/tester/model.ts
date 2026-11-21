@@ -2,7 +2,7 @@ import type {BoardRating} from './leaderboard'
 export type TesterActor={id:string;name:string;image:string;knownFor:string;biography:string;nationality:string;ethnicity?:string;gender?:string;descriptionTags?:string[];birthYear?:number}
 export type TesterRole={id:string;name:string;originalActor:string;originalImage?:string;description:string}
 export type LibraryTitle={slug:string;title:string;type:string;year:number|null;author?:string;shelf?:string;universe?:string;bookCount?:number;roleCount?:number;keywords?:string}
-export type Challenge={libraryType?:string;literary?:{kind:"book"|"universe";universe?:string;universeSlug?:string;books?:{title:string;slug:string;source:string}[]};id:string;title:string;season:string;rule:string;roles:TesterRole[];source:string;pool:string}
+export type Challenge={poolSourceId?:string;libraryType?:string;literary?:{kind:"book"|"universe";universe?:string;universeSlug?:string;books?:{title:string;slug:string;source:string}[]};id:string;title:string;season:string;rule:string;roles:TesterRole[];source:string;pool:string}
 export type Catalogue={titles?:LibraryTitle[];challenges:Challenge[];actors:TesterActor[];pools:Record<string,string[]>}
 export type CastInput={challengeId:string;picks:string[];pitch:string;publish:boolean}
 export type CastSnapshot={challenge:Challenge;actors:TesterActor[];pitch:string}

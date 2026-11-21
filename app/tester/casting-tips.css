@@ -15,7 +15,8 @@
 .welcome-balloon::after { background:var(--paper); margin-left:-1px; }
 .tester .welcome-balloon h1 { color:#201529; font-size:clamp(46px,5.8vw,80px); }
 .tester .welcome-balloon h1 span,.tester .welcome-balloon .welcome-jump { color:#654477; }
-.tester .welcome-balloon .welcome-jump { top:clamp(20px,2.6vw,38px); right:clamp(20px,2.6vw,38px); }
+.welcome-jumps { position:absolute; top:clamp(20px,2.6vw,38px); right:clamp(20px,2.6vw,38px); display:flex; flex-wrap:wrap; gap:12px; }
+@media(max-width:1000px) { .welcome-jumps { position:static; margin-top:12px; } }
 .tester .welcome-balloon .welcome-lede { color:#2c2032; }
 .tester .welcome-balloon .welcome-copy p { color:#362b39; }
 .tester .welcome-balloon .welcome-copy p:last-child { margin-bottom:0; }

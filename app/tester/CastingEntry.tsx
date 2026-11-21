@@ -5,6 +5,8 @@ import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
 import CastingTutorial from './CastingTutorial'
+import WeeklyReboot from './WeeklyReboot'
+import ExampleCasts from './ExampleCasts'
 import ActorPortrait from './ActorPortrait'
 import {CastingTip,CastingTipsProvider} from './CastingTips'
 import {literaryTitles} from '../../lib/tester/books'
@@ -134,7 +136,7 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
         <div className="welcome-story">
           <div className="welcome-balloon">
             <h1 id="welcome-title"><span>Welcome to </span>Wilder League.</h1>
-            <a className="welcome-jump" href="#library-heading">Pick a title <span aria-hidden="true">↓</span></a>
+            <div className="welcome-jumps"><a className="welcome-jump" href="#example-casts">See our casts</a><a className="welcome-jump" href="#library-heading">Pick a title <span aria-hidden="true">↓</span></a></div>
             <p className="welcome-lede">This is a game. It is for film and book nerds.</p>
             <div className="welcome-copy">
               <p>The idea is that you pick an old movie and recast it with actors you think could do a better job.</p>
@@ -152,13 +154,17 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
             <label className="splash-preference"><input type="checkbox" checked={hideSplash} onChange={e=>setHideSplash(e.target.checked)}/>Don’t show this to me again</label>
           </div>
         </div>
-        <div className="welcome-portraits" role="group" aria-label="Possible casting choices">
-          {welcomeCast.map(({actor,role,photo})=><figure key={actor}>
-            <ActorPortrait name={actor} src={'/actor-portraits/'+photo+'.webp'} className="welcome-photo" eager/>
-            <figcaption><strong>{actor}</strong><span>as {role}?</span></figcaption>
-          </figure>)}
+        <div className="welcome-showcase">
+          <div className="welcome-portraits" role="group" aria-label="Possible casting choices">
+            {welcomeCast.map(({actor,role,photo})=><figure key={actor}>
+              <ActorPortrait name={actor} src={'/actor-portraits/'+photo+'.webp'} className="welcome-photo" eager/>
+              <figcaption><strong>{actor}</strong><span>as {role}?</span></figcaption>
+            </figure>)}
+          </div>
+          <ExampleCasts openTitle={slug=>selectPath('expert',slug)}/>
         </div>
       </section>
+      <WeeklyReboot/>
       <CastingLibrary {...picker} headingLevel={2} showTips={atTitlePicker} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
     </main>
   </div>

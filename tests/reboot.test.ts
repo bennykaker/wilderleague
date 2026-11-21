@@ -12,7 +12,8 @@ test('reboot eligibility excludes deceased, unknown and implausibly old records'
  assert.equal(eligibleForReboot({...record,birth:'2030-01-01'},'2026-10-26'),false)
 })
 import {validateCast} from '../lib/tester/model'
-import {challenges} from '../lib/tester/challenges'
+import {challenges,lorreMadMen} from '../lib/tester/challenges'
+import {starterCatalogue} from '../lib/tester/starter-catalogue'
 import lifeStatus from '../lib/tester/life-status.json'
 test('Janney remains eligible for Bartlet without a gender restriction',()=>{
  assert.equal(eligibleForReboot(lifeStatus.entries['19'],'2026-10-26'),true)
@@ -20,4 +21,15 @@ test('Janney remains eligible for Bartlet without a gender restriction',()=>{
  const challenge=challenges[1],actors=challenge.roles.map((_,i)=>({id:String(i),name:i===0?'Allison Janney':'Actor '+i,image:'',knownFor:'',biography:'',nationality:'',gender:i===0?'female':'male'}))
  const input={challengeId:challenge.id,picks:actors.map(a=>a.id),pitch:'Allison Janney as Bartlet.',publish:false}
  assert.deepEqual(validateCast(input,{challenges:[challenge],actors,pools:{[challenge.id]:actors.map(a=>a.id)}}),input)
+})
+
+test('the homepage Mad Men challenge accepts its Lorre ensemble and rejects actors outside its pool',()=>{
+ const picks=starterCatalogue.pools[lorreMadMen.id]
+ const input={challengeId:lorreMadMen.id,picks,pitch:'',publish:false}
+ assert.equal(lorreMadMen.roles.length,6)
+ assert.ok(lorreMadMen.roles.some(role=>role.name==='Roger Sterling'))
+ assert.deepEqual(validateCast(input,starterCatalogue),input)
+ const outsider=starterCatalogue.actors.find(actor=>!picks.includes(actor.id))
+ assert.ok(outsider)
+ assert.throws(()=>validateCast({...input,picks:[outsider.id,...picks.slice(1)]},starterCatalogue),/outside this challenge/)
 })

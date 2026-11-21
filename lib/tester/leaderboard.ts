@@ -12,5 +12,6 @@ export type BoardRating = {
 
 export function hasLeaderboard(challenge:Challenge | undefined) {
   if (!challenge || challenge.id==='custom') return false
-  return !challenge.id.startsWith('free:') || challenge.literary?.kind==='book' || challenge.libraryType==='book'
+  if(challenge.id.startsWith('free:'))return challenge.literary?.kind==='book' || challenge.libraryType==='book'
+  return challenge.id.startsWith('weekly:') || challenge.pool!=='all'
 }
