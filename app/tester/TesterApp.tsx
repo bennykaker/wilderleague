@@ -146,7 +146,7 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
  function launch(c:Challenge){window.scrollTo(0,0);rememberRoster(c);setGuided(false);start(c.id,c)}
  async function openTitle(slug:string){
   await run(async()=>{
-   const roster=literaryChallenge(slug)||(await api('title?slug='+encodeURIComponent(slug))).challenge
+   const roster=data.challenges.find(challenge=>challenge.id===slug)||literaryChallenge(slug)||(await api('title?slug='+encodeURIComponent(slug))).challenge
    launch(roster)
    if(location.protocol!=='file:')history.replaceState(null,'',location.pathname+'?title='+encodeURIComponent(slug))
   })

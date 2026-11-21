@@ -6,7 +6,7 @@ import {cache} from 'react'
 import {createServiceClient} from '../supabase/service'
 import {getLibraryIndex,fetchLibraryChallenge,featuredSpecs} from './library'
 import {snlMembers} from './snl-members'
-import {challenges} from './challenges'
+import {coreRosters} from './challenges'
 import {isBritish,type Catalogue,type TesterActor} from './model'
 
 export const ACTOR_PAGE_SIZE=250
@@ -63,10 +63,10 @@ async function loadCastingDirectory(cached:boolean):Promise<Catalogue>{
   if(isBritish(actor.nationality))british.push(actor.id)
  }
  const all=actors.map(a=>a.id),pools:Record<string,string[]>={}
- for(const c of [...challenges,...featuredSpecs]){
+ for(const c of [...coreRosters,...featuredSpecs]){
   pools[c.id]=c.pool==='snl'?snl:c.pool==='british'?british:c.pool==='all'?all:tags[c.pool]||[]
  }
- return {actors,challenges,pools}
+ return {actors,challenges:coreRosters,pools}
 }
 
 async function loadChallengeRosters(cached:boolean) {
@@ -76,7 +76,7 @@ async function loadChallengeRosters(cached:boolean) {
  ])
  const images=new Map(portraits.map(r=>[r.original_actor,r.original_actor_image]))
  const featured=features.flatMap(result=>result.status==='fulfilled'?[result.value]:[])
- return [...challenges,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(r.originalActor)||''}))}))
+ return [...coreRosters,...featured].map(c=>({...c,roles:c.roles.map(r=>({...r,originalImage:r.originalImage||images.get(r.originalActor)||''}))}))
 }
 
 export const getCastingDirectory=cache(()=>loadCastingDirectory(true))
@@ -87,7 +87,7 @@ async function loadCatalogue(cached:boolean):Promise<Catalogue>{
   cached?getChallengeRosters():loadChallengeRosters(false),
   getLibraryIndex(cached),
  ])
- return {...directory,challenges:rosters.filter(c=>challenges.some(core=>core.id===c.id)||(directory.pools[c.id]?.length??0)>=c.roles.length),titles}
+ return {...directory,challenges:rosters.filter(c=>coreRosters.some(core=>core.id===c.id)||(directory.pools[c.id]?.length??0)>=c.roles.length),titles}
 }
 export const getTesterCatalogue=cache(()=>loadCatalogue(true))
 export const fetchTesterCatalogue=()=>loadCatalogue(false)
