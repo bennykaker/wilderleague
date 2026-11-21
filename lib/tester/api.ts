@@ -1,3 +1,5 @@
+import {hasLeaderboard} from './leaderboard'
+import {literaryChallenge} from './books'
 import {scoreBoardCast} from './board-judge'
 import type {CastRecord} from './model'
 import {selectedLiteraryRoles} from './library-client'
@@ -20,6 +22,16 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   if(req.method==='GET'&&action==='challenge-rosters')return json({challenges:await rosters()})
   const user=await store.user(token(req))
   const requireUser=()=>{if(!user)throw new StoreError('Sign in to save, submit or vote.',401);return user}
+  async function boardRoster(id:string) {
+   if (!id || id==='custom') return
+   if (!id.startsWith('free:')) return (await catalogue()).challenges.find(c=>c.id===id)
+   const slug=id.slice(5)
+   if (!/^[a-z0-9-]{1,150}$/.test(slug)) return
+   const book=literaryChallenge(slug)
+   if (book) return book
+   // Catalogue books can also have database-backed rosters.
+   try {return await resolveTitle(slug)} catch {return}
+  }
   if(req.method==='GET'){
    if(action==='title'){try{return json({challenge:await resolveTitle(url.searchParams.get('slug')||'')})}catch(e){throw new StoreError((e as Error).message,404)}}
    if(action==='me')return json({user})
@@ -27,8 +39,8 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
    if(action==='mine')return json({casts:await store.mine(requireUser())})
    if(action==='cast'){const cast=await store.cast(url.searchParams.get('id')||'',user?.id);if(!cast)throw new StoreError('Cast not found or not shared.',404);return json({cast})}
    if(action==='board'){
-    const cat=await catalogue(),id=url.searchParams.get('challenge')||'',category=url.searchParams.get('category')
-    if(!cat.challenges.some(c=>c.id===id)||!['best','hear'].includes(category||''))throw new StoreError('Unknown leaderboard.')
+    const id=url.searchParams.get('challenge')||'',category=url.searchParams.get('category')
+    if(!['best','hear'].includes(category||'')||!hasLeaderboard(await boardRoster(id)))throw new StoreError('Unknown leaderboard.')
     return json({casts:await store.board(id,category as 'best'|'hear',user?.id)})
    }
    throw new StoreError('Not found.',404)
@@ -64,8 +76,7 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
    return json(action==='feedback-status'?(store instanceof HostedStore?await readHostedFeedback(store,snapshot):readFeedback(store,snapshot)):await (store instanceof HostedStore?hostedFeedback(store,snapshot,user?.id):requestFeedback(store,snapshot)))
   }
   async function saved(cast:CastRecord|null,submitted:boolean,cat:Catalogue){
-   if(!cast || !submitted || !cat.challenges.some(c=>c.id===cast.challengeId) ||
-      cast.challengeId==='custom' || cast.challengeId.startsWith('free:')) return json({cast})
+   if(!cast || !submitted || !hasLeaderboard(cat.challenges.find(c=>c.id===cast.challengeId))) return json({cast})
    // A cast stays published and open to voters even when judging is unavailable.
    try {return json({cast,judging:await scoreBoardCast(store,cast)})}
    catch(error){return json({cast,judging:error instanceof StoreError && error.status===429?'budget':'unavailable'})}
@@ -86,6 +97,12 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
    const voter=requireUser();await store.limit('vote:'+voter.id,120,60000)
    const value=body.direction===undefined && typeof body.enabled==='boolean'?Number(body.enabled):body.direction
    if(typeof body.id!=='string'||!['best','hear'].includes(String(body.category))||(value!==-1 && value!==0 && value!==1))throw new StoreError('Invalid vote.')
+   const entry=await store.cast(body.id,voter.id)
+   if(!entry?.published)throw new StoreError('Cast not found.',404)
+   const roster=entry.snapshot.challenge
+   const legacyTitle=roster.id.startsWith('free:') && !roster.literary && !roster.libraryType
+   if(!hasLeaderboard(legacyTitle?await boardRoster(roster.id):roster))
+    throw new StoreError('This cast does not have a leaderboard.')
    return json({cast:await store.vote(voter,body.id,body.category as 'best'|'hear',value)})
   }
   if(action==='export-image'||action==='export-analysis'){

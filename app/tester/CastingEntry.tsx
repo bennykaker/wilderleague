@@ -78,7 +78,7 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
       skip = localStorage.getItem(hideSplashKey)==='yes'
     } catch {}
     setHideSplash(skip)
-    if (params.get('cast') || params.get('title')) {
+    if (params.get('cast') || params.get('title') || params.get('board')) {
       setScreen('room')
     } else if (params.get('tutorial')==='1') {
       setScreen('tutorial')

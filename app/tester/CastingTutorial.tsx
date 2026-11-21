@@ -28,7 +28,7 @@ const lessons = [
     clip:'share', label:'Save & share', title:'Make the case for your cast.',
     text:'Review your lineup and add a line about what you see in your choices. A book or universe cast is ready to share after one pick.',
     tip:'Sign in and choose Save privately to keep your cast, or Share this cast to get a public link.',
-    detail:'Featured challenges have a Submit to leaderboards button once every role is cast.',
+    detail:'Sharing a book cast enters it on that book’s Best Cast and Hear Me Out boards. In a featured challenge, fill every role and choose Submit to leaderboards.',
     cues:[[0,'Review the character and your actor side by side.'],[2.1,'Add a pitch if you like.'],[4.8,'Choose whether to save privately or share your lineup.']],
   },
 ] as const
@@ -49,12 +49,13 @@ function LessonPlayer({lesson}:{lesson:Lesson}) {
   },[])
   const cue=lesson.cues.filter(([start])=>time>=start).at(-1) ?? lesson.cues[0]
   const base='/tutorial/'+lesson.clip
+  const revision=lesson.clip==='drag'?'?v=mouse':''
   return <figure className="tutorial-player">
     <div className="tutorial-film-title"><span>Guards! Guards!</span><span>Sam Vimes</span></div>
-    <video ref={video} controls muted playsInline preload="metadata" poster={base+'.jpg'} src={base+'.mp4'}
+    <video ref={video} controls muted playsInline preload="metadata" poster={base+'.jpg'} src={base+'.mp4'+revision}
       width={768} height={450} aria-label={lesson.label+' screen demonstration'} aria-describedby="tutorial-instructions"
       onError={()=>setFailed(true)} onTimeUpdate={e=>setTime(e.currentTarget.currentTime)}>
-      <track kind="captions" src={base+'.vtt'} srcLang="en" label="English"/>
+      <track kind="captions" src={base+'.vtt'+revision} srcLang="en" label="English"/>
     </video>
     <figcaption>
       <span>{failed?'The clip couldn’t load. The steps are written out here.':cue[1]}</span>

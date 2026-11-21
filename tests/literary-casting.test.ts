@@ -5,6 +5,7 @@ import life from '../lib/tester/life-status.json'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import {literaryChallenge,literaryTitles,mergeLibrary} from '../lib/tester/books'
+import {scoreBoardCast} from '../lib/tester/board-judge'
 import {createTesterApi} from '../lib/tester/api'
 import {TesterStore} from '../lib/tester/store'
 import type {Catalogue,Challenge} from '../lib/tester/model'
@@ -137,4 +138,50 @@ test('a book can be cast and saved when the general catalogue is unavailable',as
   assert.equal(response.status,200)
   assert.equal((await response.json()).cast.snapshot.challenge.roles[0].name,book.roles[0].name)
  }finally{store.db.close()}
+})
+
+test('book boards list shared casts per title with separate ballots and keep ordinary films off the boards',async()=>{
+ const store=new TesterStore(':memory:')
+ const book=literaryChallenge('book-terry-pratchett-guards-guards')!
+ const other=literaryChallenge('book-rebecca-yarros-fourth-wing')!
+ const film:Challenge={...book,id:'free:guards-film',libraryType:'movie',literary:undefined}
+ const databaseBook:Challenge={...book,id:'free:another-book',libraryType:'book',literary:undefined}
+ const catalogue:Catalogue={challenges:[],pools:{},actors:starterCatalogue.actors}
+ const handle=createTesterApi(store,async()=>catalogue,async slug=>{
+   if(film.id==='free:'+slug)return film
+   if(databaseBook.id==='free:'+slug)return databaseBook
+   return resolve(slug)
+ })
+ const post=(action:string,body:unknown,cookie:string)=>handle(new Request('http://book.test/api/preview/'+action,{
+   method:'POST',headers:{origin:'http://book.test',cookie,'content-type':'application/json'},body:JSON.stringify(body)
+ }))
+ const board=(id:string,category='best',cookie='')=>handle(new Request('http://book.test/api/preview/board?'+new URLSearchParams({challenge:id,category}),{headers:{cookie}}))
+ try{
+   const owner=await store.register('caster','a long test password')
+   const reader=await store.register('voter','another long password')
+   const ownerCookie='wl_tester_session='+store.session(owner),readerCookie='wl_tester_session='+store.session(reader)
+   const input={challengeId:book.id,picks:[catalogue.actors[0].id],roleIds:[book.roles[0].id],pitch:'A deadpan Vimes.',publish:false}
+   const saved=await (await post('save',input,ownerCookie)).json()
+   assert.deepEqual((await (await board(book.id)).json()).casts,[])
+   // A published cast from before book scoring is immediately visible. A voluntary
+   // resubmission can attach a score to the same entry without losing its votes.
+   store.publish(owner,saved.cast.id)
+   assert.equal((await (await board(book.id)).json()).casts[0].id,saved.cast.id)
+   await scoreBoardCast(store,store.cast(saved.cast.id)!,async()=>({scores:{best:85,hear:73},cost:0}))
+   const shared=await (await post('save',{...input,publish:true},ownerCookie)).json()
+   assert.equal(shared.cast.id,saved.cast.id)
+   assert.ok(shared.judging)
+   const vote=await post('vote',{id:saved.cast.id,category:'hear',direction:1},readerCookie)
+   assert.equal(vote.status,200)
+   const best=await (await board(book.id,'best',readerCookie)).json()
+   const hear=await (await board(book.id,'hear',readerCookie)).json()
+   assert.equal(best.casts.length,1);assert.equal(hear.casts.length,1)
+   assert.deepEqual(best.casts[0].rating,{ai:85,score:85,up:0,down:0,mine:0})
+   assert.deepEqual(hear.casts[0].rating,{ai:73,score:73,up:1,down:0,mine:1})
+   assert.deepEqual((await (await board(other.id)).json()).casts,[])
+   assert.equal((await board(databaseBook.id)).status,200)
+   for(const id of [film.id,'custom','free:universe-discworld','free:book-invented']) assert.equal((await board(id)).status,400,id)
+   const ordinary=store.save(owner,{challenge:film,actors:catalogue.actors.slice(0,film.roles.length),pitch:''},true)
+   assert.equal((await post('vote',{id:ordinary.id,category:'best',direction:1},readerCookie)).status,400)
+ }finally{store.close()}
 })

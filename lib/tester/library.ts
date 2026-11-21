@@ -31,6 +31,6 @@ export async function fetchLibraryChallenge(slug:string):Promise<Challenge>{
  const [title,roles]=await Promise.all([db.from('titles').select('slug,title,type,year').eq('slug',slug).single(),db.from('roles').select('role_name,original_actor,original_actor_image,role_description,display_order').eq('title_slug',slug).order('display_order')])
  if(title.error||roles.error||!roles.data?.length)throw new Error('This title has no casting roles yet. Use “Add your own title” to enter them.')
  const mapped:TesterRole[]=roles.data.slice(0,30).map((r,i)=>({id:'r'+(i+1),name:r.role_name,originalActor:r.original_actor||'',originalImage:r.original_actor_image||'',description:r.role_description||''}))
- return{id:'free:'+slug,title:title.data.title,season:(title.data.type==='book'?'Book · catalogue characters':'Catalogue ensemble')+(roles.data.length>30?' · first 30 roles':''),rule:'Reboot casting with living actors today. All genders welcome for every role. Use each actor once.',pool:'all',source:'',roles:mapped}
+ return{id:'free:'+slug,title:title.data.title,libraryType:title.data.type,season:(title.data.type==='book'?'Book · catalogue characters':'Catalogue ensemble')+(roles.data.length>30?' · first 30 roles':''),rule:'Reboot casting with living actors today. All genders welcome for every role. Use each actor once.',pool:'all',source:'',roles:mapped}
 }
 export {customChallenge,withChallenge} from './library-client'
