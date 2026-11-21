@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME,ASK_BIG_PUDDING} from '../../lib/big-pudding'
 import {useEffect,useRef,useState} from 'react'
 import './tutorial.css'
 
@@ -18,11 +19,11 @@ const lessons = [
     cues:[[0,'Choose Search by name.'],[1.65,'Type Gosling. The cards below narrow as you type.'],[4.55,'There’s Ryan. His card is ready to drag.']],
   },
   {
-    clip:'ai', label:'Ask AI', title:'Have a type in mind?',
+    clip:'ai', label:`Ask ${AI_NAME}`, title:'Have a type in mind?',
     text:'Choose Describe an actor. Try a performance note like “a weary detective with a dry wit,” or a reference like “a Chris Traeger type.”',
-    tip:'Press Ask AI for suggestions. Read the reason on each actor’s card, then drag your favourite into the role.',
+    tip:`Click “${ASK_BIG_PUDDING}”. Read the reason on each actor’s card, then drag your favourite into the role.`,
     detail:'Typing alone searches the catalogue. Sign in for a new AI search. Anyone can reuse a saved search. This clip uses a sample answer.',
-    cues:[[0,'Switch to Describe an actor.'],[2,'Type “a weary detective with a dry wit.”'],[5.55,'Choose Ask AI for suggestions.'],[7.65,'Read the reasons on the suggested cards. You make the pick.']],
+    cues:[[0,'Switch to Describe an actor.'],[2,'Type “a weary detective with a dry wit.”'],[5.55,`Click “${ASK_BIG_PUDDING}”.`],[7.65,'Read the reasons on the suggested cards. You make the pick.']],
   },
   {
     clip:'share', label:'Save & share', title:'Make the case for your cast.',
@@ -49,7 +50,7 @@ function LessonPlayer({lesson}:{lesson:Lesson}) {
   },[])
   const cue=lesson.cues.filter(([start])=>time>=start).at(-1) ?? lesson.cues[0]
   const base='/tutorial/'+lesson.clip
-  const revision=lesson.clip==='drag'?'?v=mouse':''
+  const revision=lesson.clip==='drag'?'?v=mouse':lesson.clip==='ai'?'?v=big-pudding':''
   return <figure className="tutorial-player">
     <div className="tutorial-film-title"><span>Guards! Guards!</span><span>Sam Vimes</span></div>
     <video ref={video} controls muted playsInline preload="metadata" poster={base+'.jpg'} src={base+'.mp4'+revision}

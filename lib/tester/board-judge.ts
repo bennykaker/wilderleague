@@ -3,8 +3,9 @@ import {HostedStore} from './hosted-store'
 import {StoreError,type TesterStore} from './store'
 import type {CastRecord} from './model'
 
-const model = 'claude-haiku-4-5-20251001'
-const system = `Judge a fan casting challenge. Return integer scores from 0 to 100.
+import {AI_NAME} from '../big-pudding'
+import {boardJudgeModel,tokenCost} from './ai-models'
+const system = `You are ${AI_NAME}, Wilder League’s casting AI. Judge a fan casting challenge. Return integer scores from 0 to 100.
 Best Cast measures how the actors suit the roles, work as an ensemble and serve the brief.
 Hear Me Out measures how surprising the choices are and how convincingly they could work.
 50 is plausible, 75 is strong, and 90 is exceptional for the category.
@@ -20,24 +21,24 @@ type Store = TesterStore | HostedStore
 async function judge(input:string) {
   const client = new Anthropic({maxRetries:0,timeout:15000})
   const reply = await client.messages.create({
-    model,system,max_tokens:96,temperature:0,
+    model:boardJudgeModel.id,system,max_tokens:boardJudgeModel.maxOutputTokens,temperature:0,
     output_config:{format:{type:'json_schema',schema}},messages:[{role:'user',content:input}]
   })
   const text = reply.content.find(block=>block.type==='text')
   if (reply.stop_reason!=='end_turn' || text?.type!=='text') throw Error('Incomplete score')
-  return {scores:JSON.parse(text.text),cost:(reply.usage.input_tokens + 5 * reply.usage.output_tokens)/1e6}
+  return {scores:JSON.parse(text.text),cost:tokenCost(boardJudgeModel,reply.usage.input_tokens,reply.usage.output_tokens)}
 }
 
 async function reserve(store:Store,key:string,user:string,reserved:number) {
   if (store instanceof HostedStore) {
-    const claim=await store.rpc('ai-reserve',{key,user,reserved,model,kind:'feedback'})
+    const claim=await store.rpc('ai-reserve',{key,user,reserved,model:boardJudgeModel.id,kind:'feedback'})
     return claim.claimed ? 'claimed' : String(claim.row.status)
   }
   const now=new Date().toISOString(),day=now.slice(0,10)
   const insert=store.db.prepare(`INSERT INTO feedback(key,status,created_at,day,reserved,model)
     SELECT ?,'pending',?,?,?,? WHERE
     (SELECT COALESCE(SUM(reserved),0) FROM feedback WHERE day=?) + ? <= 2
-    ON CONFLICT(key) DO NOTHING`).run(key,now,day,reserved,model,day,reserved)
+    ON CONFLICT(key) DO NOTHING`).run(key,now,day,reserved,boardJudgeModel.id,day,reserved)
   if (insert.changes) return 'claimed'
   const existing=store.db.prepare('SELECT status FROM feedback WHERE key=?').get(key)
   if (!existing) throw new StoreError('The daily AI budget has been reached.',429)
@@ -61,7 +62,7 @@ export async function scoreBoardCast(store:Store,cast:CastRecord,generate=judge)
     cast:challenge.roles.map((role,i)=>({role:role.name,brief:role.description,
       actor:actors[i].name,credits:actors[i].knownFor.slice(0,500)}))})
   // Budget for up to one input token per UTF-8 byte plus protocol overhead.
-  const reservation=(Buffer.byteLength(input+system+JSON.stringify(schema))+2000+96*5)/1e6
+  const reservation=tokenCost(boardJudgeModel,Buffer.byteLength(input+system+JSON.stringify(schema))+2000,boardJudgeModel.maxOutputTokens)
   const key='board-v1:'+cast.id
   const status=await reserve(store,key,cast.ownerId,reservation)
   if (status!=='claimed') return status

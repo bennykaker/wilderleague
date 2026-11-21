@@ -1,4 +1,5 @@
 'use client'
+import {ASK_BIG_PUDDING} from '../../lib/big-pudding'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -229,7 +230,7 @@ export default function CastingPage({ movie, actors }: Props) {
                 disabled={searching || !query.trim()}
                 style={{ background: '#3b82f6', color: '#fff', border: 'none', borderRadius: '10px', padding: '9px 15px', fontSize: '13px', fontWeight: 600, cursor: (searching || !query.trim()) ? 'not-allowed' : 'pointer', opacity: (searching || !query.trim()) ? 0.5 : 1, whiteSpace: 'nowrap', flexShrink: 0 }}
               >
-                {searching ? 'Asking…' : 'Ask AI'}
+                {searching ? 'Asking…' : ASK_BIG_PUDDING}
               </button>
               {(isFiltered || (query && !isFiltered && visibleActors.length < actors.length)) && (
                 <button onClick={resetSearch} style={{ background: '#27272a', color: '#a1a1aa', border: 'none', borderRadius: '10px', padding: '9px 12px', fontSize: '13px', cursor: 'pointer', flexShrink: 0 }}>

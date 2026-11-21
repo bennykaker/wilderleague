@@ -751,7 +751,7 @@ CATEGORY_B_3: [Actor Name] | [One sentence: the creative logic] | [What would ne
                     justifyContent: 'center',
                   }}
                 >
-                  ✦ Ask AI for this role
+                  ✦ Ask your AI about this role
                 </button>
               </div>
             )

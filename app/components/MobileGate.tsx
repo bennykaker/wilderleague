@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME} from '../../lib/big-pudding'
 
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
@@ -36,7 +37,7 @@ export default function MobileGate() {
         Wilder League needs a bigger screen
       </div>
       <div style={{ fontSize: '15px', color: '#71717a', lineHeight: 1.6, marginBottom: '32px', maxWidth: '320px' }}>
-        Casting a full movie on a phone is a squeeze. The desktop experience is where Marlowe really shines.
+        Casting a full movie on a phone is a squeeze. There’s more room for your cast and {AI_NAME}’s suggestions on desktop.
       </div>
       <div style={{
         background: 'rgba(139,92,246,0.1)',

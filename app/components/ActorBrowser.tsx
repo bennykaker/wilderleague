@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME} from '../../lib/big-pudding'
 
 import { useState } from 'react'
 import type { EnrichedActor } from '../data/enrichedActors'
@@ -178,7 +179,7 @@ function ActorCard({ actor }: { actor: EnrichedActor }) {
             {actor.casting_profile && (
               <div style={{ margin: '12px 0 14px', background: '#0d0f14', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '10px', padding: '12px 14px' }}>
                 <div style={{ fontSize: '10px', color: '#3b82f6', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>
-                  Marlowe's assessment
+                  From {AI_NAME}’s archive
                 </div>
                 <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
                   {actor.casting_profile}

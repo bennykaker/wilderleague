@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME} from '../../lib/big-pudding'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
@@ -139,7 +140,7 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
               <p>The idea is that you pick an old movie and recast it with actors you think could do a better job.</p>
               <p>Or maybe do a recast with constraints, like recasting <em>Parks &amp; Rec</em> with Canadian actors (Will Sasso as Ron Swanson? Tatiana Maslany as Leslie Knope?). Or recast <em>The West Wing</em> with actors from the Chuck Lorre Cinematic Universe.</p>
               <p>For the book nerds, you can cast that novel with actors. Ryan Gosling as Sam Vimes from <em>Guards! Guards!</em>? Is Theo James as Rhysand just too obvious?</p>
-              <p>Pick the cast, get the AI to review, post it on your favourite feed, and then submit it to our high score list (decided by <strong>Big Pudding</strong>, our in-house AI, and then by member voting).</p>
+              <p>Pick the cast, ask <strong>{AI_NAME}</strong> (our in-house AI) to review it, post it on your favourite feed, and then submit it to our high score list. {AI_NAME} gives the opening score. Members get to vote.</p>
             </div>
           </div>
           <div className="splash-paths" role="group" aria-label="Welcome options">

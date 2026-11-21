@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME} from '../../../lib/big-pudding'
 
 import { useState, useEffect } from 'react'
 
@@ -302,7 +303,7 @@ export default function ResultsClient({
         {!scoredState && (
           <div style={{ width: '100%', background: '#111115', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '32px', textAlign: 'center' }}>
             <div style={{ fontSize: '32px', marginBottom: '16px' }}>📞</div>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Marlowe is tied up on another call</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>{AI_NAME} is tied up on another call</div>
             <div style={{ fontSize: '14px', color: '#71717a', lineHeight: 1.6, marginBottom: '24px' }}>
               Your cast has been saved. Scores couldn't be generated right now — try again in a moment.
             </div>
@@ -314,7 +315,7 @@ export default function ResultsClient({
               disabled={retrying}
               style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '10px', padding: '12px 24px', color: retrying ? '#52525b' : '#60a5fa', fontSize: '14px', fontWeight: 700, cursor: retrying ? 'not-allowed' : 'pointer' }}
             >
-              {retrying ? 'Calling Marlowe…' : 'Try scoring again'}
+              {retrying ? `Calling ${AI_NAME}…` : 'Try scoring again'}
             </button>
           </div>
         )}
@@ -358,7 +359,7 @@ export default function ResultsClient({
               borderRadius: '14px',
               padding: '20px 24px',
             }}>
-              <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', fontWeight: 700, marginBottom: '8px' }}>Marlowe's verdict</div>
+              <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#52525b', fontWeight: 700, marginBottom: '8px' }}>{AI_NAME}’s verdict</div>
               <div style={{ fontSize: '16px', fontStyle: 'italic', color: '#cbd5e1', lineHeight: 1.6 }}>"{verdict}"</div>
             </div>
 

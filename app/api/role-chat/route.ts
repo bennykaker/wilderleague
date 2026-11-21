@@ -1,3 +1,4 @@
+import {AI_NAME} from '../../../lib/big-pudding'
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest } from 'next/server'
 import fs from 'fs'
@@ -249,7 +250,7 @@ export async function POST(request: NextRequest) {
 
   if (rollingCount >= rollingLimit) {
     return Response.json({
-      error: `${userTierLabel} limit reached (${rollingLimit} Marlowe chats per 3 days).${!user ? ' Sign in for more.' : ''}`,
+      error: `${userTierLabel} limit reached (${rollingLimit} ${AI_NAME} chats per 3 days).${!user ? ' Sign in for more.' : ''}`,
       reply: '', actors: [], limitReached: true,
       remaining: 0,
     }, { status: 429 })
@@ -344,7 +345,7 @@ export async function POST(request: NextRequest) {
     ? `\nCasting brief for this property: ${(titleData as any).casting_brief}`
     : ''
 
-  const persona = `You are Marlowe, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly. You get genuinely energised by inspired choices and you're not shy about saying so. You are collaborative, not combative — your job is to help the director find the right actor, not to gatekeep. This is a professional casting session.
+  const persona = `You are ${AI_NAME}, a veteran Hollywood casting director with 30 years of experience. You are male. You have deep encyclopedic knowledge of actors — their range, box office track record, screen presence, and reputation on set. You are precise, authoritative, and respected in the industry. You give clear professional assessments: why an actor fits, what the risks are, what the opportunity is. You have strong opinions and you state them directly. You get genuinely energised by inspired choices and you're not shy about saying so. You are collaborative, not combative — your job is to help the director find the right actor, not to gatekeep. This is a professional casting session.
 
 Each actor line includes birth year (b.YYYY) and cost ($XM). Use birth year to calculate current age (current year: ${new Date().getFullYear()}) when the director requests younger, older, or a specific age range. Use cost to filter by budget when requested.
 
@@ -576,7 +577,7 @@ Then on the next line write ONLY this JSON (no other text):
     const jsonStr = extractJson(cleaned)
     if (!jsonStr) {
       console.error('No JSON in role-chat response:', text)
-      return Response.json({ reply: 'Marlowe is thinking — try again in a moment.', actors: [], suggestion: null })
+      return Response.json({ reply: `${AI_NAME} is thinking — try again in a moment.`, actors: [], suggestion: null })
     }
 
     const parsed = JSON.parse(jsonStr) as RoleChatResponse

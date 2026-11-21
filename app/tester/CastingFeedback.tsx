@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME,ASK_BIG_PUDDING} from '../../lib/big-pudding'
 import {useEffect,useState} from 'react'
 import type {Feedback} from '../../lib/tester/feedback'
 type State={status:string;feedback?:Feedback;createdAt?:string}
@@ -11,12 +12,12 @@ export default function CastingFeedback({payload}:{payload:object}){
  },[body,busy])
  async function request(){setBusy(true);setError('');try{const r=await fetch('/api/preview/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body});const d=await r.json();if(!r.ok)throw new Error(d.error);setState(d)}catch(e){setError((e as Error).message)}finally{setBusy(false)}}
  const f=state.feedback,stale=state.status==='pending'&&Date.now()-Date.parse(state.createdAt||'')>90000
- return <section className="casting-feedback" aria-labelledby="feedback-heading"><h2 id="feedback-heading">Another take on your cast</h2><p>Optional feedback from Claude Sonnet. Creative suggestions, not a score. It can get facts wrong.</p><p className="muted">This never affects leaderboard votes or sample scores. Requesting this review sends your cast and rationale to Anthropic. The review is saved for this cast; reopening the same cast and rationale reuses it. Changed choices or rationale need a new review.</p>
+ return <section className="casting-feedback" aria-labelledby="feedback-heading"><h2 id="feedback-heading">A second opinion on your cast</h2><p>{AI_NAME} reads the role briefs, actor credits and your pitch, then picks one choice that works and one worth exploring.</p><p className="muted">This never affects leaderboard votes or sample scores. Requesting this review sends your cast and rationale to Anthropic. Reopening the same cast and rationale brings back the saved review. Changed choices or rationale need a new review.</p>
  {error&&<p role="alert">{error}</p>}
  {state.status==='loading'&&<p role="status">Checking for saved feedback…</p>}
- {state.status==='none'&&<button disabled={busy} onClick={request}>{busy?'Getting feedback…':'Ask Sonnet for feedback'}</button>}
+ {state.status==='none'&&<button disabled={busy} onClick={request}>{busy?`${AI_NAME} is reviewing your cast…`:ASK_BIG_PUDDING}</button>}
  {(busy||state.status==='pending')&&<p role="status">{stale?'This request may have been interrupted. It will not be sent again automatically, to avoid another charge.':'Getting your feedback. You can leave this page; the saved result will be here when you return.'}</p>}
  {state.status==='failed'&&<p role="status">The review could not be completed. We won’t automatically send this cast again, because the first attempt may have incurred a charge.</p>}
- {state.status==='ready'&&f&&<div><p className="muted">Saved Sonnet feedback{state.createdAt?' · '+new Date(state.createdAt).toLocaleDateString():''}</p><p>{f.review}</p><h3>A promising choice</h3><p><strong>{f.promising_choice.actor} as {f.promising_choice.role}</strong><br/>{f.promising_choice.reason}</p><h3>A question to explore</h3><p><strong>{f.question_to_explore.actor} as {f.question_to_explore.role}</strong><br/>{f.question_to_explore.reason}</p><p className="muted">{f.evidence_limits}</p></div>}
+ {state.status==='ready'&&f&&<div><p className="muted">{AI_NAME}’s saved review{state.createdAt?' · '+new Date(state.createdAt).toLocaleDateString():''}</p><p>{f.review}</p><h3>A promising choice</h3><p><strong>{f.promising_choice.actor} as {f.promising_choice.role}</strong><br/>{f.promising_choice.reason}</p><h3>A question to explore</h3><p><strong>{f.question_to_explore.actor} as {f.question_to_explore.role}</strong><br/>{f.question_to_explore.reason}</p><p className="muted">{f.evidence_limits}</p></div>}
  </section>
 }

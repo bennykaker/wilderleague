@@ -1,4 +1,5 @@
 'use client'
+import {AI_NAME} from '../../lib/big-pudding'
 import {useLayoutEffect,useRef} from 'react'
 import type {TesterActor} from '../../lib/tester/model'
 import type {ActorAnalysis} from '../../lib/tester/actor-analysis'
@@ -37,8 +38,8 @@ export default function ActorAnalysisDialog({actor,onDismiss}:{actor:TesterActor
       </div>
       <div className="analysis-body">
         {analysis ? <>
-          <h3>Marlowe’s assessment</h3>
-          <small className="analysis-source">Archived AI casting notes</small>
+          <h3>From {AI_NAME}’s archive</h3>
+          <small className="analysis-source">Casting notes originally credited to Marlowe</small>
           {analysis.casting_profile && <p className="assessment">{analysis.casting_profile}</p>}
           <dl>{sections.map(([key,label])=>analysis[key] && <div key={key}><dt>{label}</dt><dd>{analysis[key]}</dd></div>)}</dl>
         </> : failed ? <p role="status">The casting notes couldn’t load. <button type="button" onClick={retry}>Try again</button></p> :

@@ -1,3 +1,4 @@
+import {AI_NAME} from '../../../lib/big-pudding'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createServerClient } from '@supabase/ssr'
@@ -41,7 +42,7 @@ async function generateScores(
   const castLines = cast.map(c => `- ${c.role} [${tierLabel(c.tier)}]: ${c.actor} ($${c.cost}M)`).join('\n')
   const budgetLine = `Budget: $${budget}M total, $${spent}M committed (${spent > budget ? `$${spent - budget}M OVER` : `$${budget - spent}M remaining`})`
 
-  const prompt = `You are Marlowe, a veteran Hollywood casting director who loves bold, unexpected choices. You are reviewing a fan cast for "${movie}".
+  const prompt = `You are ${AI_NAME}, a veteran Hollywood casting director who loves bold, unexpected choices. You are reviewing a fan cast for "${movie}".
 
 IMPORTANT CONTEXT: This cast was assembled under real constraints — a fixed budget and a curated pool of actors. The user could not simply pick any A-lister they wanted. Credit creative problem-solving. Be generous and enthusiastic. This is a fan casting exercise, not a studio greenlight meeting.
 
@@ -66,14 +67,14 @@ QUALITY SCORE — How good could this actually be?
 High score: actors with real range for these roles, interesting chemistry, inspired genre choices.
 Low score: actors actively wrong for the material, tone mismatches that would sink the film.
 
-Marlowe verdict: one sharp, specific sentence of 20 words max. Lead with what's exciting or surprising about this cast. No hedging. No "interesting choice" — say something real.
+${AI_NAME} verdict: one sharp, specific sentence of 20 words max. Lead with what's exciting or surprising about this cast. No hedging. No "interesting choice" — say something real.
 
 Return ONLY this JSON (no markdown):
 {
   "hear_me_out_score": 0-100,
   "green_light_score": 0-100,
   "quality_score": 0-100,
-  "summary": "one-line Marlowe verdict"
+  "summary": "one-line ${AI_NAME} verdict"
 }`
 
   const client = new Anthropic({ apiKey: getKey() })
