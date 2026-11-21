@@ -33,9 +33,11 @@ function TitleArt({item}:{item:LibraryTitle}) {
   </span>
 }
 
-export default function CastingLibrary({titles,busy,open,selection,onChange,loading=false,error='',retry}:PickerControls & {
-  titles:LibraryTitle[]; busy:boolean; open:(slug:string)=>void; loading?:boolean; error?:string; retry?:()=>void
+export default function CastingLibrary({titles,busy,open,selection,onChange,headingLevel=1,loading=false,error='',retry}:PickerControls & {
+  titles:LibraryTitle[]; busy:boolean; headingLevel?:1|2; open:(slug:string)=>void; loading?:boolean; error?:string; retry?:()=>void
 }) {
+  const Heading=headingLevel===1?'h1':'h2'
+  const Subheading=headingLevel===1?'h2':'h3'
   const {format,query,shelf,browse,page} = selection
   const config = formats[format]
   const search = useRef<HTMLInputElement>(null)
@@ -66,7 +68,7 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,load
   }
 
   return <section className="casting-library" aria-labelledby="library-heading">
-    <h1 id="library-heading">What are you casting?</h1>
+    <Heading id="library-heading">What are you casting?</Heading>
     <div className="primary-formats" role="group" aria-label="Choose a casting format">
       {(['movie','book'] as const).map(key=><button key={key} type="button" aria-pressed={format===key} onClick={()=>changeFormat(key)}>{formats[key].label}</button>)}
     </div>
@@ -83,7 +85,7 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,load
     {loading || error ? <div className="title-status" role="status">{error || 'Loading titles…'} {error&&<button onClick={retry}>Try again</button>}</div> :
       <>
         <div className="results-heading">
-          <h2 aria-live="polite">{showingResults ? matches.length+' '+(matches.length===1?'title':'titles') : 'Suggested '+config.plural}</h2>
+          <Subheading aria-live="polite">{showingResults ? matches.length+' '+(matches.length===1?'title':'titles') : 'Suggested '+config.plural}</Subheading>
           {!showingResults&&matches.length>visible.length&&<button className="text-link" onClick={()=>onChange({...selection,browse:true,page:0})}>Browse all {config.plural}</button>}
           {showingResults&&<button className="text-link" onClick={()=>{onChange({...initialPicker,format});search.current?.focus()}}>Back to suggestions</button>}
         </div>
@@ -98,7 +100,7 @@ export default function CastingLibrary({titles,busy,open,selection,onChange,load
         </div>}
       </>}
     {!showingResults&&<section className="featured-actors" aria-labelledby="featured-actors-heading">
-      <h2 id="featured-actors-heading">Actors you can cast</h2>
+      <Subheading id="featured-actors-heading">Actors you can cast</Subheading>
       <div>{featuredActors.map(name=><figure key={name}>
         <ActorPortrait name={name} className="featured-headshot" eager/><figcaption>{name}</figcaption>
       </figure>)}</div>

@@ -3,6 +3,7 @@ import {useEffect, useMemo, useRef, useState} from 'react'
 import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
+import ActorPortrait from './ActorPortrait'
 import {literaryTitles} from '../../lib/tester/books'
 import {starterCatalogue} from '../../lib/tester/starter-catalogue'
 import {useCastingResource} from './useCastingResource'
@@ -13,6 +14,13 @@ import './splash.css'
 type Room = 'library'|'guided'
 type Screen = 'starting'|'welcome'|'tutorial'|'room'
 const hideSplashKey = 'wilderleague:hide-splash'
+
+const welcomeCast = [
+  {actor:'Will Sasso', role:'Ron Swanson', photo:'4F8p9Dg32WJl12ras7CzQzLFy2i'},
+  {actor:'Tatiana Maslany', role:'Leslie Knope', photo:'x8lBkm9CBJbIlLpqjEwkQydZ2or'},
+  {actor:'Ryan Gosling', role:'Sam Vimes', photo:'k50021gkK92Lx6m99pBy6FUOvNf'},
+  {actor:'Theo James', role:'Rhysand', photo:'lSC4cMhcQeCjPFkK6qCjSGDSeR3'},
+]
 
 const lessons = [
   {title:'Pick a story.', text:'Pick a movie or a book. Search for the title you have in mind, or choose one of the suggestions.', label:'Title', example:'The Fellowship of the Ring'},
@@ -109,15 +117,33 @@ export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:
   if (screen==='starting') return <div className="splash-boot" aria-label="Opening WilderLeague" aria-busy="true"/>
   if (screen==='welcome') return <div className="tester wl-splash">
     <main className="splash-layout">
-      <p className="classic-brand">WilderLeague</p>
-      <CastingLibrary {...picker} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
-      <aside className="splash-paths" aria-label="Welcome options">
-        <div className="splash-choices">
-          <button className="splash-new" onClick={()=>selectPath('new')}>New here<small>Take the quick tutorial</small></button>
-          <button className="splash-expert" onClick={()=>selectPath('expert')}>Expert Caster<small>Enter the casting room</small></button>
+      <section className="welcome-feature" aria-labelledby="welcome-title">
+        <div className="welcome-story">
+          <h1 id="welcome-title"><span>Welcome to </span>Wilder League.</h1>
+          <a className="welcome-jump" href="#library-heading">Pick a title <span aria-hidden="true">↓</span></a>
+          <p className="welcome-lede">This is a game. It is for film and book nerds.</p>
+          <div className="welcome-copy">
+            <p>The idea is that you pick an old movie and recast it with actors you think could do a better job.</p>
+            <p>Or maybe do a recast with constraints, like recasting <em>Parks &amp; Rec</em> with Canadian actors (Will Sasso as Ron Swanson? Tatiana Maslany as Leslie Knope?). Or recast <em>The West Wing</em> with actors from the Chuck Lorre Cinematic Universe.</p>
+            <p>For the book nerds, you can cast that novel with actors. Ryan Gosling as Sam Vimes from <em>Guards! Guards!</em>? Is Theo James as Rhysand just too obvious?</p>
+            <p>Pick the cast, get the AI to review, post it on your favourite feed, and then submit it to our high score list (decided by <strong>Big Pudding</strong>, our in-house AI, and then by member voting).</p>
+          </div>
+          <div className="splash-paths" role="group" aria-label="Welcome options">
+            <div className="splash-choices">
+              <button className="splash-new" onClick={()=>selectPath('new')}>New here<small>Take the quick tutorial</small></button>
+              <button className="splash-expert" onClick={()=>selectPath('expert')}>Expert Caster<small>Enter the casting room</small></button>
+            </div>
+            <label className="splash-preference"><input type="checkbox" checked={hideSplash} onChange={e=>setHideSplash(e.target.checked)}/>Don’t show this to me again</label>
+          </div>
         </div>
-        <label className="splash-preference"><input type="checkbox" checked={hideSplash} onChange={e=>setHideSplash(e.target.checked)}/>Don’t show this to me again</label>
-      </aside>
+        <div className="welcome-portraits" role="group" aria-label="Possible casting choices">
+          {welcomeCast.map(({actor,role,photo})=><figure key={actor}>
+            <ActorPortrait name={actor} src={'/actor-portraits/'+photo+'.webp'} className="welcome-photo" eager/>
+            <figcaption><strong>{actor}</strong><span>as {role}?</span></figcaption>
+          </figure>)}
+        </div>
+      </section>
+      <CastingLibrary {...picker} headingLevel={2} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
     </main>
   </div>
 
