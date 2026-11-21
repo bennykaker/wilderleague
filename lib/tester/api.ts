@@ -17,7 +17,6 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
  try{
   const url=new URL(req.url),action=url.pathname.split('/api/preview/')[1]||''
   if(req.method==='GET'&&action==='titles')return json({titles:await getLibraryIndex()})
-  if(req.method==='GET'&&action==='actor-directory')return json(await directory())
   if(req.method==='GET'&&action==='challenge-rosters')return json({challenges:await rosters()})
   const user=await store.user(token(req))
   const requireUser=()=>{if(!user)throw new StoreError('Sign in to save, submit or vote.',401);return user}

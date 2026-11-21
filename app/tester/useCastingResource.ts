@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react'
 
 // Each catalogue request has its own deadline. A slow optional resource cannot
 // hold the title roster or another resource's retry button open.
-export function useCastingResource<T>(url:string,enabled:boolean,read:(body:unknown)=>T) {
+export function useCastingResource<T>(url:string,enabled:boolean,read:(body:unknown)=>T, timeoutMs=20000) {
   const [value,setValue] = useState<T|null>(null)
   const [failed,setFailed] = useState(false)
   const [attempt,setAttempt] = useState(0)
@@ -14,7 +14,7 @@ export function useCastingResource<T>(url:string,enabled:boolean,read:(body:unkn
     const deadline = window.setTimeout(()=>{
       controller.abort()
       setFailed(true)
-    },20000)
+    },timeoutMs)
     async function load() {
       try {
         const response = await fetch(url,{signal:controller.signal})
@@ -32,6 +32,6 @@ export function useCastingResource<T>(url:string,enabled:boolean,read:(body:unkn
       window.clearTimeout(deadline)
       controller.abort()
     }
-  },[url,enabled,value,read,attempt])
+  },[url,enabled,value,read,attempt,timeoutMs])
   return {value,failed,retry:()=>setAttempt(n=>n+1)}
 }

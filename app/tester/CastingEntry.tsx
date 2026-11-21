@@ -44,7 +44,7 @@ export default function CastingEntry({publicMode,embeddedCatalogue}:{publicMode:
   const [selection,setSelection] = useState(initialPicker)
   const [initialTitle,setInitialTitle] = useState('')
   const titleIndex=useCastingResource('/api/preview/titles',!embeddedCatalogue && (screen==='welcome'||screen==='room'),readTitles)
-  const directory=useCastingResource('/api/preview/actor-directory',!embeddedCatalogue && screen==='room',readDirectory)
+  const directory=useCastingResource('/api/preview/actor-directory',!embeddedCatalogue && screen==='room',readDirectory,90000)
   const features=useCastingResource('/api/preview/challenge-rosters',!embeddedCatalogue && screen==='room' && !!directory.value,readRosters)
   const partial=!embeddedCatalogue && !directory.value
   const data=useMemo(()=>{

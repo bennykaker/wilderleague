@@ -129,9 +129,6 @@ test('a book can be cast and saved when the general catalogue is unavailable',as
  try{
   const unavailable=async():Promise<Catalogue>=>{throw new Error('Unrelated catalogue unavailable')}
   const api=createTesterApi(store,unavailable,resolve,async()=>starterCatalogue)
-  const read=await api(new Request('http://release.test/api/preview/actor-directory'))
-  assert.equal(read.status,200)
-  assert.equal((await read.json()).actors.length,starterCatalogue.actors.length)
   const book=literaryChallenge('book-rebecca-yarros-fourth-wing')!
   const user=await store.register('bookreader','reader password example')
   const response=await api(new Request('http://release.test/api/preview/save',{method:'POST',headers:{
