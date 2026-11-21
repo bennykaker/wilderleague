@@ -8,7 +8,7 @@ export function customChallenge(value:unknown):Challenge{
  const names=b.roles.map(r=>(r as string).trim());if(new Set(names.map(n=>n.toLowerCase())).size!==names.length)throw new Error('Use each character name once.')
  return{id:'custom',title:b.title.trim(),season:`Your ${b.kind} · custom characters`,rule:'Reboot casting with living actors today. All genders welcome for every role. Use each actor once.',pool:'all',source:'',roles:names.map((name,i)=>({id:'r'+(i+1),name,originalActor:'',description:''}))}
 }
-export function withChallenge(cat:Catalogue,challenge:Challenge):Catalogue{if(challenge.pool==='all')challenge={...challenge,rule:rebootRule+' Use each actor once.'};return {...cat,challenges:[...cat.challenges.filter(c=>c.id!==challenge.id),challenge],pools:{...cat.pools,[challenge.id]:challenge.pool==='all'?cat.actors.map(a=>a.id):cat.pools[challenge.id]||[]}}}
+export function withChallenge(cat:Catalogue,challenge:Challenge):Catalogue{if(challenge.pool==='all'&&!challenge.id.startsWith('weekly:'))challenge={...challenge,rule:rebootRule+' Use each actor once.'};return {...cat,challenges:[...cat.challenges.filter(c=>c.id!==challenge.id),challenge],pools:{...cat.pools,[challenge.id]:challenge.pool==='all'?cat.actors.map(a=>a.id):cat.pools[challenge.poolSourceId||challenge.id]||[]}}}
 
 // A book or universe cast may start with one role and grow over several sessions.
 export function selectedLiteraryRoles(challenge:Challenge, roleIds:unknown):Challenge {

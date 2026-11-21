@@ -5,6 +5,7 @@ import type {Catalogue,Challenge,LibraryTitle} from '../../lib/tester/model'
 import CastingLibrary, {initialPicker} from './CastingLibrary'
 import TesterApp from './TesterApp'
 import CastingTutorial from './CastingTutorial'
+import WeeklyReboot from './WeeklyReboot'
 import ExampleCasts from './ExampleCasts'
 import ActorPortrait from './ActorPortrait'
 import {CastingTip,CastingTipsProvider} from './CastingTips'
@@ -163,6 +164,7 @@ function CastingExperience({publicMode,embeddedCatalogue}:EntryProps) {
           <ExampleCasts openTitle={slug=>selectPath('expert',slug)}/>
         </div>
       </section>
+      <WeeklyReboot/>
       <CastingLibrary {...picker} headingLevel={2} showTips={atTitlePicker} titles={data.titles||[]} busy={false} open={slug=>selectPath('expert',slug)}/>
     </main>
   </div>

@@ -196,3 +196,15 @@ body:has(.tester), body:has(.splash-boot) { margin:0; background:#09090b; }
   .example-lineup strong { font-size:1rem; }
   .example-lineup span { font-size:.94rem; }
 }
+
+.tester .weekly-reboot { margin:30px 0; padding:clamp(18px,3vw,32px); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:18px; border:1px solid #695045; border-left:5px solid #eabe91; border-radius:8px; background:linear-gradient(120deg,#32251f,#171519); }
+.tester .weekly-reboot h2 { margin:4px 0; color:#fff3de; font:normal clamp(32px,4vw,54px)/1.1 Georgia,serif; }
+.tester .weekly-reboot p { margin:4px 0; }
+.tester .edition-line { color:#f4c9a1; font-weight:700; }
+.edition-line span { display:inline-block; margin-left:8px; color:#d2c7bf; font-size:.875rem; font-weight:400; }
+.edition-links { display:flex; flex-wrap:wrap; align-items:center; gap:14px; }
+.tester .edition-play { padding:9px 16px; background:#f2d1ad; color:#241b14; border-radius:5px; text-decoration:none; font-weight:700; }
+.tester .board-picker { max-width:780px; }
+.tester .board-explainer { font-size:1.08rem; line-height:1.5; }
+.tester .board-picker label { display:block; margin-top:12px; }
+.tester .board-picker :is(input,select) { display:block; width:100%; max-width:640px; }

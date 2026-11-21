@@ -1,3 +1,4 @@
+import {programmeRoster,houseId} from './board-programme'
 import {hasLeaderboard} from './leaderboard'
 import {literaryChallenge} from './books'
 import {scoreBoardCast} from './board-judge'
@@ -24,6 +25,8 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   const requireUser=()=>{if(!user)throw new StoreError('Sign in to save, submit or vote.',401);return user}
   async function boardRoster(id:string) {
    if (!id || id==='custom') return
+   const programme=programmeRoster(id)
+   if(programme)return programme
    if (!id.startsWith('free:')) return (await catalogue()).challenges.find(c=>c.id===id)
    const slug=id.slice(5)
    if (!/^[a-z0-9-]{1,150}$/.test(slug)) return
@@ -40,8 +43,15 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
    if(action==='cast'){const cast=await store.cast(url.searchParams.get('id')||'',user?.id);if(!cast)throw new StoreError('Cast not found or not shared.',404);return json({cast})}
    if(action==='board'){
     const id=url.searchParams.get('challenge')||'',category=url.searchParams.get('category')
-    if(!['best','hear'].includes(category||'')||!hasLeaderboard(await boardRoster(id)))throw new StoreError('Unknown leaderboard.')
-    return json({casts:await store.board(id,category as 'best'|'hear',user?.id)})
+    const roster=await boardRoster(id)
+    if(!['best','hear'].includes(category||'')||!roster||!hasLeaderboard(roster))throw new StoreError('Unknown leaderboard.')
+    const read=()=>store.board(id,category as 'best'|'hear',user?.id)
+    let casts=await read()
+    if(store instanceof HostedStore&&id.startsWith('weekly:')&&casts.length<50&&!casts.some(c=>c.ownerId===houseId)){
+      await store.seedWeekly(roster)
+      casts=await read()
+    }
+    return json({casts})
    }
    throw new StoreError('Not found.',404)
   }
@@ -63,6 +73,8 @@ export function createTesterApi(store:TesterStore|HostedStore,catalogue:()=>Prom
   }
   if(action==='logout'){await store.logout(token(req));return json({user:null},200,{'Set-Cookie':cookie('',0)})}
   async function castCatalogue(candidate:Record<string,unknown>=body){
+   const programme=typeof candidate.challengeId==='string' && programmeRoster(candidate.challengeId)
+   if(programme)return withChallenge(await directory(),programme)
    const freeCast=typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:')
    let cat=await (freeCast||candidate.challengeId==='custom'?directory:catalogue)()
    try{if(candidate.challengeId==='custom')cat=withChallenge(cat,customChallenge(candidate.custom));else if(typeof candidate.challengeId==='string'&&candidate.challengeId.startsWith('free:'))cat=withChallenge(cat,selectedLiteraryRoles(await resolveTitle(candidate.challengeId.slice(5)),candidate.roleIds))}catch(e){throw new StoreError((e as Error).message)}
