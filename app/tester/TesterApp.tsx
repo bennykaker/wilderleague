@@ -161,7 +161,7 @@ export default function TesterApp({data:initialData,publicMode=false,initialMode
    message="Type part of a character’s name to narrow the role list. Choose the character, then find an actor to play them." onDismiss={closeSearchHelp}/>}
  {searchHelp==='actor-search'&&<CastingTip target="actor-search" heading={description?'Have a type in mind?':'Know the actor’s name?'}
    message={description?'Try “warm and funny” for instant matches. For “a Chris Traeger type,” choose Ask AI for suggestions.'+(user?'':' Sign in to run a new AI search.'):
-     'Type a first or last name to narrow the actor pool. Drag a matching actor into the selected role. On a phone, use the Drag handle.'} onDismiss={closeSearchHelp}/>}
+     'Type a first or last name to narrow the actor pool. Drag a matching actor into the selected role.'} onDismiss={closeSearchHelp}/>}
  <div className="casting-navigation">
    <button className="plain" onClick={()=>guided?setView('home'):home()}>{guided?'← Introduction':'← Casting room'}</button>
    <TipsToggle/>

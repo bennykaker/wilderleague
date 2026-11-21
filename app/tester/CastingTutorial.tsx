@@ -6,15 +6,15 @@ const lessons = [
   {
     clip:'drag', label:'Drag & drop', title:'Give Sam Vimes a new face.',
     text:'Pick a title in the casting room, then select a character. In Guards! Guards!, we’re giving Sam Vimes to Ryan Gosling.',
-    tip:'Grab the actor’s name or headshot. Hold it, move it inside the outlined role, then let go.',
-    detail:'On a phone, hold the Drag handle. With a keyboard, focus the actor and press Space twice to pick up and drop.',
-    cues:[[0,'Find the actor’s card.'],[2.1,'Hold the card and drag it into the outlined role.'],[5.8,'Release. Gosling’s headshot now fills the Sam Vimes slot.'],[8.1,'On a phone, hold the Drag handle on the actor’s card.'],[9.35,'Slide your finger into the slot, then lift to cast.']],
+    tip:'Click and hold the actor’s name or headshot. Drag the card into the outlined role, then release the mouse button.',
+    detail:'Using a keyboard? Tab to the actor, press Space to pick up the card, then press Space again to drop it.',
+    cues:[[0,'Point to Ryan Gosling’s card.'],[2.1,'Click and hold. Drag the card into the Sam Vimes slot.'],[5.8,'Release the mouse button to cast Gosling as Vimes.']],
   },
   {
     clip:'name', label:'Search by name', title:'Know who you want?',
     text:'Open Search by name and type a first or last name. Watch the actor pool change with each letter.',
     tip:'Try “Gosling.” As soon as Ryan appears, you can drag his card into the role.',
-    detail:'On a phone, open Role & actor search to reach the search box.',
+    detail:'If the search box is collapsed, click Role & actor search to open it.',
     cues:[[0,'Choose Search by name.'],[1.65,'Type Gosling. The cards below narrow as you type.'],[4.55,'There’s Ryan. His card is ready to drag.']],
   },
   {

@@ -73,7 +73,7 @@ export default function ActorCastingTray({guideStep,hasPicks,candidates,roleName
       message={drag.method==='keyboard'?'Press Space or Enter to confirm. Escape cancels.':'Release over the outlined slot for '+roleName+'.'}/> :
      guideStep==='review' ? <CastingTip target="review" heading="Your cast is ready." message="Review your lineup and add a pitch for your choices."/> :
      guideStep==='actor' && firstAvailable ? <CastingTip key={firstAvailable.id} target="actor" heading={'Who plays '+roleName+'?'}
-       message="Drag an actor into the outlined slot. On a phone, use the Drag handle." prefer="below"/> :
+       message="Drag the actor’s card into the outlined slot. Release it when the slot lights up." prefer="below"/> :
      guideStep==='role' ? <CastingTip target="role" heading={hasPicks?'Choose your next role.':'Choose a role.'}
        message={hasPicks?'Select another character to keep casting.':roleName+' is selected. You can start here or pick another character.'}/> : null}
     <p className="cast-instructions">
